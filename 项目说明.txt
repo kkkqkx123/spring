@@ -1,0 +1,28 @@
+该文件夹是Spring Boot项目的核心Java代码目录，主要结构如下：
+
+1. **DemoApplication.java** - Spring Boot主启动类
+2. **ServletInitializer.java** - 用于部署到外部Servlet容器的初始化类
+3. **config/** - 配置类目录
+   - `AsyncConfig.java` - 异步任务配置
+   - `JpaConfig.java` - JPA/Hibernate配置
+   - `RedisConfig.java` - Redis缓存配置
+   - `SecurityConfig.java` - Spring Security配置
+4. **controller/** - REST API控制器
+   - `AuthController.java` - 认证相关API
+   - `DepartmentController.java` - 部门管理API
+   - `PermissionController.java` - 权限管理API
+   - `PositionController.java` - 职位管理API
+5. **exception/** - 异常处理
+   - 包含自定义异常和全局异常处理器
+6. **model/** - 数据模型
+   - `dto/` - 数据传输对象
+   - `entity/` - JPA实体类
+7. **repository/** - JPA数据访问层
+   - 包含各实体的Repository接口
+8. **security/** - 安全相关
+   - JWT认证、权限过滤等实现
+9. **service/** - 业务逻辑层
+   - 接口和实现分离的Service层代码
+
+这是一个典型的企业级员工管理系统后端结构，采用Spring Boot + JPA + Spring Security技术栈。
+        
