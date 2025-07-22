@@ -48,6 +48,13 @@ public class Department extends BaseEntity {
     private String name;
     
     /**
+     * Department description
+     */
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
+    @Column(length = 500)
+    private String description;
+    
+    /**
      * Path for efficient hierarchical queries
      * Format: /1/2/3/ where numbers are department IDs
      */
@@ -139,8 +146,12 @@ public class Department extends BaseEntity {
         return depPath.split("/").length - 1;
     }
 
-    public void setDescription(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setDescription'");
+    /**
+     * Set the department description
+     * 
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

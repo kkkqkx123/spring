@@ -1,9 +1,12 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,7 @@ import com.example.demo.model.entity.Employee;
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.repository.specification.EmployeeSpecification;
 import com.example.demo.service.EmployeeService;
+import com.example.demo.service.ExcelService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -297,5 +301,52 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!criteria.isValidSalaryRange()) {
             throw new InvalidDataException("Invalid salary range");
         }
+    }
+    
+    @Autowired
+    private ExcelService excelService;
+    
+    @Override
+    @Transactional
+    public List<Employee> importEmployeesFromExcel(MultipartFile file) throws IOException {
+        log.info("Importing employees from Excel file: {}", file.getOriginalFilename());
+        
+        // Parse employees from Excel
+        List<Employee> employees = excelService.importEmployeesFromExcel(file);
+        
+        // Save all employees
+        List<Employee> savedEmployees = new ArrayList<>();
+        for (Employee employee : employees) {
+            try {
+                savedEmployees.add(createEmployee(employee));
+            } catch (Exception e) {
+                log.error("Error saving employee: {}", e.getMessage());
+                throw e;
+            }
+        }
+        
+        return savedEmployees;
+    }
+    
+    @Override
+    public byte[] exportEmployeesToExcel(List<Long> employeeIds) throws IOException {
+        log.info("Exporting employees to Excel. IDs: {}", employeeIds);
+        
+        List<Employee> employees;
+        if (employeeIds == null || employeeIds.isEmpty()) {
+            // Export all employees
+            employees = employeeRepository.findAll();
+        } else {
+            // Export selected employees
+            employees = employeeRepository.findByIdIn(employeeIds);
+        }
+        
+        return excelService.exportEmployeesToExcel(employees);
+    }
+    
+    @Override
+    public byte[] getEmployeeImportTemplate() throws IOException {
+        log.info("Generating employee import template");
+        return excelService.getEmployeeImportTemplate();
     }
 }

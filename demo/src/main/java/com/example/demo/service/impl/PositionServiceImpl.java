@@ -70,7 +70,7 @@ public class PositionServiceImpl implements PositionService {
         
         // Check if job title already exists for another position
         if (!existingPosition.getJobTitle().equals(positionDto.getJobTitle()) 
-                && positionRepository.existsByJobTitle(positionDto.getJobTitle())) {
+                && positionRepository.existsByJobTitleAndIdNot(positionDto.getJobTitle(), id)) {
             throw new IllegalArgumentException("Position with job title '" + positionDto.getJobTitle() + "' already exists");
         }
         

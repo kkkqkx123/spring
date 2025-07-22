@@ -200,7 +200,7 @@ class PositionServiceTest {
         // Arrange
         positionDto.setJobTitle("Senior Software Engineer");
         when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.existsByJobTitle("Senior Software Engineer")).thenReturn(false);
+        when(positionRepository.existsByJobTitleAndIdNot("Senior Software Engineer", 1L)).thenReturn(false);
         when(positionRepository.save(any(Position.class))).thenReturn(position);
         
         // Act
@@ -209,7 +209,7 @@ class PositionServiceTest {
         // Assert
         assertNotNull(result);
         verify(positionRepository).findById(1L);
-        verify(positionRepository).existsByJobTitle("Senior Software Engineer");
+        verify(positionRepository).existsByJobTitleAndIdNot("Senior Software Engineer", 1L);
         verify(positionRepository).save(any(Position.class));
     }
     
@@ -218,12 +218,12 @@ class PositionServiceTest {
         // Arrange
         positionDto.setJobTitle("Senior Software Engineer");
         when(positionRepository.findById(1L)).thenReturn(Optional.of(position));
-        when(positionRepository.existsByJobTitle("Senior Software Engineer")).thenReturn(true);
+        when(positionRepository.existsByJobTitleAndIdNot("Senior Software Engineer", 1L)).thenReturn(true);
         
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> positionService.updatePosition(1L, positionDto));
         verify(positionRepository).findById(1L);
-        verify(positionRepository).existsByJobTitle("Senior Software Engineer");
+        verify(positionRepository).existsByJobTitleAndIdNot("Senior Software Engineer", 1L);
         verify(positionRepository, never()).save(any(Position.class));
     }
     

@@ -109,8 +109,6 @@
 
 
 
-
-
 - [x] 5.1 Create employee entity and repository
 
 
@@ -144,6 +142,12 @@
   - _Requirements: 5.4_
 
 - [ ] 5.4 Implement Excel import/export functionality
+
+
+
+
+
+
   - Create ExcelService for handling file import and export operations
   - Implement employee data validation during Excel import
   - Add error reporting for invalid import data

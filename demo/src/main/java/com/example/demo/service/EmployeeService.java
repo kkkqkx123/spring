@@ -1,9 +1,11 @@
 package com.example.demo.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.model.dto.EmployeeSearchCriteria;
 import com.example.demo.model.entity.Employee;
@@ -167,4 +169,31 @@ public interface EmployeeService {
      * @return list of status statistics
      */
     List<Object[]> getEmployeeCountByStatus();
+    
+    /**
+     * Import employees from Excel file
+     * 
+     * @param file the Excel file to import
+     * @return list of imported employees
+     * @throws IOException if file reading fails
+     * @throws com.example.demo.exception.ImportValidationException if validation errors occur
+     */
+    List<Employee> importEmployeesFromExcel(MultipartFile file) throws IOException;
+    
+    /**
+     * Export employees to Excel file
+     * 
+     * @param employeeIds list of employee IDs to export (null for all employees)
+     * @return byte array containing the Excel file
+     * @throws IOException if file writing fails
+     */
+    byte[] exportEmployeesToExcel(List<Long> employeeIds) throws IOException;
+    
+    /**
+     * Get employee import template
+     * 
+     * @return byte array containing the template Excel file
+     * @throws IOException if file creation fails
+     */
+    byte[] getEmployeeImportTemplate() throws IOException;
 }
