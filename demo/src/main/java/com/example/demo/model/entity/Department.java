@@ -138,4 +138,9 @@ public class Department extends BaseEntity {
         // Count slashes and subtract 1 (root has 2 slashes: /id/)
         return depPath.split("/").length - 1;
     }
+
+    public void setDescription(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setDescription'");
+    }
 }

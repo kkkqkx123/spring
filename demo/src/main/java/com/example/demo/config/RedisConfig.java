@@ -1,83 +1,75 @@
 package com.example.demo.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.time.Duration;
+
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.time.Duration;
-
 /**
- * Redis configuration for caching and session management
+ * Redis configuration for caching
  */
 @Configuration
 @EnableCaching
 public class RedisConfig {
 
-    @Value("${spring.redis.host:localhost}")
-    private String redisHost;
-
-    @Value("${spring.redis.port:6379}")
-    private int redisPort;
-    
-    @Value("${spring.redis.password:}")
-    private String redisPassword;
-    
-    @Value("${spring.cache.redis.time-to-live:3600}")
-    private long timeToLive;
-
     /**
-     * Redis connection factory
+     * Configure Redis cache manager
+     * 
+     * @param connectionFactory Redis connection factory
+     * @return Redis cache manager
      */
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
-        redisConfig.setHostName(redisHost);
-        redisConfig.setPort(redisPort);
-        
-        if (!redisPassword.isEmpty()) {
-            redisConfig.setPassword(redisPassword);
-        }
-        
-        return new LettuceConnectionFactory(redisConfig);
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        // Default cache configuration
+        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(30)) // Cache entries expire after 30 minutes
+                .disableCachingNullValues()
+                .serializeKeysWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        // Configure specific cache TTLs
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(cacheConfig)
+                .withCacheConfiguration("employees", 
+                        cacheConfig.entryTtl(Duration.ofHours(1))) // Employee cache expires after 1 hour
+                .withCacheConfiguration("employeeSearchResults", 
+                        cacheConfig.entryTtl(Duration.ofMinutes(15))) // Search results expire after 15 minutes
+                .withCacheConfiguration("employeeNameSearch", 
+                        cacheConfig.entryTtl(Duration.ofMinutes(15))) // Name search results expire after 15 minutes
+                .withCacheConfiguration("employeeEmailSearch", 
+                        cacheConfig.entryTtl(Duration.ofMinutes(15))) // Email search results expire after 15 minutes
+                .withCacheConfiguration("employeeDepartmentSearch", 
+                        cacheConfig.entryTtl(Duration.ofMinutes(15))) // Department search results expire after 15 minutes
+                .withCacheConfiguration("employeeJobTitleSearch", 
+                        cacheConfig.entryTtl(Duration.ofMinutes(15))) // Job title search results expire after 15 minutes
+                .build();
     }
 
     /**
-     * Redis template for general operations
+     * Configure Redis template
+     * 
+     * @param connectionFactory Redis connection factory
+     * @return Redis template
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
+        template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.afterPropertiesSet();
         return template;
-    }
-
-    /**
-     * Redis cache manager for Spring Cache abstraction
-     */
-    @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofSeconds(timeToLive))
-            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
-
-        return RedisCacheManager.builder(connectionFactory)
-            .cacheDefaults(config)
-            .build();
     }
 }
