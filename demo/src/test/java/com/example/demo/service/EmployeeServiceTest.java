@@ -339,6 +339,7 @@ public class EmployeeServiceTest {
         verify(employeeRepository).deleteAll(employeeList);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void searchEmployees_WithValidCriteria_ShouldReturnMatchingEmployees() {
         // Arrange
@@ -357,6 +358,7 @@ public class EmployeeServiceTest {
         verify(employeeRepository).findAll(any(Specification.class), eq(pageable));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void searchEmployees_WithInvalidCriteria_ShouldThrowException() {
         // Arrange

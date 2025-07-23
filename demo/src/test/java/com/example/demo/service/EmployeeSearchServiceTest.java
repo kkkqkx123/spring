@@ -88,9 +88,11 @@ public class EmployeeSearchServiceTest {
         validCriteria.setStatus(EmployeeStatus.ACTIVE);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void searchEmployees_WithValidCriteria_ShouldReturnMatchingEmployees() {
         // Arrange
+        
         when(employeeRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(employeePage);
 
         // Act
@@ -102,6 +104,7 @@ public class EmployeeSearchServiceTest {
         verify(employeeRepository).findAll(any(Specification.class), eq(pageable));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void searchEmployees_WithNullCriteria_ShouldThrowException() {
         // Act & Assert
@@ -111,6 +114,7 @@ public class EmployeeSearchServiceTest {
         verify(employeeRepository, never()).findAll(any(Specification.class), any(Pageable.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void searchEmployees_WithInvalidHireDateRange_ShouldThrowException() {
         // Arrange
