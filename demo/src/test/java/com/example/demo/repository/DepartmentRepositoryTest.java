@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ class DepartmentRepositoryTest {
         // Create and persist a department
         Department department = new Department();
         department.setName("IT Department");
+        department.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(department);
         entityManager.flush();
         
@@ -56,6 +58,7 @@ class DepartmentRepositoryTest {
         // Create and persist a department
         Department department = new Department();
         department.setName("IT Department");
+        department.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(department);
         entityManager.flush();
         
@@ -80,16 +83,19 @@ class DepartmentRepositoryTest {
         // Create and persist root departments
         Department root1 = new Department();
         root1.setName("IT Department");
+        root1.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(root1);
         
         Department root2 = new Department();
         root2.setName("HR Department");
+        root2.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(root2);
         
         // Create and persist a child department
         Department child = new Department();
         child.setName("Software Development");
         child.setParentId(root1.getId());
+        child.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(child);
         
         entityManager.flush();
@@ -108,17 +114,20 @@ class DepartmentRepositoryTest {
         // Create and persist a root department
         Department root = new Department();
         root.setName("IT Department");
+        root.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(root);
         
         // Create and persist child departments
         Department child1 = new Department();
         child1.setName("Software Development");
         child1.setParentId(root.getId());
+        child1.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(child1);
         
         Department child2 = new Department();
         child2.setName("IT Support");
         child2.setParentId(root.getId());
+        child2.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(child2);
         
         entityManager.flush();
@@ -138,24 +147,28 @@ class DepartmentRepositoryTest {
         Department root = new Department();
         root.setName("IT Department");
         root.setDepPath("/1/");
+        root.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(root);
         
         Department child1 = new Department();
         child1.setName("Software Development");
         child1.setDepPath("/1/2/");
         child1.setParentId(root.getId());
+        child1.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(child1);
         
         Department child2 = new Department();
         child2.setName("IT Support");
         child2.setDepPath("/1/3/");
         child2.setParentId(root.getId());
+        child2.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(child2);
         
         Department grandchild = new Department();
         grandchild.setName("Web Development");
         grandchild.setDepPath("/1/2/4/");
         grandchild.setParentId(child1.getId());
+        grandchild.setCreatedAt(LocalDateTime.now()); // Set createdAt field
         entityManager.persist(grandchild);
         
         entityManager.flush();

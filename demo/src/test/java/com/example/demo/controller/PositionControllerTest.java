@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+// Removed unused import: import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
+import com.example.demo.security.TestSecurityConfig;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -33,6 +36,10 @@ import jakarta.persistence.EntityNotFoundException;
  * Unit tests for PositionController
  */
 @WebMvcTest(PositionController.class)
+@Import(TestSecurityConfig.class)
+@TestPropertySource(properties = {
+    "spring.security.csrf.enabled=false"
+})
 class PositionControllerTest {
 
     @Autowired
@@ -166,10 +173,6 @@ class PositionControllerTest {
     @Test
     @WithMockUser
     void testCreatePosition_WhenUnauthorized_ReturnsForbidden() throws Exception {
-        // Mock the security to throw AccessDeniedException
-        when(positionService.createPosition(any(PositionDto.class)))
-            .thenThrow(new org.springframework.security.access.AccessDeniedException("Access denied"));
-            
         // Act & Assert
         mockMvc.perform(post("/api/positions")
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -177,7 +180,7 @@ class PositionControllerTest {
                 .content(objectMapper.writeValueAsString(positionDto)))
                 .andExpect(status().isForbidden());
         
-        verify(positionService).createPosition(any(PositionDto.class));
+        // No need to verify service call as security prevents it from being called
     }
     
     @Test
@@ -217,16 +220,12 @@ class PositionControllerTest {
     @Test
     @WithMockUser
     void testDeletePosition_WhenUnauthorized_ReturnsForbidden() throws Exception {
-        // Mock the security to throw AccessDeniedException
-        doThrow(new org.springframework.security.access.AccessDeniedException("Access denied"))
-            .when(positionService).deletePosition(anyLong());
-            
         // Act & Assert
         mockMvc.perform(delete("/api/positions/1")
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isForbidden());
         
-        verify(positionService).deletePosition(anyLong());
+        // No need to verify service call as security prevents it from being called
     }
     
     @Test

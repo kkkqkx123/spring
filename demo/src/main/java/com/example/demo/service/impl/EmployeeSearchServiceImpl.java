@@ -29,7 +29,6 @@ public class EmployeeSearchServiceImpl implements EmployeeSearchService {
 
     private final EmployeeRepository employeeRepository;
     
-    @Autowired
     public EmployeeSearchServiceImpl(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }

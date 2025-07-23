@@ -77,12 +77,14 @@ public class Position extends BaseEntity {
      * Flag indicating if this position is active
      */
     @Column(name = "is_active")
+    @Builder.Default
     private Boolean isActive = true;
     
     /**
      * Employees with this position (transient to avoid circular references)
      */
     @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Employee> employees = new ArrayList<>();
     
     /**

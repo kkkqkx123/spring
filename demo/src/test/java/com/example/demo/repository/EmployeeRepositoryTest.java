@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,22 +51,32 @@ public class EmployeeRepositoryTest {
         itDepartment = new Department();
         itDepartment.setName("IT Department");
         itDepartment.setDescription("Information Technology Department");
+        itDepartment.setCreatedAt(LocalDateTime.now()); // Set required field
+        itDepartment.setCreatedBy("test-user"); // Set required field
         itDepartment = entityManager.persistAndFlush(itDepartment);
 
         hrDepartment = new Department();
         hrDepartment.setName("HR Department");
         hrDepartment.setDescription("Human Resources Department");
+        hrDepartment.setCreatedAt(LocalDateTime.now()); // Set required field
+        hrDepartment.setCreatedBy("test-user"); // Set required field
         hrDepartment = entityManager.persistAndFlush(hrDepartment);
 
         // Create positions
         developerPosition = new Position();
         developerPosition.setJobTitle("Software Developer");
         developerPosition.setDescription("Develops software applications");
+        developerPosition.setDepartment(itDepartment); // Set department to satisfy validation constraint
+        developerPosition.setCreatedAt(LocalDateTime.now()); // Set required field
+        developerPosition.setCreatedBy("test-user"); // Set required field
         developerPosition = entityManager.persistAndFlush(developerPosition);
 
         managerPosition = new Position();
         managerPosition.setJobTitle("Department Manager");
         managerPosition.setDescription("Manages department operations");
+        managerPosition.setDepartment(hrDepartment); // Set department to satisfy validation constraint
+        managerPosition.setCreatedAt(LocalDateTime.now()); // Set required field
+        managerPosition.setCreatedBy("test-user"); // Set required field
         managerPosition = entityManager.persistAndFlush(managerPosition);
 
         // Create employees
@@ -83,6 +94,9 @@ public class EmployeeRepositoryTest {
                 .address("123 Main St, City")
                 .salary(new BigDecimal("75000.00"))
                 .build();
+        // Set required audit fields
+        employee1.setCreatedAt(LocalDateTime.now());
+        employee1.setCreatedBy("test-user");
         entityManager.persistAndFlush(employee1);
 
         employee2 = Employee.builder()
@@ -99,6 +113,9 @@ public class EmployeeRepositoryTest {
                 .address("456 Oak Ave, Town")
                 .salary(new BigDecimal("95000.00"))
                 .build();
+        // Set required audit fields
+        employee2.setCreatedAt(LocalDateTime.now());
+        employee2.setCreatedBy("test-user");
         entityManager.persistAndFlush(employee2);
 
         employee3 = Employee.builder()
@@ -115,6 +132,9 @@ public class EmployeeRepositoryTest {
                 .address("789 Pine St, Village")
                 .salary(new BigDecimal("70000.00"))
                 .build();
+        // Set required audit fields
+        employee3.setCreatedAt(LocalDateTime.now());
+        employee3.setCreatedBy("test-user");
         entityManager.persistAndFlush(employee3);
     }
 
@@ -207,8 +227,12 @@ public class EmployeeRepositoryTest {
         Page<Employee> result = employeeRepository.findByNameContainingIgnoreCase("john", pageable);
 
         // Assert
-        assertEquals(1, result.getTotalElements());
-        assertEquals("John Doe", result.getContent().get(0).getName());
+        // The search is case-insensitive, so it will find both "John Doe" and "Robert Johnson"
+        assertEquals(2, result.getTotalElements());
+        assertTrue(result.getContent().stream()
+                .anyMatch(e -> e.getName().equals("John Doe")));
+        assertTrue(result.getContent().stream()
+                .anyMatch(e -> e.getName().equals("Robert Johnson")));
     }
 
     @Test
@@ -365,8 +389,7 @@ public class EmployeeRepositoryTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
         
-        Specification<Employee> spec = Specification.where(
-                EmployeeSpecification.isActive())
+        Specification<Employee> spec = EmployeeSpecification.isActive()
                 .and(EmployeeSpecification.inDepartment(itDepartment.getId()));
         
         // Act

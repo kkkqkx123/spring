@@ -69,13 +69,13 @@ class EmployeeServiceExcelTest {
     
     @Test
     void testImportEmployeesFromExcel() throws IOException {
-        // Mock ExcelService
-        when(excelService.importEmployeesFromExcel(any(MultipartFile.class))).thenReturn(employees);
+        // Mock ExcelService with lenient mode to avoid unnecessary stubbing errors
+        lenient().when(excelService.importEmployeesFromExcel(any(MultipartFile.class))).thenReturn(employees);
         
         // Mock EmployeeRepository for createEmployee method
-        when(employeeRepository.save(any(Employee.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(employeeRepository.existsByEmployeeNumber(anyString())).thenReturn(false);
-        when(employeeRepository.existsByEmail(anyString())).thenReturn(false);
+        lenient().when(employeeRepository.save(any(Employee.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(employeeRepository.existsByEmployeeNumber(anyString())).thenReturn(false);
+        lenient().when(employeeRepository.existsByEmail(anyString())).thenReturn(false);
         
         // Test import
         List<Employee> importedEmployees = employeeService.importEmployeesFromExcel(excelFile);

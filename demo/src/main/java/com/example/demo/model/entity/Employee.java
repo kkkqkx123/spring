@@ -129,6 +129,7 @@ public class Employee extends BaseEntity {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private EmployeeStatus status = EmployeeStatus.ACTIVE;
     
     @Enumerated(EnumType.STRING)

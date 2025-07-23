@@ -137,4 +137,16 @@ public class DepartmentController {
         Department department = departmentService.moveDepartment(departmentId, newParentId);
         return ResponseEntity.ok(departmentService.convertToDto(department));
     }
+    
+    /**
+     * Get a department by name
+     * 
+     * @param name the department name
+     * @return the department
+     */
+    @GetMapping("/by-name")
+    public ResponseEntity<DepartmentDto> getDepartmentByName(@org.springframework.web.bind.annotation.RequestParam String name) {
+        Department department = departmentService.getDepartmentByName(name);
+        return ResponseEntity.ok(departmentService.convertToDto(department));
+    }
 }

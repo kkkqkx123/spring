@@ -3,9 +3,7 @@ package com.example.demo.service.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,10 +35,11 @@ import lombok.extern.slf4j.Slf4j;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final ExcelService excelService;
     
-    @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, ExcelService excelService) {
         this.employeeRepository = employeeRepository;
+        this.excelService = excelService;
     }
     
     @Override
@@ -303,8 +302,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
     
-    @Autowired
-    private ExcelService excelService;
+    // ExcelService is now injected via constructor
     
     @Override
     @Transactional

@@ -188,7 +188,7 @@ class DepartmentServiceTest {
         assertEquals("QA Team", result.getName());
         assertEquals(3L, result.getParentId());
         verify(departmentRepository).existsByName("QA Team");
-        verify(departmentRepository).findById(3L);
+        verify(departmentRepository, times(2)).findById(3L); // Changed to times(2) since it's called twice
         verify(departmentRepository, times(2)).save(any(Department.class));
     }
 

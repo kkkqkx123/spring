@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -31,7 +28,6 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,7 +81,6 @@ public class ExcelServiceImpl implements ExcelService {
     private static final int EMERGENCY_CONTACT_PHONE_IDX = 13;
     private static final int NOTES_IDX = 14;
     
-    @Autowired
     public ExcelServiceImpl(DepartmentRepository departmentRepository, PositionRepository positionRepository) {
         this.departmentRepository = departmentRepository;
         this.positionRepository = positionRepository;
@@ -110,8 +105,32 @@ public class ExcelServiceImpl implements ExcelService {
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             
-            // Skip header row
+            // Validate sheet structure
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null || headerRow.getPhysicalNumberOfCells() < 5) {
+                throw new IllegalArgumentException("Invalid Excel format: Missing header row or required columns");
+            }
+            
+            // Validate header row
+            boolean validHeader = true;
+            for (int i = 0; i < Math.min(HEADERS.length, headerRow.getPhysicalNumberOfCells()); i++) {
+                Cell cell = headerRow.getCell(i);
+                String headerValue = getCellValueAsString(cell);
+                if (headerValue == null || !headerValue.replace("*", "").trim().equalsIgnoreCase(HEADERS[i].replace("*", "").trim())) {
+                    validHeader = false;
+                    break;
+                }
+            }
+            
+            if (!validHeader) {
+                throw new IllegalArgumentException("Invalid Excel format: Header row does not match expected format. Please use the template.");
+            }
+            
+            // Process data rows
             int rowIndex = 1;
+            int totalRows = 0;
+            int successRows = 0;
+            
             for (Row row : sheet) {
                 // Skip header row
                 if (row.getRowNum() == 0) {
@@ -123,21 +142,26 @@ public class ExcelServiceImpl implements ExcelService {
                     continue;
                 }
                 
+                totalRows++;
                 try {
                     Employee employee = parseEmployeeFromRow(row);
                     employees.add(employee);
+                    successRows++;
                 } catch (Exception e) {
                     List<String> errors = validationErrors.getOrDefault(rowIndex, new ArrayList<>());
-                    errors.add("Row " + rowIndex + ": " + e.getMessage());
+                    errors.add(e.getMessage());
                     validationErrors.put(rowIndex, errors);
                     log.error("Error parsing row {}: {}", rowIndex, e.getMessage());
                 }
                 
                 rowIndex++;
             }
+            
+            log.info("Processed {} rows: {} successful, {} with errors", 
+                    totalRows, successRows, validationErrors.size());
         }
         
-        // If there are validation errors, throw exception
+        // If there are validation errors, throw exception with detailed report
         if (!validationErrors.isEmpty()) {
             throw new ImportValidationException("Validation errors occurred during import", validationErrors);
         }
@@ -250,19 +274,41 @@ public class ExcelServiceImpl implements ExcelService {
     public Map<Integer, List<String>> validateEmployeeData(List<Employee> employees) {
         Map<Integer, List<String>> validationErrors = new HashMap<>();
         
+        // Track duplicate employee numbers and emails for cross-validation
+        Map<String, Integer> employeeNumbers = new HashMap<>();
+        Map<String, Integer> emails = new HashMap<>();
+        
         for (int i = 0; i < employees.size(); i++) {
             Employee employee = employees.get(i);
             List<String> errors = new ArrayList<>();
+            int rowNum = i + 1; // Row numbers start from 1
             
             // Validate required fields
             if (!StringUtils.hasText(employee.getEmployeeNumber())) {
                 errors.add("Employee number is required");
+            } else {
+                // Check for duplicate employee numbers within the import file
+                if (employeeNumbers.containsKey(employee.getEmployeeNumber())) {
+                    errors.add("Duplicate employee number: " + employee.getEmployeeNumber() + 
+                            " (also in row " + employeeNumbers.get(employee.getEmployeeNumber()) + ")");
+                } else {
+                    employeeNumbers.put(employee.getEmployeeNumber(), rowNum);
+                }
+                
+                // Validate employee number format
+                if (!employee.getEmployeeNumber().matches("^[A-Za-z0-9-_]{1,20}$")) {
+                    errors.add("Employee number format is invalid (use only letters, numbers, hyphens, and underscores)");
+                }
             }
             
+            // Validate name
             if (!StringUtils.hasText(employee.getName())) {
                 errors.add("Name is required");
+            } else if (employee.getName().length() < 2 || employee.getName().length() > 100) {
+                errors.add("Name must be between 2 and 100 characters");
             }
             
+            // Validate department
             if (employee.getDepartment() == null) {
                 errors.add("Department is required");
             }
@@ -272,6 +318,14 @@ public class ExcelServiceImpl implements ExcelService {
                 String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
                 if (!employee.getEmail().matches(emailRegex)) {
                     errors.add("Invalid email format");
+                } else {
+                    // Check for duplicate emails within the import file
+                    if (emails.containsKey(employee.getEmail())) {
+                        errors.add("Duplicate email: " + employee.getEmail() + 
+                                " (also in row " + emails.get(employee.getEmail()) + ")");
+                    } else {
+                        emails.put(employee.getEmail(), rowNum);
+                    }
                 }
             }
             
@@ -283,8 +337,38 @@ public class ExcelServiceImpl implements ExcelService {
                 }
             }
             
+            // Validate hire date
+            if (employee.getHireDate() != null && employee.getHireDate().isAfter(LocalDate.now())) {
+                errors.add("Hire date cannot be in the future");
+            }
+            
+            // Validate birth date
+            if (employee.getBirthDate() != null) {
+                if (employee.getBirthDate().isAfter(LocalDate.now())) {
+                    errors.add("Birth date cannot be in the future");
+                }
+                
+                // Check if employee is at least 16 years old
+                if (employee.getBirthDate().isAfter(LocalDate.now().minusYears(16))) {
+                    errors.add("Employee must be at least 16 years old");
+                }
+            }
+            
+            // Validate salary
+            if (employee.getSalary() != null && employee.getSalary().compareTo(BigDecimal.ZERO) < 0) {
+                errors.add("Salary cannot be negative");
+            }
+            
+            // Validate emergency contact phone if provided
+            if (StringUtils.hasText(employee.getEmergencyContactPhone())) {
+                String phoneRegex = "^[+]?[0-9\\s\\-()]{10,20}$";
+                if (!employee.getEmergencyContactPhone().matches(phoneRegex)) {
+                    errors.add("Invalid emergency contact phone format");
+                }
+            }
+            
             if (!errors.isEmpty()) {
-                validationErrors.put(i + 1, errors); // Row numbers start from 1
+                validationErrors.put(rowNum, errors);
             }
         }
         

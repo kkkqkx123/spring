@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.example.demo.config.TestJpaConfig;
 import com.example.demo.model.entity.Department;
 import com.example.demo.model.entity.Employee;
 import com.example.demo.model.entity.Position;
@@ -21,6 +24,7 @@ import com.example.demo.model.entity.Position;
  */
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(TestJpaConfig.class)
 class PositionRepositoryTest {
     
     @Autowired
@@ -36,6 +40,8 @@ class PositionRepositoryTest {
         // Create and persist a department for testing
         department = new Department();
         department.setName("IT Department");
+        department.setCreatedAt(LocalDateTime.now());
+        department.setCreatedBy("test-user");
         entityManager.persist(department);
         entityManager.flush();
     }
@@ -280,12 +286,22 @@ class PositionRepositoryTest {
         // Create and persist employees with the position
         Employee employee1 = new Employee();
         employee1.setName("John Doe");
+        employee1.setEmployeeNumber("EMP001");
+        employee1.setDepartment(department);
         employee1.setPosition(position);
+        employee1.setStatus(Employee.EmployeeStatus.ACTIVE);
+        employee1.setCreatedAt(LocalDateTime.now());
+        employee1.setCreatedBy("test-user");
         entityManager.persist(employee1);
         
         Employee employee2 = new Employee();
         employee2.setName("Jane Smith");
+        employee2.setEmployeeNumber("EMP002");
+        employee2.setDepartment(department);
         employee2.setPosition(position);
+        employee2.setStatus(Employee.EmployeeStatus.ACTIVE);
+        employee2.setCreatedAt(LocalDateTime.now());
+        employee2.setCreatedBy("test-user");
         entityManager.persist(employee2);
         
         entityManager.flush();
@@ -303,6 +319,8 @@ class PositionRepositoryTest {
         Position position = new Position();
         position.setJobTitle("Software Engineer");
         position.setDepartment(department);
+        position.setCreatedAt(LocalDateTime.now());
+        position.setCreatedBy("test-user");
         entityManager.persist(position);
         entityManager.flush();
         
