@@ -35,19 +35,15 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(
-    securedEnabled = true,
-    jsr250Enabled = true,
-    prePostEnabled = true
-)
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig {
-    
+
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
-    
+
     @Autowired
     private PermissionService permissionService;
 
@@ -66,11 +62,11 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setHideUserNotFoundExceptions(true);
-        
+
         return authProvider;
     }
 
@@ -90,7 +86,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-    
+
     /**
      * CORS configuration
      */
@@ -103,7 +99,7 @@ public class SecurityConfig {
         configuration.setExposedHeaders(List.of("x-auth-token"));
         configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -116,56 +112,50 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // CSRF configuration - disabled for API endpoints, enabled for web endpoints
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers(
-                    new AntPathRequestMatcher("/api/auth/**"),
-                    new AntPathRequestMatcher("/h2-console/**"),
-                    new AntPathRequestMatcher("/actuator/**")
-                )
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            )
-            // CORS configuration
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // Exception handling
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(unauthorizedHandler)
-            )
-            // Session management - stateless for REST API
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            // Authorization rules
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/api/public/**").permitAll()
-                // Admin endpoints
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // HR endpoints
-                .requestMatchers("/api/hr/**").hasAnyRole("ADMIN", "HR_MANAGER")
-                // Department endpoints
-                .requestMatchers("/api/departments/**").hasAnyRole("ADMIN", "HR_MANAGER", "DEPARTMENT_MANAGER")
-                // Employee endpoints
-                .requestMatchers("/api/employees/**").hasAnyRole("ADMIN", "HR_MANAGER", "EMPLOYEE_MANAGER")
-                // Position endpoints
-                .requestMatchers("/api/positions/**").hasAnyRole("ADMIN", "HR_MANAGER")
-                // Payroll endpoints
-                .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "PAYROLL_MANAGER")
-                // All other endpoints require authentication
-                .anyRequest().authenticated()
-            )
-            // H2 console support
-            .headers(headers -> headers
-                .frameOptions(frameOptions -> frameOptions.sameOrigin())
-            );
-        
+                // CSRF configuration - disabled for API endpoints, enabled for web endpoints
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(
+                                new AntPathRequestMatcher("/api/auth/**"),
+                                new AntPathRequestMatcher("/h2-console/**"),
+                                new AntPathRequestMatcher("/actuator/**"))
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                // CORS configuration
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // Exception handling
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(unauthorizedHandler))
+                // Session management - stateless for REST API
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Authorization rules
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        // Admin endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // HR endpoints
+                        .requestMatchers("/api/hr/**").hasAnyRole("ADMIN", "HR_MANAGER")
+                        // Department endpoints
+                        .requestMatchers("/api/departments/**").hasAnyRole("ADMIN", "HR_MANAGER", "DEPARTMENT_MANAGER")
+                        // Employee endpoints
+                        .requestMatchers("/api/employees/**").hasAnyRole("ADMIN", "HR_MANAGER", "EMPLOYEE_MANAGER")
+                        // Position endpoints
+                        .requestMatchers("/api/positions/**").hasAnyRole("ADMIN", "HR_MANAGER")
+                        // Payroll endpoints
+                        .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "PAYROLL_MANAGER")
+                        // All other endpoints require authentication
+                        .anyRequest().authenticated())
+                // H2 console support
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
         // Authentication provider and JWT filter
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 }
