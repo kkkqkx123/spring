@@ -246,22 +246,33 @@
   - Write controller integration tests
   - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 8. Implement communication and notification system
-- [ ] 8.1 Create messaging entities and repositories
+- [x] 8. Implement communication and notification system
+
+
+
+
+- [x] 8.1 Create messaging entities and repositories
+
+
   - Implement MessageContent and SystemMessage entities
   - Create MessageRepository and SystemMessageRepository
   - Add support for different message types and read status
   - Write repository tests for messaging operations
   - _Requirements: 8.2, 8.3_
 
-- [ ] 8.2 Implement notification service
+- [x] 8.2 Implement notification service
+
+
   - Create NotificationService for managing user notifications
   - Add methods for creating, retrieving, and marking notifications as read
   - Implement notification pushing logic to relevant users
   - Write service tests for notification functionality
   - _Requirements: 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 8.3 Create chat and notification controllers
+- [x] 8.3 Create chat and notification controllers
+
+
+
   - Implement ChatController for real-time chat functionality
   - Create NotificationController for notification management
   - Add WebSocket support for real-time message delivery
