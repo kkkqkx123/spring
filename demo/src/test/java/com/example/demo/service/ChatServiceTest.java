@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,6 +50,12 @@ class ChatServiceTest {
     
     @Mock
     private Query query;
+    
+    @BeforeEach
+    void initMocks() {
+        // Initialize entityManager in the ChatServiceImpl
+        ReflectionTestUtils.setField(chatService, "entityManager", entityManager);
+    }
     
     @InjectMocks
     private ChatServiceImpl chatService;

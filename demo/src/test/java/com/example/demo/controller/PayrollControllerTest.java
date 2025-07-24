@@ -265,6 +265,8 @@ public class PayrollControllerTest {
         inputDTO.setEmployeeId(1L);
         inputDTO.setPayPeriod(currentPeriod);
         inputDTO.setBaseSalary(new BigDecimal("5000.00"));
+        // Add netSalary to fix validation error (controller requires @Valid)
+        inputDTO.setNetSalary(new BigDecimal("5000.00"));
         
         PayrollLedgerDTO calculatedDTO = new PayrollLedgerDTO();
         calculatedDTO.setEmployeeId(1L);

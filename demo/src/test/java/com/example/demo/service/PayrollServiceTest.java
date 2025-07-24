@@ -535,16 +535,22 @@ public class PayrollServiceTest {
     @Test
     void generatePayrollLedger_WithExistingLedger_ShouldThrowException() {
         // Arrange
-        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+        // We need to set up the mock before the exception is thrown
         when(payrollRepository.existsByEmployeeIdAndPayPeriod(1L, currentPeriod)).thenReturn(true);
+        
+        // The findById should not be called because the method should throw an exception
+        // before reaching that point, so we don't need to mock it
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () -> {
             payrollService.generatePayrollLedger(1L, currentPeriod);
         });
 
-        verify(employeeRepository).findById(1L);
+        // Verify that existsByEmployeeIdAndPayPeriod was called
         verify(payrollRepository).existsByEmployeeIdAndPayPeriod(1L, currentPeriod);
+        
+        // Verify that findById and save were never called
+        verify(employeeRepository, never()).findById(anyLong());
         verify(payrollRepository, never()).save(any());
     }
 }

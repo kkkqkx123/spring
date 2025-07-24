@@ -189,14 +189,49 @@ public class PayrollServiceImpl implements PayrollService {
         log.info("Calculating payroll for employee ID: {}, pay period: {}", 
                 payrollLedgerDTO.getEmployeeId(), payrollLedgerDTO.getPayPeriod());
         
-        // Convert to entity for calculation
-        PayrollLedger payrollLedger = convertToEntity(payrollLedgerDTO);
+        // Create a new DTO with calculated values instead of using entity conversion
+        // This avoids the NullPointerException when trying to access employee.getId()
+        PayrollLedgerDTO calculatedDTO = new PayrollLedgerDTO();
         
-        // Calculate values
-        calculatePayrollValues(payrollLedger);
+        // Copy all fields from input DTO
+        calculatedDTO.setId(payrollLedgerDTO.getId());
+        calculatedDTO.setEmployeeId(payrollLedgerDTO.getEmployeeId());
+        calculatedDTO.setEmployeeName(payrollLedgerDTO.getEmployeeName());
+        calculatedDTO.setEmployeeNumber(payrollLedgerDTO.getEmployeeNumber());
+        calculatedDTO.setDepartmentId(payrollLedgerDTO.getDepartmentId());
+        calculatedDTO.setDepartmentName(payrollLedgerDTO.getDepartmentName());
+        calculatedDTO.setPayPeriod(payrollLedgerDTO.getPayPeriod());
+        calculatedDTO.setFormattedPayPeriod(payrollLedgerDTO.getFormattedPayPeriod());
+        calculatedDTO.setBaseSalary(payrollLedgerDTO.getBaseSalary());
+        calculatedDTO.setOvertimePay(payrollLedgerDTO.getOvertimePay());
+        calculatedDTO.setBonus(payrollLedgerDTO.getBonus());
+        calculatedDTO.setAllowances(payrollLedgerDTO.getAllowances());
+        calculatedDTO.setTaxDeductions(payrollLedgerDTO.getTaxDeductions());
+        calculatedDTO.setInsuranceDeductions(payrollLedgerDTO.getInsuranceDeductions());
+        calculatedDTO.setOtherDeductions(payrollLedgerDTO.getOtherDeductions());
         
-        // Convert back to DTO with calculated values
-        PayrollLedgerDTO calculatedDTO = convertToDTO(payrollLedger);
+        // Calculate gross salary
+        BigDecimal baseSalary = payrollLedgerDTO.getBaseSalary() != null ? payrollLedgerDTO.getBaseSalary() : BigDecimal.ZERO;
+        BigDecimal overtimePay = payrollLedgerDTO.getOvertimePay() != null ? payrollLedgerDTO.getOvertimePay() : BigDecimal.ZERO;
+        BigDecimal bonus = payrollLedgerDTO.getBonus() != null ? payrollLedgerDTO.getBonus() : BigDecimal.ZERO;
+        BigDecimal allowances = payrollLedgerDTO.getAllowances() != null ? payrollLedgerDTO.getAllowances() : BigDecimal.ZERO;
+        
+        BigDecimal grossSalary = baseSalary.add(overtimePay).add(bonus).add(allowances);
+        calculatedDTO.setGrossSalary(grossSalary);
+        
+        // Calculate total deductions
+        BigDecimal taxDeductions = payrollLedgerDTO.getTaxDeductions() != null ? payrollLedgerDTO.getTaxDeductions() : BigDecimal.ZERO;
+        BigDecimal insuranceDeductions = payrollLedgerDTO.getInsuranceDeductions() != null ? payrollLedgerDTO.getInsuranceDeductions() : BigDecimal.ZERO;
+        BigDecimal otherDeductions = payrollLedgerDTO.getOtherDeductions() != null ? payrollLedgerDTO.getOtherDeductions() : BigDecimal.ZERO;
+        
+        BigDecimal totalDeductions = taxDeductions.add(insuranceDeductions).add(otherDeductions);
+        calculatedDTO.setTotalDeductions(totalDeductions);
+        
+        // Calculate net salary
+        BigDecimal netSalary = grossSalary.subtract(totalDeductions);
+        calculatedDTO.setNetSalary(netSalary);
+        
+        // Set status to CALCULATED
         calculatedDTO.setStatus(PayrollStatus.CALCULATED);
         
         return calculatedDTO;

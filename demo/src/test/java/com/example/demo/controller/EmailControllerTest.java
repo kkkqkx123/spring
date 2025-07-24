@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import com.example.demo.config.EmailControllerTestSecurityConfig;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -26,7 +28,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(EmailController.class)
+@WebMvcTest(controllers = EmailController.class)
+@Import(EmailControllerTestSecurityConfig.class)
 class EmailControllerTest {
 
         @Autowired
@@ -39,7 +42,7 @@ class EmailControllerTest {
         private EmailService emailService;
 
         @Test
-        @WithMockUser(authorities = { "ROLE_HR_MANAGER" })
+        @WithMockUser(roles = { "HR_MANAGER" })
         void sendEmail_Success() throws Exception {
                 // Arrange
                 Map<String, Object> variables = new HashMap<>();
@@ -68,7 +71,7 @@ class EmailControllerTest {
         }
 
         @Test
-        @WithMockUser(authorities = { "ROLE_HR_MANAGER" })
+        @WithMockUser(roles = { "HR_MANAGER" })
         void sendEmail_Failure() throws Exception {
                 // Arrange
                 Map<String, Object> variables = new HashMap<>();
@@ -93,7 +96,7 @@ class EmailControllerTest {
         }
 
         @Test
-        @WithMockUser(authorities = { "ROLE_HR_MANAGER" })
+        @WithMockUser(roles = { "HR_MANAGER" })
         void sendBulkEmails_Success() throws Exception {
                 // Arrange
                 List<String> recipients = List.of(
@@ -127,7 +130,7 @@ class EmailControllerTest {
         }
 
         @Test
-        @WithMockUser(authorities = { "ROLE_EMPLOYEE" })
+        @WithMockUser(roles = { "EMPLOYEE" })
         void sendEmail_AccessDenied() throws Exception {
                 // Arrange
                 Map<String, Object> variables = new HashMap<>();
@@ -148,7 +151,7 @@ class EmailControllerTest {
         }
 
         @Test
-        @WithMockUser(authorities = { "ROLE_HR_MANAGER" })
+        @WithMockUser(roles = { "HR_MANAGER" })
         void sendWelcomeEmail_Success() throws Exception {
                 // Act & Assert
                 mockMvc.perform(post("/emails/welcome/1")
@@ -159,7 +162,7 @@ class EmailControllerTest {
         }
 
         @Test
-        @WithMockUser(authorities = { "ROLE_FINANCE_MANAGER" })
+        @WithMockUser(roles = { "FINANCE_MANAGER" })
         void sendPayrollNotification_Success() throws Exception {
                 // Act & Assert
                 mockMvc.perform(post("/emails/payroll-notification/1/2")
@@ -170,7 +173,7 @@ class EmailControllerTest {
         }
 
         @Test
-        @WithMockUser(authorities = { "ROLE_HR_MANAGER" })
+        @WithMockUser(roles = { "HR_MANAGER" })
         void sendAnnouncement_Success() throws Exception {
                 // Arrange
                 Map<String, Object> variables = new HashMap<>();

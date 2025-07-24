@@ -12,16 +12,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,52 +56,6 @@ class EmailServiceTest {
     }
 
     @Test
-    void sendTemplatedEmail_Success() throws Exception {
-        // Arrange
-        String processedTemplate = "<html><body>Hello, Test User!</body></html>";
-        
-        when(freemarkerConfiguration.getTemplate(templateName)).thenReturn(template);
-        when(FreeMarkerTemplateUtils.processTemplateIntoString(template, variables)).thenReturn(processedTemplate);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        
-        // Act
-        emailService.sendTemplatedEmail(recipient, subject, templateName, variables);
-        
-        // Assert
-        verify(mailSender, times(1)).send(any(MimeMessage.class));
-    }
-
-    @Test
-    void sendTemplatedEmail_TemplateProcessingError() throws Exception {
-        // Arrange
-        when(freemarkerConfiguration.getTemplate(templateName)).thenThrow(new RuntimeException("Template not found"));
-        
-        // Act & Assert
-        assertThrows(EmailSendingException.class, () -> 
-            emailService.sendTemplatedEmail(recipient, subject, templateName, variables)
-        );
-        
-        verify(mailSender, never()).send(any(MimeMessage.class));
-    }
-
-    @Test
-    void sendBulkEmails_Success() throws Exception {
-        // Arrange
-        List<String> recipients = List.of("user1@example.com", "user2@example.com", "user3@example.com");
-        String processedTemplate = "<html><body>Hello, Test User!</body></html>";
-        
-        when(freemarkerConfiguration.getTemplate(templateName)).thenReturn(template);
-        when(FreeMarkerTemplateUtils.processTemplateIntoString(template, variables)).thenReturn(processedTemplate);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        
-        // Act
-        emailService.sendBulkEmails(recipients, subject, templateName, variables);
-        
-        // Assert - verify that send was called for each recipient
-        verify(mailSender, times(recipients.size())).createMimeMessage();
-    }
-
-    @Test
     void sendSimpleEmail_Success() {
         // Arrange
         String content = "This is a test email content";
@@ -121,11 +77,61 @@ class EmailServiceTest {
     void sendSimpleEmail_MailException() {
         // Arrange
         String content = "This is a test email content";
-        doThrow(new RuntimeException("Mail server connection failed")).when(mailSender).send(any(SimpleMailMessage.class));
+        doThrow(new MailException("Mail server connection failed") {
+            private static final long serialVersionUID = 1L;
+        }).when(mailSender).send(any(SimpleMailMessage.class));
         
         // Act & Assert
         assertThrows(EmailSendingException.class, () -> 
             emailService.sendSimpleEmail(recipient, subject, content)
         );
+    }
+    
+    @Test
+    void sendTemplatedEmail_Success() throws Exception {
+        // Arrange
+        // Mock the template retrieval
+        when(freemarkerConfiguration.getTemplate(anyString())).thenReturn(template);
+        
+        // Mock the mail sender
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        
+        // Act
+        emailService.sendTemplatedEmail(recipient, subject, templateName, variables);
+        
+        // Assert
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+    
+    @Test
+    void sendTemplatedEmail_TemplateProcessingError() throws Exception {
+        // Arrange
+        when(freemarkerConfiguration.getTemplate(anyString())).thenThrow(new IOException("Template not found"));
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        
+        // Act & Assert
+        assertThrows(EmailSendingException.class, () -> 
+            emailService.sendTemplatedEmail(recipient, subject, templateName, variables)
+        );
+        
+        verify(mailSender, never()).send(any(MimeMessage.class));
+    }
+    
+    @Test
+    void sendBulkEmails_Success() throws Exception {
+        // Arrange
+        List<String> recipients = List.of("user1@example.com", "user2@example.com", "user3@example.com");
+        
+        // Mock the template retrieval
+        when(freemarkerConfiguration.getTemplate(anyString())).thenReturn(template);
+        
+        // Mock the mail sender
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        
+        // Act
+        emailService.sendBulkEmails(recipients, subject, templateName, variables);
+        
+        // Assert
+        verify(mailSender, times(recipients.size())).createMimeMessage();
     }
 }
