@@ -16,12 +16,12 @@ public class TestSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/notifications/user", "/api/notifications/users").hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers("/api/notifications/role").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            );
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                                .requestMatchers("/api/notifications/user", "/api/notifications/users").hasAnyRole("ADMIN", "MANAGER")
+                                .requestMatchers("/api/notifications/role").hasRole("ADMIN")
+                                .anyRequest().authenticated()
+                );
         
         return http.build();
     }

@@ -2,7 +2,7 @@ package com.example.demo.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,7 @@ import com.example.demo.service.ChatService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -85,7 +86,7 @@ public class ChatServiceImpl implements ChatService {
                       "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId1)) " +
                       "ORDER BY m.createdAt DESC";
         
-        Query query = entityManager.createQuery(jpql)
+        TypedQuery<MessageContent> query = entityManager.createQuery(jpql, MessageContent.class)
                 .setParameter("userId1", userId1)
                 .setParameter("userId2", userId2)
                 .setParameter("messageType", MessageType.CHAT_MESSAGE)
@@ -101,12 +102,12 @@ public class ChatServiceImpl implements ChatService {
                            "(m.senderId = :userId2 AND m.messageType = :messageType AND " +
                            "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId1))";
         
-        Query countQuery = entityManager.createQuery(countJpql)
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class)
                 .setParameter("userId1", userId1)
                 .setParameter("userId2", userId2)
                 .setParameter("messageType", MessageType.CHAT_MESSAGE);
         
-        long total = (long) countQuery.getSingleResult();
+        long total = countQuery.getSingleResult();
         
         return new org.springframework.data.domain.PageImpl<>(messages, pageable, total);
     }
@@ -121,7 +122,7 @@ public class ChatServiceImpl implements ChatService {
                            "WHERE sm.userId = :userId AND m.messageType = :messageType " +
                            "ORDER BY MAX(m.createdAt) DESC";
         
-        Query senderQuery = entityManager.createQuery(senderJpql)
+        TypedQuery <Long> senderQuery = entityManager.createQuery(senderJpql,Long.class)
                 .setParameter("userId", userId)
                 .setParameter("messageType", MessageType.CHAT_MESSAGE)
                 .setMaxResults(10);
@@ -134,7 +135,7 @@ public class ChatServiceImpl implements ChatService {
                               "WHERE m.senderId = :userId AND m.messageType = :messageType " +
                               "ORDER BY MAX(m.createdAt) DESC";
         
-        Query recipientQuery = entityManager.createQuery(recipientJpql)
+        TypedQuery <Long> recipientQuery = entityManager.createQuery(recipientJpql,long.class)
                 .setParameter("userId", userId)
                 .setParameter("messageType", MessageType.CHAT_MESSAGE)
                 .setMaxResults(10);
@@ -170,7 +171,7 @@ public class ChatServiceImpl implements ChatService {
                       "WHERE sm.userId = :recipientId AND m.senderId = :senderId " +
                       "AND sm.isRead = false";
         
-        Query query = entityManager.createQuery(jpql)
+        TypedQuery <Long> query = entityManager.createQuery(jpql,Long.class)
                 .setParameter("recipientId", recipientId)
                 .setParameter("senderId", senderId);
         

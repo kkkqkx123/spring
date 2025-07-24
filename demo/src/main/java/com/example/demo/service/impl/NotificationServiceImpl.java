@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.model.entity.MessageContent;
-import com.example.demo.model.entity.MessageContent.MessageType;
 import com.example.demo.model.entity.SystemMessage;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.MessageRepository;
@@ -33,7 +31,6 @@ public class NotificationServiceImpl implements NotificationService {
     private final SystemMessageRepository systemMessageRepository;
     private final UserRepository userRepository;
     
-    @Autowired
     public NotificationServiceImpl(
             MessageRepository messageRepository,
             SystemMessageRepository systemMessageRepository,

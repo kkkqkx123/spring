@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +44,6 @@ public class ChatController {
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
     
-    @Autowired
     public ChatController(
             ChatService chatService,
             UserService userService,
