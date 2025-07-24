@@ -17,7 +17,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import com.example.demo.config.TestSecurityConfig;
 import com.example.demo.service.MockUserService;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +28,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -74,13 +74,13 @@ class ChatControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     
-    @MockBean
+    @MockitoBean
     private ChatService chatService;
     
-    @MockBean
+    @MockitoBean
     private UserService userService;
     
-    @MockBean
+    @MockitoBean
     private SimpMessagingTemplate messagingTemplate;
     
     private User currentUser;

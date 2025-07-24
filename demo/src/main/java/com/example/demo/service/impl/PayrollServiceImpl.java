@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -40,7 +39,6 @@ public class PayrollServiceImpl implements PayrollService {
     private final PayrollRepository payrollRepository;
     private final EmployeeRepository employeeRepository;
 
-    @Autowired
     public PayrollServiceImpl(PayrollRepository payrollRepository, EmployeeRepository employeeRepository) {
         this.payrollRepository = payrollRepository;
         this.employeeRepository = employeeRepository;
@@ -667,7 +665,7 @@ public class PayrollServiceImpl implements PayrollService {
      * @return the specification
      */
     private Specification<PayrollLedger> buildSpecificationFromCriteria(PayrollSearchCriteria criteria) {
-        Specification<PayrollLedger> spec = Specification.where(null);
+        Specification<PayrollLedger> spec = (root, query, criteriaBuilder) -> null;
         
         if (criteria == null) {
             return spec;
