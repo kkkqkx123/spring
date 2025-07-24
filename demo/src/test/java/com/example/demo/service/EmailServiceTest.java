@@ -68,7 +68,10 @@ class EmailServiceTest {
         verify(mailSender).send(messageCaptor.capture());
         SimpleMailMessage sentMessage = messageCaptor.getValue();
         
-        assertEquals(recipient, sentMessage.getTo()[0]);
+        String[] recipients = sentMessage.getTo();
+        assertNotNull(recipients, "Recipients array should not be null");
+        assertTrue(recipients.length > 0, "Recipients array should not be empty");
+        assertEquals(recipient, recipients[0]);
         assertEquals(subject, sentMessage.getSubject());
         assertEquals(content, sentMessage.getText());
     }
