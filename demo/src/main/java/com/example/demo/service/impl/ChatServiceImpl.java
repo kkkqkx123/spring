@@ -135,7 +135,7 @@ public class ChatServiceImpl implements ChatService {
                               "WHERE m.senderId = :userId AND m.messageType = :messageType " +
                               "ORDER BY MAX(m.createdAt) DESC";
         
-        TypedQuery <Long> recipientQuery = entityManager.createQuery(recipientJpql,long.class)
+        TypedQuery <Long> recipientQuery = entityManager.createQuery(recipientJpql, Long.class)
                 .setParameter("userId", userId)
                 .setParameter("messageType", MessageType.CHAT_MESSAGE)
                 .setMaxResults(10);

@@ -51,7 +51,7 @@ public class PayrollServiceImpl implements PayrollService {
                 payrollLedgerDTO.getEmployeeId(), payrollLedgerDTO.getPayPeriod());
         
         // Check if payroll ledger already exists for employee and pay period
-        if (payrollRepository.existsByEmployeeIdAndPayPeriod(
+        if (payrollRepository.existsByEmployee_IdAndPayPeriod(
                 payrollLedgerDTO.getEmployeeId(), payrollLedgerDTO.getPayPeriod())) {
             throw new IllegalStateException("Payroll ledger already exists for employee ID: " + 
                     payrollLedgerDTO.getEmployeeId() + " and pay period: " + payrollLedgerDTO.getPayPeriod());
@@ -161,7 +161,7 @@ public class PayrollServiceImpl implements PayrollService {
             throw new ResourceNotFoundException("Employee not found with ID: " + employeeId);
         }
         
-        return payrollRepository.findByEmployeeId(employeeId, pageable)
+        return payrollRepository.findByEmployee_Id(employeeId, pageable)
                 .map(this::convertToDTO);
     }
 
@@ -375,7 +375,7 @@ public class PayrollServiceImpl implements PayrollService {
         
         for (Employee employee : activeEmployees) {
             // Skip if payroll ledger already exists for this employee and pay period
-            if (payrollRepository.existsByEmployeeIdAndPayPeriod(employee.getId(), payPeriod)) {
+            if (payrollRepository.existsByEmployee_IdAndPayPeriod(employee.getId(), payPeriod)) {
                 log.info("Payroll ledger already exists for employee ID: {} and pay period: {}", 
                         employee.getId(), payPeriod);
                 continue;
@@ -423,7 +423,7 @@ public class PayrollServiceImpl implements PayrollService {
         log.info("Generating payroll ledger for employee ID: {} and pay period: {}", employeeId, payPeriod);
         
         // Check if payroll ledger already exists
-        if (payrollRepository.existsByEmployeeIdAndPayPeriod(employeeId, payPeriod)) {
+        if (payrollRepository.existsByEmployee_IdAndPayPeriod(employeeId, payPeriod)) {
             throw new IllegalStateException("Payroll ledger already exists for employee ID: " + 
                     employeeId + " and pay period: " + payPeriod);
         }

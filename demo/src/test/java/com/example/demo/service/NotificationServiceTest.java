@@ -193,6 +193,7 @@ class NotificationServiceTest {
         assertNotNull(result);
         
         // Verify system messages creation
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<List<SystemMessage>> systemMessagesCaptor = ArgumentCaptor.forClass(List.class);
         verify(systemMessageRepository).saveAll(systemMessagesCaptor.capture());
         List<SystemMessage> savedMessages = systemMessagesCaptor.getValue();

@@ -29,6 +29,7 @@ import com.example.demo.service.impl.ChatServiceImpl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 /**
  * Unit tests for ChatService
@@ -50,6 +51,12 @@ class ChatServiceTest {
     
     @Mock
     private Query query;
+    
+    @Mock
+    private TypedQuery<MessageContent> messageQuery;
+    
+    @Mock
+    private TypedQuery<Long> longQuery;
     
     @BeforeEach
     void initMocks() {
@@ -131,12 +138,23 @@ class ChatServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         List<MessageContent> messages = Arrays.asList(messageContent);
         
-        when(entityManager.createQuery(anyString())).thenReturn(query);
-        when(query.setParameter(anyString(), any())).thenReturn(query);
-        when(query.setFirstResult(anyInt())).thenReturn(query);
-        when(query.setMaxResults(anyInt())).thenReturn(query);
-        when(query.getResultList()).thenReturn(messages);
-        when(query.getSingleResult()).thenReturn(1L);
+        // Mock the main query
+        when(entityManager.createQuery(
+            "SELECT m FROM MessageContent m WHERE (m.senderId = :userId1 AND m.messageType = :messageType AND EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId2)) OR (m.senderId = :userId2 AND m.messageType = :messageType AND EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId1)) ORDER BY m.createdAt DESC",
+            MessageContent.class)).thenReturn(messageQuery);
+        
+        // Mock the count query
+        when(entityManager.createQuery(
+            "SELECT COUNT(m) FROM MessageContent m WHERE (m.senderId = :userId1 AND m.messageType = :messageType AND EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId2)) OR (m.senderId = :userId2 AND m.messageType = :messageType AND EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId1))",
+            Long.class)).thenReturn(longQuery);
+        
+        when(messageQuery.setParameter(anyString(), any())).thenReturn(messageQuery);
+        when(messageQuery.setFirstResult(anyInt())).thenReturn(messageQuery);
+        when(messageQuery.setMaxResults(anyInt())).thenReturn(messageQuery);
+        when(messageQuery.getResultList()).thenReturn(messages);
+        
+        when(longQuery.setParameter(anyString(), any())).thenReturn(longQuery);
+        when(longQuery.getSingleResult()).thenReturn(1L);
         
         // Act
         Page<MessageContent> result = chatService.getConversation(1L, 2L, pageable);
@@ -153,12 +171,21 @@ class ChatServiceTest {
         List<Long> senders = Arrays.asList(2L, 3L);
         List<Long> recipients = Arrays.asList(3L, 4L);
         
-        when(entityManager.createQuery(anyString())).thenReturn(query);
-        when(query.setParameter(anyString(), any())).thenReturn(query);
-        when(query.setMaxResults(anyInt())).thenReturn(query);
+        // Mock the sender query
+        when(entityManager.createQuery(
+            "SELECT DISTINCT m.senderId FROM MessageContent m JOIN SystemMessage sm ON sm.messageId = m.id WHERE sm.userId = :userId AND m.messageType = :messageType ORDER BY MAX(m.createdAt) DESC",
+            Long.class)).thenReturn(longQuery);
         
-        // First query returns senders
-        when(query.getResultList()).thenReturn(senders).thenReturn(recipients);
+        // Mock the recipient query  
+        when(entityManager.createQuery(
+            "SELECT DISTINCT sm.userId FROM MessageContent m JOIN SystemMessage sm ON sm.messageId = m.id WHERE m.senderId = :userId AND m.messageType = :messageType ORDER BY MAX(m.createdAt) DESC",
+            Long.class)).thenReturn(longQuery);
+        
+        when(longQuery.setParameter(anyString(), any())).thenReturn(longQuery);
+        when(longQuery.setMaxResults(anyInt())).thenReturn(longQuery);
+        
+        // First query returns senders, second returns recipients
+        when(longQuery.getResultList()).thenReturn(senders).thenReturn(recipients);
         
         // Act
         List<Long> result = chatService.getRecentConversations(1L);
@@ -176,9 +203,11 @@ class ChatServiceTest {
         // Arrange
         List<Long> messageIds = Arrays.asList(1L, 2L);
         
-        when(entityManager.createQuery(anyString())).thenReturn(query);
-        when(query.setParameter(anyString(), any())).thenReturn(query);
-        when(query.getResultList()).thenReturn(messageIds);
+        when(entityManager.createQuery(
+            "SELECT sm.id FROM SystemMessage sm JOIN MessageContent m ON sm.messageId = m.id WHERE sm.userId = :recipientId AND m.senderId = :senderId AND sm.isRead = false",
+            Long.class)).thenReturn(longQuery);
+        when(longQuery.setParameter(anyString(), any())).thenReturn(longQuery);
+        when(longQuery.getResultList()).thenReturn(messageIds);
         when(systemMessageRepository.markAsReadByIds(messageIds)).thenReturn(2);
         
         // Act
@@ -192,9 +221,11 @@ class ChatServiceTest {
     @Test
     void testMarkConversationAsRead_WhenNoUnreadMessages_ReturnsZero() {
         // Arrange
-        when(entityManager.createQuery(anyString())).thenReturn(query);
-        when(query.setParameter(anyString(), any())).thenReturn(query);
-        when(query.getResultList()).thenReturn(Arrays.asList());
+        when(entityManager.createQuery(
+            "SELECT sm.id FROM SystemMessage sm JOIN MessageContent m ON sm.messageId = m.id WHERE sm.userId = :recipientId AND m.senderId = :senderId AND sm.isRead = false",
+            Long.class)).thenReturn(longQuery);
+        when(longQuery.setParameter(anyString(), any())).thenReturn(longQuery);
+        when(longQuery.getResultList()).thenReturn(Arrays.asList());
         
         // Act
         int result = chatService.markConversationAsRead(1L, 2L);
@@ -207,7 +238,9 @@ class ChatServiceTest {
     @Test
     void testCountUnreadMessages_ReturnsCount() {
         // Arrange
-        when(entityManager.createQuery(anyString())).thenReturn(query);
+        when(entityManager.createQuery(
+            "SELECT COUNT(sm) FROM SystemMessage sm JOIN MessageContent m ON sm.messageId = m.id WHERE sm.userId = :userId AND m.messageType = :messageType AND sm.isRead = false"))
+            .thenReturn(query);
         when(query.setParameter(anyString(), any())).thenReturn(query);
         when(query.getSingleResult()).thenReturn(5L);
         

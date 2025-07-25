@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +106,7 @@ public class PayrollServiceTest {
     void createPayrollLedger_ShouldCreateAndReturnPayrollLedger() {
         // Arrange
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(payrollRepository.existsByEmployeeIdAndPayPeriod(1L, currentPeriod)).thenReturn(false);
+        when(payrollRepository.existsByEmployee_IdAndPayPeriod(1L, currentPeriod)).thenReturn(false);
         when(payrollRepository.save(any())).thenReturn(payrollLedger);
 
         // Act
@@ -122,21 +121,21 @@ public class PayrollServiceTest {
         assertEquals(PayrollStatus.DRAFT, result.getStatus());
 
         verify(employeeRepository).findById(1L);
-        verify(payrollRepository).existsByEmployeeIdAndPayPeriod(1L, currentPeriod);
+        verify(payrollRepository).existsByEmployee_IdAndPayPeriod(1L, currentPeriod);
         verify(payrollRepository).save(any());
     }
 
     @Test
     void createPayrollLedger_WithExistingLedger_ShouldThrowException() {
         // Arrange
-        when(payrollRepository.existsByEmployeeIdAndPayPeriod(1L, currentPeriod)).thenReturn(true);
+        when(payrollRepository.existsByEmployee_IdAndPayPeriod(1L, currentPeriod)).thenReturn(true);
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () -> {
             payrollService.createPayrollLedger(payrollLedgerDTO);
         });
 
-        verify(payrollRepository).existsByEmployeeIdAndPayPeriod(1L, currentPeriod);
+        verify(payrollRepository).existsByEmployee_IdAndPayPeriod(1L, currentPeriod);
         verify(employeeRepository, never()).findById(anyLong());
         verify(payrollRepository, never()).save(any());
     }
@@ -298,7 +297,7 @@ public class PayrollServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         when(employeeRepository.existsById(1L)).thenReturn(true);
-        when(payrollRepository.findByEmployeeId(1L, pageable)).thenReturn(page);
+        when(payrollRepository.findByEmployee_Id(1L, pageable)).thenReturn(page);
 
         // Act
         Page<PayrollLedgerDTO> result = payrollService.getPayrollLedgersByEmployee(1L, pageable);
@@ -309,7 +308,7 @@ public class PayrollServiceTest {
         assertEquals(1L, result.getContent().get(0).getEmployeeId());
 
         verify(employeeRepository).existsById(1L);
-        verify(payrollRepository).findByEmployeeId(1L, pageable);
+        verify(payrollRepository).findByEmployee_Id(1L, pageable);
     }
 
     @Test
@@ -325,7 +324,7 @@ public class PayrollServiceTest {
         });
 
         verify(employeeRepository).existsById(99L);
-        verify(payrollRepository, never()).findByEmployeeId(anyLong(), any(Pageable.class));
+        verify(payrollRepository, never()).findByEmployee_Id(anyLong(), any(Pageable.class));
     }
 
     @Test
@@ -496,8 +495,8 @@ public class PayrollServiceTest {
         activeEmployees.add(employee2);
 
         when(employeeRepository.findAll()).thenReturn(activeEmployees);
-        when(payrollRepository.existsByEmployeeIdAndPayPeriod(1L, currentPeriod)).thenReturn(false);
-        when(payrollRepository.existsByEmployeeIdAndPayPeriod(2L, currentPeriod)).thenReturn(false);
+        when(payrollRepository.existsByEmployee_IdAndPayPeriod(1L, currentPeriod)).thenReturn(false);
+        when(payrollRepository.existsByEmployee_IdAndPayPeriod(2L, currentPeriod)).thenReturn(false);
         when(payrollRepository.save(any())).thenReturn(payrollLedger);
 
         // Act
@@ -515,7 +514,7 @@ public class PayrollServiceTest {
     void generatePayrollLedger_ShouldGenerateLedgerForEmployee() {
         // Arrange
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(payrollRepository.existsByEmployeeIdAndPayPeriod(1L, currentPeriod)).thenReturn(false);
+        when(payrollRepository.existsByEmployee_IdAndPayPeriod(1L, currentPeriod)).thenReturn(false);
         when(payrollRepository.save(any())).thenReturn(payrollLedger);
 
         // Act
@@ -528,7 +527,7 @@ public class PayrollServiceTest {
         assertEquals(PayrollStatus.DRAFT, result.getStatus());
 
         verify(employeeRepository).findById(1L);
-        verify(payrollRepository).existsByEmployeeIdAndPayPeriod(1L, currentPeriod);
+        verify(payrollRepository).existsByEmployee_IdAndPayPeriod(1L, currentPeriod);
         verify(payrollRepository).save(any());
     }
 
@@ -536,7 +535,7 @@ public class PayrollServiceTest {
     void generatePayrollLedger_WithExistingLedger_ShouldThrowException() {
         // Arrange
         // We need to set up the mock before the exception is thrown
-        when(payrollRepository.existsByEmployeeIdAndPayPeriod(1L, currentPeriod)).thenReturn(true);
+        when(payrollRepository.existsByEmployee_IdAndPayPeriod(1L, currentPeriod)).thenReturn(true);
         
         // The findById should not be called because the method should throw an exception
         // before reaching that point, so we don't need to mock it
@@ -546,8 +545,8 @@ public class PayrollServiceTest {
             payrollService.generatePayrollLedger(1L, currentPeriod);
         });
 
-        // Verify that existsByEmployeeIdAndPayPeriod was called
-        verify(payrollRepository).existsByEmployeeIdAndPayPeriod(1L, currentPeriod);
+        // Verify that existsByEmployee_IdAndPayPeriod was called
+        verify(payrollRepository).existsByEmployee_IdAndPayPeriod(1L, currentPeriod);
         
         // Verify that findById and save were never called
         verify(employeeRepository, never()).findById(anyLong());

@@ -65,4 +65,10 @@ public interface MessageRepository extends JpaRepository<MessageContent, Long> {
      */
     @Query("SELECT m FROM MessageContent m WHERE m.messageType = :messageType ORDER BY m.createdAt DESC")
     List<MessageContent> findRecentByType(@Param("messageType") MessageType messageType, Pageable pageable);
+
+    List<MessageContent> findByMessageType(MessageType chatMessage);
+
+    List<MessageContent> findBySenderId(Long id);
+
+    List<MessageContent> findByContentContainingIgnoreCase(String string);
 }

@@ -20,6 +20,8 @@ public class TestSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/api/notifications/user", "/api/notifications/users").hasAnyRole("ADMIN", "MANAGER")
                                 .requestMatchers("/api/notifications/role").hasRole("ADMIN")
+                                .requestMatchers("/api/chat/**").hasAnyRole("USER", "ADMIN", "MANAGER")
+                                .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "MANAGER")
                                 .anyRequest().authenticated()
                 );
         

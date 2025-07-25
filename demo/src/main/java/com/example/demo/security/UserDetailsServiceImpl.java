@@ -49,16 +49,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     return new UsernameNotFoundException("User not found with username: " + username);
                 });
         
-        // Load user permissions
-        try {
-            List<Resource> userResources = permissionService.getUserResources(username);
-            logger.debug("Loaded {} resources for user {}", userResources.size(), username);
-            
-            // Build UserDetails with user data and permissions
-            return UserDetailsImpl.build(user);
-        } catch (Exception e) {
-            logger.error("Error loading permissions for user {}: {}", username, e.getMessage());
-            throw new RuntimeException("Error loading user permissions", e);
-        }
+        logger.debug("Found user {} with {} roles", username, user.getRoles().size());
+        
+        // Build UserDetails with user data and permissions
+        return UserDetailsImpl.build(user);
     }
 }

@@ -36,7 +36,7 @@ public class MessageContent extends BaseEntity {
     public enum MessageType {
         SYSTEM_NOTIFICATION,
         CHAT_MESSAGE,
-        ANNOUNCEMENT
+        ANNOUNCEMENT, BROADCAST
     }
     
     @Id

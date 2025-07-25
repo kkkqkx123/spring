@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.model.dto.AuthRequest;
 import com.example.demo.model.dto.AuthResponse;
+import com.example.demo.model.dto.LoginRequest;
+import com.example.demo.model.dto.RegisterRequest;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.model.entity.Role;
 import com.example.demo.model.entity.User;
@@ -57,7 +58,7 @@ public class AuthController {
      * Authenticate user and generate JWT token
      */
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -81,7 +82,7 @@ public class AuthController {
      * Register a new user
      */
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDto signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
         }
@@ -95,44 +96,60 @@ public class AuthController {
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
-        user.setFirstName(signUpRequest.getFirstName());
-        user.setLastName(signUpRequest.getLastName());
         user.setEnabled(true);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
 
-        Set<String> strRoles = signUpRequest.getRoles();
+        // Default role for new users
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                case "admin":
-                    Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(adminRole);
-                    break;
-                case "hr":
-                    Role hrRole = roleRepository.findByName("ROLE_HR_MANAGER")
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(hrRole);
-                    break;
-                default:
-                    Role userRole = roleRepository.findByName("ROLE_USER")
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(userRole);
-                }
-            });
-        }
-
+        roles.add(userRole);
         user.setRoles(roles);
-        userRepository.save(user);
+        
+        User savedUser = userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully!");
+        // Return user details
+        UserDto userDto = new UserDto();
+        userDto.setId(savedUser.getId());
+        userDto.setUsername(savedUser.getUsername());
+        userDto.setEmail(savedUser.getEmail());
+        userDto.setFirstName(savedUser.getFirstName());
+        userDto.setLastName(savedUser.getLastName());
+
+        return ResponseEntity.status(201).body(userDto);
+    }
+
+    /**
+     * Logout user
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok("User logged out successfully!");
+    }
+
+    /**
+     * Refresh JWT token
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String jwt = jwtUtils.generateJwtToken(authentication);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(new AuthResponse(
+                    jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    roles));
+        }
+        return ResponseEntity.badRequest().body("Invalid token");
     }
 }

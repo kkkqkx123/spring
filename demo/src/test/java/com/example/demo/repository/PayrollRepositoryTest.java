@@ -216,9 +216,9 @@ public class PayrollRepositoryTest {
     }
 
     @Test
-    void findByEmployeeIdAndPayPeriod_ShouldReturnPayrollLedger() {
+    void findByEmployee_IdAndPayPeriod_ShouldReturnPayrollLedger() {
         // Act
-        Optional<PayrollLedger> result = payrollRepository.findByEmployeeIdAndPayPeriod(
+        Optional<PayrollLedger> result = payrollRepository.findByEmployee_IdAndPayPeriod(
                 employee1.getId(), YearMonth.of(2023, 1));
 
         // Assert
@@ -228,9 +228,9 @@ public class PayrollRepositoryTest {
     }
 
     @Test
-    void existsByEmployeeIdAndPayPeriod_WithExistingRecord_ShouldReturnTrue() {
+    void existsByEmployee_IdAndPayPeriod_WithExistingRecord_ShouldReturnTrue() {
         // Act
-        boolean exists = payrollRepository.existsByEmployeeIdAndPayPeriod(
+        boolean exists = payrollRepository.existsByEmployee_IdAndPayPeriod(
                 employee1.getId(), YearMonth.of(2023, 1));
 
         // Assert
@@ -238,9 +238,9 @@ public class PayrollRepositoryTest {
     }
 
     @Test
-    void existsByEmployeeIdAndPayPeriod_WithNonExistingRecord_ShouldReturnFalse() {
+    void existsByEmployee_IdAndPayPeriod_WithNonExistingRecord_ShouldReturnFalse() {
         // Act
-        boolean exists = payrollRepository.existsByEmployeeIdAndPayPeriod(
+        boolean exists = payrollRepository.existsByEmployee_IdAndPayPeriod(
                 employee1.getId(), YearMonth.of(2023, 3));
 
         // Assert
@@ -253,7 +253,7 @@ public class PayrollRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act
-        Page<PayrollLedger> result = payrollRepository.findByEmployeeId(employee1.getId(), pageable);
+        Page<PayrollLedger> result = payrollRepository.findByEmployee_Id(employee1.getId(), pageable);
 
         // Assert
         assertEquals(2, result.getTotalElements());
@@ -290,12 +290,12 @@ public class PayrollRepositoryTest {
     }
 
     @Test
-    void findByEmployeeIdAndStatus_ShouldReturnMatchingPayrollLedgers() {
+    void findByEmployee_IdAndStatus_ShouldReturnMatchingPayrollLedgers() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
 
         // Act
-        Page<PayrollLedger> result = payrollRepository.findByEmployeeIdAndStatus(
+        Page<PayrollLedger> result = payrollRepository.findByEmployee_IdAndStatus(
                 employee1.getId(), PayrollStatus.PAID, pageable);
 
         // Assert
@@ -367,9 +367,9 @@ public class PayrollRepositoryTest {
     }
 
     @Test
-    void countByEmployeeId_ShouldReturnCorrectCount() {
+    void countByEmployee_Id_ShouldReturnCorrectCount() {
         // Act
-        long count = payrollRepository.countByEmployeeId(employee1.getId());
+        long count = payrollRepository.countByEmployee_Id(employee1.getId());
 
         // Assert
         assertEquals(2, count);

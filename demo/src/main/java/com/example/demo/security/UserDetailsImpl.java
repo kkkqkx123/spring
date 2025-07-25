@@ -62,10 +62,14 @@ public class UserDetailsImpl implements UserDetails {
     public static UserDetailsImpl build(User user) {
         Set<GrantedAuthority> authorities = new HashSet<>();
         
-        // Add role-based authorities with ROLE_ prefix
+        // Add role-based authorities
         for (Role role : user.getRoles()) {
-            // Add the role itself as an authority with ROLE_ prefix
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+            // Add the role itself as an authority (role name should already have ROLE_ prefix)
+            String roleName = role.getName();
+            if (!roleName.startsWith("ROLE_")) {
+                roleName = "ROLE_" + roleName;
+            }
+            authorities.add(new SimpleGrantedAuthority(roleName));
             
             // Add all resource permissions as authorities
             for (Resource resource : role.getResources()) {
@@ -108,7 +112,8 @@ public class UserDetailsImpl implements UserDetails {
      * Check if user has a specific role
      */
     public boolean hasRole(String role) {
-        return hasAuthority("ROLE_" + role);
+        String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        return hasAuthority(roleWithPrefix);
     }
 
     public Long getId() {

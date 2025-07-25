@@ -227,4 +227,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
      */
     @Query("SELECT e.status, COUNT(e) FROM Employee e GROUP BY e.status ORDER BY COUNT(e) DESC")
     List<Object[]> getEmployeeCountByStatus();
+
+    List<Employee> findByNameContainingIgnoreCase(String string);
+
+    List<Employee> findByDepartmentId(Long id);
+
+    List<Employee> findByStatus(EmployeeStatus active);
 }

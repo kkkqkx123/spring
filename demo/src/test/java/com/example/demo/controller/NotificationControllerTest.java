@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Collections;
 
 import com.example.demo.model.dto.NotificationRequest;
 import com.example.demo.model.entity.MessageContent;

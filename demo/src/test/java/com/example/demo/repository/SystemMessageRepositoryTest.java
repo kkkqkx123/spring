@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -40,12 +39,14 @@ class SystemMessageRepositoryTest {
         messageContent1.setContent("Test message 1");
         messageContent1.setSenderId(1L);
         messageContent1.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent1);
         
         MessageContent messageContent2 = new MessageContent();
         messageContent2.setContent("Test message 2");
         messageContent2.setSenderId(1L);
         messageContent2.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent2);
         
         // Create and persist system messages for a user
@@ -53,6 +54,7 @@ class SystemMessageRepositoryTest {
         systemMessage1.setUserId(1L);
         systemMessage1.setMessageId(messageContent1.getId());
         systemMessage1.setIsRead(false);
+        systemMessage1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage1);
         
         SystemMessage systemMessage2 = new SystemMessage();
@@ -60,6 +62,7 @@ class SystemMessageRepositoryTest {
         systemMessage2.setMessageId(messageContent2.getId());
         systemMessage2.setIsRead(true);
         systemMessage2.setReadAt(LocalDateTime.now());
+        systemMessage2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage2);
         
         // Create and persist a system message for another user
@@ -67,6 +70,7 @@ class SystemMessageRepositoryTest {
         systemMessage3.setUserId(2L);
         systemMessage3.setMessageId(messageContent1.getId());
         systemMessage3.setIsRead(false);
+        systemMessage3.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage3);
         
         entityManager.flush();
@@ -85,12 +89,14 @@ class SystemMessageRepositoryTest {
         messageContent1.setContent("Test message 1");
         messageContent1.setSenderId(1L);
         messageContent1.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent1);
         
         MessageContent messageContent2 = new MessageContent();
         messageContent2.setContent("Test message 2");
         messageContent2.setSenderId(1L);
         messageContent2.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent2);
         
         // Create and persist system messages for a user
@@ -98,6 +104,7 @@ class SystemMessageRepositoryTest {
         systemMessage1.setUserId(1L);
         systemMessage1.setMessageId(messageContent1.getId());
         systemMessage1.setIsRead(false);
+        systemMessage1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage1);
         
         SystemMessage systemMessage2 = new SystemMessage();
@@ -105,6 +112,7 @@ class SystemMessageRepositoryTest {
         systemMessage2.setMessageId(messageContent2.getId());
         systemMessage2.setIsRead(true);
         systemMessage2.setReadAt(LocalDateTime.now());
+        systemMessage2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage2);
         
         entityManager.flush();
@@ -124,6 +132,7 @@ class SystemMessageRepositoryTest {
         messageContent.setContent("Test message");
         messageContent.setSenderId(1L);
         messageContent.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent);
         
         // Create and persist a system message
@@ -131,6 +140,7 @@ class SystemMessageRepositoryTest {
         systemMessage.setUserId(1L);
         systemMessage.setMessageId(messageContent.getId());
         systemMessage.setIsRead(false);
+        systemMessage.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage);
         
         entityManager.flush();
@@ -151,12 +161,14 @@ class SystemMessageRepositoryTest {
         messageContent1.setContent("Test message 1");
         messageContent1.setSenderId(1L);
         messageContent1.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent1);
         
         MessageContent messageContent2 = new MessageContent();
         messageContent2.setContent("Test message 2");
         messageContent2.setSenderId(1L);
         messageContent2.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent2);
         
         // Create and persist system messages for a user
@@ -164,12 +176,14 @@ class SystemMessageRepositoryTest {
         systemMessage1.setUserId(1L);
         systemMessage1.setMessageId(messageContent1.getId());
         systemMessage1.setIsRead(false);
+        systemMessage1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage1);
         
         SystemMessage systemMessage2 = new SystemMessage();
         systemMessage2.setUserId(1L);
         systemMessage2.setMessageId(messageContent2.getId());
         systemMessage2.setIsRead(false);
+        systemMessage2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage2);
         
         SystemMessage systemMessage3 = new SystemMessage();
@@ -177,6 +191,7 @@ class SystemMessageRepositoryTest {
         systemMessage3.setMessageId(messageContent2.getId());
         systemMessage3.setIsRead(true);
         systemMessage3.setReadAt(LocalDateTime.now());
+        systemMessage3.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage3);
         
         entityManager.flush();
@@ -196,12 +211,14 @@ class SystemMessageRepositoryTest {
         messageContent1.setContent("Test message 1");
         messageContent1.setSenderId(1L);
         messageContent1.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent1);
         
         MessageContent messageContent2 = new MessageContent();
         messageContent2.setContent("Test message 2");
         messageContent2.setSenderId(1L);
         messageContent2.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent2);
         
         // Create and persist system messages
@@ -209,12 +226,14 @@ class SystemMessageRepositoryTest {
         systemMessage1.setUserId(1L);
         systemMessage1.setMessageId(messageContent1.getId());
         systemMessage1.setIsRead(false);
+        systemMessage1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage1);
         
         SystemMessage systemMessage2 = new SystemMessage();
         systemMessage2.setUserId(1L);
         systemMessage2.setMessageId(messageContent2.getId());
         systemMessage2.setIsRead(false);
+        systemMessage2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage2);
         
         entityManager.flush();
@@ -224,6 +243,9 @@ class SystemMessageRepositoryTest {
         
         // Verify
         assertEquals(2, updated);
+        
+        // Clear the persistence context to force fresh reads from database
+        entityManager.clear();
         
         // Refresh entities from database
         SystemMessage refreshedMessage1 = entityManager.find(SystemMessage.class, systemMessage1.getId());
@@ -244,12 +266,14 @@ class SystemMessageRepositoryTest {
         messageContent1.setContent("Test message 1");
         messageContent1.setSenderId(1L);
         messageContent1.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent1);
         
         MessageContent messageContent2 = new MessageContent();
         messageContent2.setContent("Test message 2");
         messageContent2.setSenderId(1L);
         messageContent2.setMessageType(MessageType.SYSTEM_NOTIFICATION);
+        messageContent2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(messageContent2);
         
         // Create and persist system messages for a user
@@ -257,12 +281,14 @@ class SystemMessageRepositoryTest {
         systemMessage1.setUserId(1L);
         systemMessage1.setMessageId(messageContent1.getId());
         systemMessage1.setIsRead(false);
+        systemMessage1.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage1);
         
         SystemMessage systemMessage2 = new SystemMessage();
         systemMessage2.setUserId(1L);
         systemMessage2.setMessageId(messageContent2.getId());
         systemMessage2.setIsRead(false);
+        systemMessage2.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage2);
         
         // Create and persist a system message for another user
@@ -270,6 +296,7 @@ class SystemMessageRepositoryTest {
         systemMessage3.setUserId(2L);
         systemMessage3.setMessageId(messageContent1.getId());
         systemMessage3.setIsRead(false);
+        systemMessage3.setCreatedAt(LocalDateTime.now());
         entityManager.persist(systemMessage3);
         
         entityManager.flush();
@@ -279,6 +306,9 @@ class SystemMessageRepositoryTest {
         
         // Verify
         assertEquals(2, updated);
+        
+        // Clear the persistence context to force fresh reads from database
+        entityManager.clear();
         
         // Refresh entities from database
         SystemMessage refreshedMessage1 = entityManager.find(SystemMessage.class, systemMessage1.getId());

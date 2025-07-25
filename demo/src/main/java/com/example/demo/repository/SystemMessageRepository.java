@@ -83,4 +83,8 @@ public interface SystemMessageRepository extends JpaRepository<SystemMessage, Lo
      */
     @Query("SELECT sm FROM SystemMessage sm JOIN FETCH sm.messageContent WHERE sm.userId = :userId")
     Page<SystemMessage> findWithContentByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    List<SystemMessage> findByUserId(Long id);
+
+    List<SystemMessage> findByUserIdAndIsRead(Long id, boolean b);
 }

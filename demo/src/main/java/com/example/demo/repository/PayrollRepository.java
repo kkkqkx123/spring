@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public interface PayrollRepository extends JpaRepository<PayrollLedger, Long>, J
      * @param payPeriod the pay period
      * @return Optional containing the payroll ledger if found
      */
-    Optional<PayrollLedger> findByEmployeeIdAndPayPeriod(Long employeeId, YearMonth payPeriod);
+    Optional<PayrollLedger> findByEmployee_IdAndPayPeriod(Long employeeId, YearMonth payPeriod);
     
     /**
      * Check if payroll ledger exists for employee and pay period
@@ -39,7 +40,7 @@ public interface PayrollRepository extends JpaRepository<PayrollLedger, Long>, J
      * @param payPeriod the pay period
      * @return true if exists, false otherwise
      */
-    boolean existsByEmployeeIdAndPayPeriod(Long employeeId, YearMonth payPeriod);
+    boolean existsByEmployee_IdAndPayPeriod(Long employeeId, YearMonth payPeriod);
     
     /**
      * Find payroll ledgers by employee ID with pagination
@@ -48,7 +49,7 @@ public interface PayrollRepository extends JpaRepository<PayrollLedger, Long>, J
      * @param pageable pagination information
      * @return page of payroll ledgers
      */
-    Page<PayrollLedger> findByEmployeeId(Long employeeId, Pageable pageable);
+    Page<PayrollLedger> findByEmployee_Id(Long employeeId, Pageable pageable);
     
     /**
      * Find payroll ledgers by pay period with pagination
@@ -76,7 +77,7 @@ public interface PayrollRepository extends JpaRepository<PayrollLedger, Long>, J
      * @param pageable pagination information
      * @return page of payroll ledgers
      */
-    Page<PayrollLedger> findByEmployeeIdAndStatus(Long employeeId, PayrollStatus status, Pageable pageable);
+    Page<PayrollLedger> findByEmployee_IdAndStatus(Long employeeId, PayrollStatus status, Pageable pageable);
     
     /**
      * Find payroll ledgers by pay period and status
@@ -147,7 +148,7 @@ public interface PayrollRepository extends JpaRepository<PayrollLedger, Long>, J
      * @param employeeId the employee ID
      * @return count of payroll ledgers
      */
-    long countByEmployeeId(Long employeeId);
+    long countByEmployee_Id(Long employeeId);
     
     /**
      * Count payroll ledgers by pay period
@@ -217,4 +218,51 @@ public interface PayrollRepository extends JpaRepository<PayrollLedger, Long>, J
      * @return list of payroll ledgers
      */
     List<PayrollLedger> findByIdIn(List<Long> ids);
+
+    /**
+     * Find payroll ledgers by employee ID
+     * 
+     * @param employeeId the employee ID
+     * @return list of payroll ledgers
+     */
+    List<PayrollLedger> findByEmployee_Id(Long employeeId);
+
+    /**
+     * Find payroll ledgers by pay period between two dates
+     * 
+     * @param startDate the start date
+     * @param endDate the end date
+     * @return list of payroll ledgers
+     */
+    @Query("SELECT pl FROM PayrollLedger pl WHERE pl.payPeriod >= :startPeriod AND pl.payPeriod <= :endPeriod")
+// 由于存在重复方法，此处删除重复的方法声明，保留后续的方法声明
+
+    /**
+     * Find payroll ledgers by pay period between two dates
+     * 
+     * @param startDate the start date
+     * @param endDate the end date
+     * @return list of payroll ledgers
+     */
+    /**
+     * Find payroll ledgers by pay period between two dates
+     * 
+     * @param startDate the start date
+     * @param endDate the end date
+     * @return list of payroll ledgers
+     */
+    List<PayrollLedger> findByPayPeriodBetween(@Param("startPeriod") YearMonth startDate, @Param("endPeriod") YearMonth endDate);
+
+    /**
+     * Find payroll ledgers by pay period between two dates (LocalDate version)
+     * 
+     * @param startDate the start date
+     * @param endDate the end date
+     * @return list of payroll ledgers
+     */
+    default List<PayrollLedger> findByPayPeriodBetween(LocalDate startDate, LocalDate endDate) {
+        YearMonth startPeriod = YearMonth.from(startDate);
+        YearMonth endPeriod = YearMonth.from(endDate);
+        return findByPayPeriodBetween(startPeriod, endPeriod);
+    }
 }
