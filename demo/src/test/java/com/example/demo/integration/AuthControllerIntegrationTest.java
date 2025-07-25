@@ -153,10 +153,13 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        // Extract token from response (simplified for test)
+        // Extract token from response
+        com.fasterxml.jackson.databind.JsonNode jsonNode = objectMapper.readTree(response);
+        String token = jsonNode.get("token").asText();
+
         mockMvc.perform(post("/api/auth/refresh")
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .header("Authorization", "Bearer valid-token"))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists());
     }

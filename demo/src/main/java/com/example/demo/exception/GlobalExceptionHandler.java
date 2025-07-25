@@ -147,6 +147,14 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Handle authentication exceptions
+     */
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(org.springframework.security.core.AuthenticationException ex, WebRequest request) {
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication failed: " + ex.getMessage(), "AUTH-401");
+    }
+    
+    /**
      * Handle authorization exceptions
      */
     @ExceptionHandler(AuthorizationDeniedException.class)
