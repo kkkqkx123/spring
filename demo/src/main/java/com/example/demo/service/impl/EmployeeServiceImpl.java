@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.exception.EmployeeNotFoundException;
 import com.example.demo.exception.InvalidDataException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.dto.EmployeeSearchCriteria;
@@ -53,7 +54,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee getEmployeeById(Long id) {
         log.info("Fetching employee by ID: {}", id);
         return employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee", "id"));
     }
     
     @Override

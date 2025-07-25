@@ -1,0 +1,52 @@
+these issues are detected by demo\src\test\java\com\example\demo\security\UserDetailsServiceImplTest.java
+
+##1.
+Wanted but not invoked:permissionService.getUserResources();
+
+example 1：
+Wanted but not invoked:
+permissionService.getUserResources(
+    "disableduser"
+);
+ at com.example.demo.security.UserDetailsServiceImplTest.testLoadUserByUsername_DisabledUser_ShouldReturnUserDetailsWithDisabledFlag(UserDetailsServiceImplTest.java:189)
+
+However, there was exactly 1 interaction with this mock:
+permissionService.loadUserPermissions(
+    com.example.demo.model.entity.User@719843e5
+);
+ at com.example.demo.security.UserDetailsServiceImpl.loadUserByUsername(UserDetailsServiceImpl.java:55)
+
+
+ at com.example.demo.security.UserDetailsServiceImplTest.testLoadUserByUsername_DisabledUser_ShouldReturnUserDetailsWithDisabledFlag(UserDetailsServiceImplTest.java:189)
+ at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+ at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+Same type of issues(remain different part)：
+permissionService.getUserResources(
+    "expireduser"
+);
+
+permissionService.getUserResources(
+    "expiredcredentialsuser"
+);
+
+permissionService.getUserResources(
+    "lockeduser"
+);
+
+permissionService.getUserResources(
+    "testuser"
+);
+
+permissionService.getUserResources(
+    "noroleuser"
+);
+
+
+
+##2.
+org.opentest4j.AssertionFailedError: Expected java.lang.RuntimeException to be thrown, but nothing was thrown.
+org.opentest4j.AssertionFailedError: Expected java.lang.RuntimeException to be thrown, but nothing was thrown.
+ at com.example.demo.security.UserDetailsServiceImplTest.testLoadUserByUsername_PermissionServiceError_ShouldThrowRuntimeException(UserDetailsServiceImplTest.java:163)
+ at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+ at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)

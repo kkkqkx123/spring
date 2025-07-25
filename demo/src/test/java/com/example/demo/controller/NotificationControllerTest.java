@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -148,6 +149,7 @@ class NotificationControllerTest {
         
         // Act & Assert
         mockMvc.perform(put("/api/notifications/1/read")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -161,7 +163,8 @@ class NotificationControllerTest {
         
         // Act & Assert
         mockMvc.perform(put("/api/notifications/1/read")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNotFound());
     }
     
@@ -175,7 +178,8 @@ class NotificationControllerTest {
         // Act & Assert
         mockMvc.perform(put("/api/notifications/read")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Arrays.asList(1L, 2L))))
+                .content(objectMapper.writeValueAsString(Arrays.asList(1L, 2L)))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("2"));
     }
@@ -189,7 +193,8 @@ class NotificationControllerTest {
         
         // Act & Assert
         mockMvc.perform(put("/api/notifications/read-all")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("5"));
     }
@@ -206,6 +211,7 @@ class NotificationControllerTest {
         
         // Act & Assert
         mockMvc.perform(post("/api/notifications/user")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -227,7 +233,8 @@ class NotificationControllerTest {
         // Act & Assert
         mockMvc.perform(post("/api/notifications/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(request))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.messageId").value(messageContent.getId()))
                 .andExpect(jsonPath("$.content").value(messageContent.getContent()));
@@ -247,7 +254,8 @@ class NotificationControllerTest {
         // Act & Assert
         mockMvc.perform(post("/api/notifications/role")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(request))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.messageId").value(messageContent.getId()))
                 .andExpect(jsonPath("$.content").value(messageContent.getContent()));

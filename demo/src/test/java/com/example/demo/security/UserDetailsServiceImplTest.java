@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -106,7 +107,7 @@ class UserDetailsServiceImplTest {
         // Given
         String username = "testuser";
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username)).thenReturn(List.of(adminResource, hrResource));
+        doNothing().when(permissionService).loadUserPermissions(testUser);
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -129,7 +130,7 @@ class UserDetailsServiceImplTest {
 
         // Verify method calls
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 
     @Test
@@ -147,7 +148,7 @@ class UserDetailsServiceImplTest {
 
         assertEquals("User not found with username: " + username, exception.getMessage());
         verify(userRepository).findByUsername(username);
-        verify(permissionService, never()).getUserResources(anyString());
+        verify(permissionService, never()).loadUserPermissions(any(User.class));
     }
 
     @Test
@@ -156,8 +157,8 @@ class UserDetailsServiceImplTest {
         // Given
         String username = "testuser";
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username))
-                .thenThrow(new RuntimeException("Permission service error"));
+        doThrow(new RuntimeException("Permission service error"))
+                .when(permissionService).loadUserPermissions(testUser);
 
         // When & Then
         RuntimeException exception = assertThrows(
@@ -167,7 +168,7 @@ class UserDetailsServiceImplTest {
 
         assertEquals("Error loading user permissions", exception.getMessage());
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 
     @Test
@@ -177,7 +178,7 @@ class UserDetailsServiceImplTest {
         String username = "disableduser";
         testUser.setEnabled(false);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username)).thenReturn(List.of());
+        doNothing().when(permissionService).loadUserPermissions(testUser);
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -186,7 +187,7 @@ class UserDetailsServiceImplTest {
         assertNotNull(userDetails);
         assertFalse(userDetails.isEnabled());
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 
     @Test
@@ -196,7 +197,7 @@ class UserDetailsServiceImplTest {
         String username = "expireduser";
         testUser.setAccountNonExpired(false);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username)).thenReturn(List.of());
+        doNothing().when(permissionService).loadUserPermissions(testUser);
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -205,7 +206,7 @@ class UserDetailsServiceImplTest {
         assertNotNull(userDetails);
         assertFalse(userDetails.isAccountNonExpired());
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 
     @Test
@@ -215,7 +216,7 @@ class UserDetailsServiceImplTest {
         String username = "lockeduser";
         testUser.setAccountNonLocked(false);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username)).thenReturn(List.of());
+        doNothing().when(permissionService).loadUserPermissions(testUser);
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -224,7 +225,7 @@ class UserDetailsServiceImplTest {
         assertNotNull(userDetails);
         assertFalse(userDetails.isAccountNonLocked());
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 
     @Test
@@ -234,7 +235,7 @@ class UserDetailsServiceImplTest {
         String username = "expiredcredentialsuser";
         testUser.setCredentialsNonExpired(false);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username)).thenReturn(List.of());
+        doNothing().when(permissionService).loadUserPermissions(testUser);
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -243,7 +244,7 @@ class UserDetailsServiceImplTest {
         assertNotNull(userDetails);
         assertFalse(userDetails.isCredentialsNonExpired());
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 
     @Test
@@ -253,7 +254,7 @@ class UserDetailsServiceImplTest {
         String username = "noroleuser";
         testUser.setRoles(new HashSet<>());
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
-        when(permissionService.getUserResources(username)).thenReturn(List.of());
+        doNothing().when(permissionService).loadUserPermissions(testUser);
 
         // When
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -262,6 +263,6 @@ class UserDetailsServiceImplTest {
         assertNotNull(userDetails);
         assertTrue(userDetails.getAuthorities().isEmpty());
         verify(userRepository).findByUsername(username);
-        verify(permissionService).getUserResources(username);
+        verify(permissionService).loadUserPermissions(testUser);
     }
 }

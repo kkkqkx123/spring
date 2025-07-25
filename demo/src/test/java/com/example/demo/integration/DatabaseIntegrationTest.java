@@ -67,7 +67,7 @@ class DatabaseIntegrationTest extends BaseIntegrationTest {
         // Test many-to-many relationship between User and Role
         User user = userRepository.findById(regularUser.getId()).orElseThrow();
         assertThat(user.getRoles()).hasSize(1);
-        assertThat(user.getRoles().iterator().next().getName()).isEqualTo("USER");
+        assertThat(user.getRoles().iterator().next().getName()).isEqualTo("ROLE_USER");
 
         // Add another role
         user.getRoles().add(hrManagerRole);
@@ -77,7 +77,7 @@ class DatabaseIntegrationTest extends BaseIntegrationTest {
         User updatedUser = userRepository.findById(regularUser.getId()).orElseThrow();
         assertThat(updatedUser.getRoles()).hasSize(2);
         assertThat(updatedUser.getRoles().stream().map(Role::getName))
-                .containsExactlyInAnyOrder("USER", "HR_MANAGER");
+                .containsExactlyInAnyOrder("ROLE_USER", "ROLE_HR_MANAGER");
     }
 
     @Test

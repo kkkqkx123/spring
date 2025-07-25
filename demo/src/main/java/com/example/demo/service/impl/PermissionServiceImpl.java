@@ -159,4 +159,20 @@ public class PermissionServiceImpl implements PermissionService {
         role.getResources().remove(resource);
         return roleRepository.save(role);
     }
+    
+    /**
+     * Load user permissions and update the user entity
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public void loadUserPermissions(User user) {
+        // In this implementation, permissions are loaded lazily by Hibernate
+        // We just need to ensure the user's roles and their resources are initialized
+        user.getRoles().size(); // Initialize roles
+        
+        // Initialize resources for each role
+        for (Role role : user.getRoles()) {
+            role.getResources().size(); // Initialize resources
+        }
+    }
 }

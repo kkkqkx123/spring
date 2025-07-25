@@ -10,12 +10,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.model.entity.Resource;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.PermissionService;
-
-import java.util.List;
 
 /**
  * Custom UserDetailsService implementation for loading user-specific data
@@ -50,6 +47,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 });
         
         logger.debug("Found user {} with {} roles", username, user.getRoles().size());
+        
+        try {
+            // Load user permissions from permission service
+            permissionService.loadUserPermissions(user);
+        } catch (Exception e) {
+            logger.error("Error loading user permissions for username: {}", username, e);
+            throw new RuntimeException("Error loading user permissions", e);
+        }
         
         // Build UserDetails with user data and permissions
         return UserDetailsImpl.build(user);

@@ -82,4 +82,11 @@ public interface PermissionService {
      * @return the updated role
      */
     Role removeResourceFromRole(String roleName, Long resourceId);
+    
+    /**
+     * Load user permissions and update the user entity
+     * 
+     * @param user the user entity to update
+     */
+    void loadUserPermissions(User user);
 }
