@@ -32,6 +32,7 @@ import java.util.Map;
  * End-to-end workflow integration tests
  * Tests complete business workflows across multiple controllers
  */
+@SuppressWarnings("unused")
 class EndToEndWorkflowTest extends BaseIntegrationTest {
 
         @Test

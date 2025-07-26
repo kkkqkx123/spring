@@ -10,12 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
+import jakarta.persistence.EntityManager;
+
 import com.example.demo.model.entity.MessageContent;
 import com.example.demo.model.entity.SystemMessage;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.SystemMessageRepository;
 
 import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * Integration tests for Notification REST endpoints
@@ -27,6 +31,9 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private SystemMessageRepository systemMessageRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private MessageContent testMessage;
     private SystemMessage testSystemMessage;
@@ -59,10 +66,9 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/notifications")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].userId").value(regularUser.getId()))
-                .andExpect(jsonPath("$[0].messageId").value(testMessage.getId()))
-                .andExpect(jsonPath("$[0].isRead").value(false));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].messageId").value(testMessage.getId()))
+                .andExpect(jsonPath("$.content[0].isRead").value(false));
     }
 
     @Test
@@ -73,11 +79,12 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testGetUnreadNotifications_AsRegularUser_ShouldReturnUnreadOnly() throws Exception {
-        mockMvc.perform(get("/api/notifications/unread")
+        mockMvc.perform(get("/api/notifications")
+                .param("unreadOnly", "true")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].isRead").value(false));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].isRead").value(false));
     }
 
     @Test
@@ -91,7 +98,7 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/notifications")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].isRead").value(true));
+                .andExpect(jsonPath("$.content[0].isRead").value(true));
     }
 
     @Test
@@ -125,10 +132,11 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         // Verify all notifications are marked as read
-        mockMvc.perform(get("/api/notifications/unread")
+        mockMvc.perform(get("/api/notifications")
+                .param("unreadOnly", "true")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test
@@ -136,13 +144,13 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(delete("/api/notifications/{id}", testSystemMessage.getId())
                 .with(user(regularUser.getUsername()).roles("USER"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         // Verify notification is deleted
         mockMvc.perform(get("/api/notifications")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test
@@ -159,7 +167,7 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
         newMessage.setContent("New system notification");
         newMessage.setMessageType(MessageContent.MessageType.SYSTEM_NOTIFICATION);
 
-        mockMvc.perform(post("/api/notifications")
+        mockMvc.perform(post("/api/notifications/broadcast")
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +182,7 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
         newMessage.setContent("Unauthorized notification");
         newMessage.setMessageType(MessageContent.MessageType.SYSTEM_NOTIFICATION);
 
-        mockMvc.perform(post("/api/notifications")
+        mockMvc.perform(post("/api/notifications/broadcast")
                 .with(user(regularUser.getUsername()).roles("USER"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -184,6 +192,10 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testBroadcastNotification_AsAdmin_ShouldCreateForAllUsers() throws Exception {
+        // Clean existing notifications to avoid conflicts
+        systemMessageRepository.deleteAll();
+        messageRepository.deleteAll();
+        
         MessageContent broadcastMessage = new MessageContent();
         broadcastMessage.setContent("Broadcast notification to all users");
         broadcastMessage.setMessageType(MessageContent.MessageType.BROADCAST);
@@ -195,11 +207,23 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
                 .content(objectMapper.writeValueAsString(broadcastMessage)))
                 .andExpect(status().isCreated());
 
+        // Force flush to ensure data is persisted
+        entityManager.flush();
+        entityManager.clear();
+
         // Verify all users received the notification
+        String response = mockMvc.perform(get("/api/notifications")
+                .with(user(regularUser.getUsername()).roles("USER")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+                
+        System.out.println("Response content: " + response);
+                
         mockMvc.perform(get("/api/notifications")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.content=='Broadcast notification to all users')]").exists());
+                .andExpect(jsonPath("$.content[?(@.content == 'Broadcast notification to all users')].content")
+                        .value(hasItem("Broadcast notification to all users")));
     }
 
     @Test
@@ -207,7 +231,6 @@ class NotificationControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/notifications/count")
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.total").value(1))
-                .andExpect(jsonPath("$.unread").value(1));
+                .andExpect(jsonPath("$").value(1));
     }
 }

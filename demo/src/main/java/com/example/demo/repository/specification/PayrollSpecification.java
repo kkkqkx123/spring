@@ -24,6 +24,7 @@ public class PayrollSpecification {
      * @param employeeId the employee ID
      * @return specification for employee ID filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> hasEmployeeId(Long employeeId) {
         return (root, query, criteriaBuilder) -> {
             if (employeeId == null) {
@@ -39,6 +40,7 @@ public class PayrollSpecification {
      * @param departmentId the department ID
      * @return specification for department ID filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> inDepartment(Long departmentId) {
         return (root, query, criteriaBuilder) -> {
             if (departmentId == null) {
@@ -54,6 +56,7 @@ public class PayrollSpecification {
      * @param payPeriod the pay period
      * @return specification for pay period filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> hasPayPeriod(YearMonth payPeriod) {
         return (root, query, criteriaBuilder) -> {
             if (payPeriod == null) {
@@ -69,6 +72,7 @@ public class PayrollSpecification {
      * @param status the payroll status
      * @return specification for status filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> hasStatus(PayrollStatus status) {
         return (root, query, criteriaBuilder) -> {
             if (status == null) {
@@ -84,6 +88,7 @@ public class PayrollSpecification {
      * @param minNetSalary the minimum net salary
      * @return specification for minimum net salary filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> hasMinNetSalary(BigDecimal minNetSalary) {
         return (root, query, criteriaBuilder) -> {
             if (minNetSalary == null) {
@@ -99,6 +104,7 @@ public class PayrollSpecification {
      * @param maxNetSalary the maximum net salary
      * @return specification for maximum net salary filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> hasMaxNetSalary(BigDecimal maxNetSalary) {
         return (root, query, criteriaBuilder) -> {
             if (maxNetSalary == null) {
@@ -113,6 +119,7 @@ public class PayrollSpecification {
      * 
      * @return specification for draft status filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> isDraft() {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(root.get("status"), PayrollStatus.DRAFT);
@@ -123,6 +130,7 @@ public class PayrollSpecification {
      * 
      * @return specification for approved status filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> isApproved() {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(root.get("status"), PayrollStatus.APPROVED);
@@ -133,6 +141,7 @@ public class PayrollSpecification {
      * 
      * @return specification for paid status filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> isPaid() {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(root.get("status"), PayrollStatus.PAID);
@@ -143,6 +152,7 @@ public class PayrollSpecification {
      * 
      * @return specification for modifiable status filter
      */
+    @SuppressWarnings("unused")
     public static Specification<PayrollLedger> isModifiable() {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.or(

@@ -38,6 +38,7 @@ import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.repository.PayrollRepository;
 import com.example.demo.service.impl.PayrollServiceImpl;
 
+@SuppressWarnings("unused")
 @ExtendWith(MockitoExtension.class)
 public class PayrollServiceTest {
 

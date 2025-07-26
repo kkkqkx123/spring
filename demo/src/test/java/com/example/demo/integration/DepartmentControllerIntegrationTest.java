@@ -125,6 +125,7 @@ class DepartmentControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetDepartmentTree_AsAdmin_ShouldReturnHierarchy() throws Exception {
         // Create a child department
+        @SuppressWarnings("unused")
         Department childDepartment = createDepartment("IT Support", itDepartment.getId(), null, false);
 
         mockMvc.perform(get("/api/departments/tree")
@@ -137,6 +138,7 @@ class DepartmentControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetDepartmentsByParent_AsAdmin_ShouldReturnChildren() throws Exception {
         // Create a child department
+        @SuppressWarnings("unused")
         Department childDepartment = createDepartment("IT Support", itDepartment.getId(), null, false);
 
         mockMvc.perform(get("/api/departments/parent/{parentId}", itDepartment.getId())

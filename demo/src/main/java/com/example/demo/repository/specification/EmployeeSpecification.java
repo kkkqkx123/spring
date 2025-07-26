@@ -22,6 +22,7 @@ public class EmployeeSpecification {
      * @param criteria the search criteria
      * @return specification for dynamic query building
      */
+    @SuppressWarnings("unused")
     public static Specification<Employee> createSpecification(EmployeeSearchCriteria criteria) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -168,6 +169,7 @@ public class EmployeeSpecification {
      * 
      * @return specification for active employees
      */
+    @SuppressWarnings("unused")
     public static Specification<Employee> isActive() {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(root.get("status"), Employee.EmployeeStatus.ACTIVE);
@@ -179,6 +181,7 @@ public class EmployeeSpecification {
      * @param departmentId the department ID
      * @return specification for department filter
      */
+    @SuppressWarnings("unused")
     public static Specification<Employee> inDepartment(Long departmentId) {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(root.get("department").get("id"), departmentId);
@@ -190,6 +193,7 @@ public class EmployeeSpecification {
      * @param positionId the position ID
      * @return specification for position filter
      */
+    @SuppressWarnings("unused")
     public static Specification<Employee> withPosition(Long positionId) {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(root.get("position").get("id"), positionId);
@@ -200,6 +204,7 @@ public class EmployeeSpecification {
      * 
      * @return specification for current year hires
      */
+    @SuppressWarnings("unused")
     public static Specification<Employee> hiredThisYear() {
         return (root, query, criteriaBuilder) -> 
             criteriaBuilder.equal(

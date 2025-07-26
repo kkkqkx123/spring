@@ -173,6 +173,7 @@ class ChatControllerTest {
     void testGetRecentConversations_ReturnsUsers() throws Exception {
         // Arrange
         List<Long> userIds = Arrays.asList(2L, 3L);
+        @SuppressWarnings("unused")
         List<User> users = Arrays.asList(otherUser);
         
         when(userService.getUserFromAuthentication(any())).thenReturn(currentUser);

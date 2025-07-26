@@ -98,6 +98,7 @@ class DatabaseIntegrationTest extends BaseIntegrationTest {
     void testDepartmentRepository_HierarchicalQueries_ShouldWorkCorrectly() {
         // Create parent-child department relationship
         Department parentDept = createDepartment("Parent Dept", null, "/Parent", true);
+        @SuppressWarnings("unused")
         Department childDept = createDepartment("Child Dept", parentDept.getId(), "/Parent/Child", false);
 
         // Test finding by parent

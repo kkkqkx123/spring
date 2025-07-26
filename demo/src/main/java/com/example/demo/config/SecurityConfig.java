@@ -43,6 +43,7 @@ public class SecurityConfig {
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
+    @SuppressWarnings("unused")
     @Autowired
     private PermissionService permissionService;
 

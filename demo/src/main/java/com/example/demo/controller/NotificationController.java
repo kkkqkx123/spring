@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -112,6 +113,20 @@ public class NotificationController {
     @PutMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(Authentication authentication, @PathVariable Long id) {
         User currentUser = userService.getUserFromAuthentication(authentication);
+        
+        // Check if notification exists first
+        Optional<SystemMessage> messageOpt = notificationService.getNotificationById(id);
+        if (messageOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        SystemMessage message = messageOpt.get();
+        
+        // Check if user owns the notification
+        if (!message.getUserId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
         boolean success = notificationService.markAsRead(id, currentUser.getId());
         
         if (success) {
@@ -161,6 +176,20 @@ public class NotificationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(Authentication authentication, @PathVariable Long id) {
         User currentUser = userService.getUserFromAuthentication(authentication);
+        
+        // Check if notification exists first
+        Optional<SystemMessage> messageOpt = notificationService.getNotificationById(id);
+        if (messageOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        SystemMessage message = messageOpt.get();
+        
+        // Check if user owns the notification
+        if (!message.getUserId().equals(currentUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
         boolean success = notificationService.deleteNotification(id, currentUser.getId());
         
         if (success) {
@@ -261,6 +290,48 @@ public class NotificationController {
                 messageContent.getContent(),
                 messageContent.getMessageType(),
                 messageContent.getCreatedAt(),
+                false,
+                null
+        );
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    /**
+     * Broadcast a notification to all users
+     * 
+     * @param authentication the authentication object
+     * @param messageContent the message content to broadcast
+     * @return a response entity with the created notification
+     */
+    @PostMapping("/broadcast")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<NotificationResponse> broadcastNotification(
+            Authentication authentication,
+            @RequestBody MessageContent messageContent) {
+        
+        if (messageContent.getContent() == null || messageContent.getContent().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        // Get current user for senderId
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        
+        // Create message content with proper sender ID
+        MessageContent messageToCreate = new MessageContent();
+        messageToCreate.setContent(messageContent.getContent());
+        messageToCreate.setSenderId(currentUser.getId());
+        messageToCreate.setMessageType(MessageContent.MessageType.BROADCAST);
+        
+        // Save the message content first
+        MessageContent savedMessage = notificationService.createNotificationForAllUsers(messageToCreate.getContent());
+        
+        NotificationResponse response = NotificationResponse.create(
+                null, // System message ID not available here
+                savedMessage.getId(),
+                savedMessage.getContent(),
+                savedMessage.getMessageType(),
+                savedMessage.getCreatedAt(),
                 false,
                 null
         );

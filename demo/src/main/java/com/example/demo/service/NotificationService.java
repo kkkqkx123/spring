@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -100,4 +101,20 @@ public interface NotificationService {
      * @return true if the notification was deleted, false otherwise
      */
     boolean deleteNotification(Long messageId, Long userId);
+    
+    /**
+     * Create a notification for all users
+     * 
+     * @param content the notification content
+     * @return the created message content
+     */
+    MessageContent createNotificationForAllUsers(String content);
+    
+    /**
+     * Get a notification by ID
+     * 
+     * @param messageId the system message ID
+     * @return optional containing the system message if found
+     */
+    Optional<SystemMessage> getNotificationById(Long messageId);
 }

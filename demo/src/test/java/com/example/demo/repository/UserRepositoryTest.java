@@ -30,6 +30,7 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
     
+    @SuppressWarnings("unused")
     @Autowired
     private RoleRepository roleRepository;
     

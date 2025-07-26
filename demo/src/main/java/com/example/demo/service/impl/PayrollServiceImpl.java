@@ -699,6 +699,7 @@ public class PayrollServiceImpl implements PayrollService {
      * @param criteria the search criteria
      * @return the specification
      */
+    @SuppressWarnings("unused")
     private Specification<PayrollLedger> buildSpecificationFromCriteria(PayrollSearchCriteria criteria) {
         Specification<PayrollLedger> spec = (root, query, criteriaBuilder) -> null;
         

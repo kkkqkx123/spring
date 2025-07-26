@@ -116,13 +116,13 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Page<SystemMessage> getUserNotifications(Long userId, Pageable pageable) {
         log.debug("Getting notifications for user ID: {}", userId);
-        return systemMessageRepository.findByUserId(userId, pageable);
+        return systemMessageRepository.findWithContentByUserId(userId, pageable);
     }
     
     @Override
     public Page<SystemMessage> getUnreadNotifications(Long userId, Pageable pageable) {
         log.debug("Getting unread notifications for user ID: {}", userId);
-        return systemMessageRepository.findByUserIdAndIsReadFalse(userId, pageable);
+        return systemMessageRepository.findWithContentByUserIdAndIsReadFalse(userId, pageable);
     }
     
     @Override
@@ -228,5 +228,43 @@ public class NotificationServiceImpl implements NotificationService {
             log.warn("Notification not found: messageId={}", messageId);
             return false;
         }
+    }
+    
+    @Override
+    public Optional<SystemMessage> getNotificationById(Long messageId) {
+        log.debug("Getting notification by ID: {}", messageId);
+        return systemMessageRepository.findById(messageId);
+    }
+    
+    @Override
+    @Transactional
+    public MessageContent createNotificationForAllUsers(String content) {
+        log.debug("Creating broadcast notification for all users");
+        
+        // Create message content
+        MessageContent messageContent = MessageContent.createSystemNotification(content, 0L); // 0L represents system
+        messageContent.setMessageType(MessageContent.MessageType.BROADCAST);
+        MessageContent savedMessageContent = messageRepository.save(messageContent);
+        
+        // Get all user IDs
+        List<Long> allUserIds = userRepository.findAll().stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+        
+        if (allUserIds.isEmpty()) {
+            log.warn("No users found for broadcast notification");
+            return savedMessageContent;
+        }
+        
+        // Create system messages for each user
+        List<SystemMessage> systemMessages = allUserIds.stream()
+                .map(userId -> SystemMessage.create(userId, savedMessageContent.getId()))
+                .collect(Collectors.toList());
+        
+        systemMessageRepository.saveAll(systemMessages);
+        log.info("Broadcast notification created for {} users, message ID: {}", 
+                systemMessages.size(), savedMessageContent.getId());
+        
+        return savedMessageContent;
     }
 }
