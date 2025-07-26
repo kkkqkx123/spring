@@ -73,6 +73,10 @@ public class UserDetailsImpl implements UserDetails {
             
             // Add all resource permissions as authorities
             for (Resource resource : role.getResources()) {
+                // Add resource name as authority (e.g., EMPLOYEE_READ, PAYROLL_CREATE)
+                authorities.add(new SimpleGrantedAuthority(resource.getName()));
+                
+                // Also add method:url format for compatibility
                 String permission = resource.getMethod() + ":" + resource.getUrl();
                 authorities.add(new SimpleGrantedAuthority(permission));
             }

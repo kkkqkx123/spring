@@ -119,41 +119,56 @@ public abstract class BaseIntegrationTest {
         departmentRepository.deleteAll();
         positionRepository.deleteAll();
 
-        // Create resources
+        // Create resources with proper authority names
         Resource employeeReadResource = createResource("EMPLOYEE_READ", "/api/employees", "GET");
         Resource employeeCreateResource = createResource("EMPLOYEE_CREATE", "/api/employees", "POST");
         Resource employeeUpdateResource = createResource("EMPLOYEE_UPDATE", "/api/employees/*", "PUT");
         Resource employeeDeleteResource = createResource("EMPLOYEE_DELETE", "/api/employees/*", "DELETE");
         Resource departmentReadResource = createResource("DEPARTMENT_READ", "/api/departments", "GET");
         Resource departmentCreateResource = createResource("DEPARTMENT_CREATE", "/api/departments", "POST");
+        Resource departmentUpdateResource = createResource("DEPARTMENT_UPDATE", "/api/departments/*", "PUT");
         Resource positionReadResource = createResource("POSITION_READ", "/api/positions", "GET");
         Resource positionCreateResource = createResource("POSITION_CREATE", "/api/positions", "POST");
         Resource payrollReadResource = createResource("PAYROLL_READ", "/api/payroll", "GET");
         Resource payrollCreateResource = createResource("PAYROLL_CREATE", "/api/payroll", "POST");
+        Resource payrollUpdateResource = createResource("PAYROLL_UPDATE", "/api/payroll/*", "PUT");
+        Resource chatReadResource = createResource("CHAT_READ", "/api/chat", "GET");
+        Resource chatCreateResource = createResource("CHAT_CREATE", "/api/chat", "POST");
+        Resource chatUpdateResource = createResource("CHAT_UPDATE", "/api/chat/*", "PUT");
+        Resource notificationReadResource = createResource("NOTIFICATION_READ", "/api/notifications", "GET");
+        Resource notificationCreateResource = createResource("NOTIFICATION_CREATE", "/api/notifications", "POST");
+        Resource emailSendResource = createResource("EMAIL_SEND", "/api/email", "POST");
 
         // Create roles
         Set<Resource> adminResources = new HashSet<>();
         adminResources.addAll(Set.of(
                 employeeReadResource, employeeCreateResource, employeeUpdateResource, employeeDeleteResource,
-                departmentReadResource, departmentCreateResource,
+                departmentReadResource, departmentCreateResource, departmentUpdateResource,
                 positionReadResource, positionCreateResource,
-                payrollReadResource, payrollCreateResource
+                payrollReadResource, payrollCreateResource, payrollUpdateResource,
+                chatReadResource, chatCreateResource, chatUpdateResource,
+                notificationReadResource, notificationCreateResource,
+                emailSendResource
         ));
-        adminRole = createRole("ROLE_ADMIN", "System Administrator", adminResources);
+        adminRole = createRole("ADMIN", "System Administrator", adminResources);
 
         Set<Resource> hrManagerResources = new HashSet<>();
         hrManagerResources.addAll(Set.of(
                 employeeReadResource, employeeCreateResource, employeeUpdateResource, employeeDeleteResource,
-                departmentReadResource, positionReadResource,
-                payrollReadResource, payrollCreateResource
+                departmentReadResource, departmentCreateResource, departmentUpdateResource,
+                positionReadResource, positionCreateResource,
+                payrollReadResource, payrollCreateResource, payrollUpdateResource,
+                emailSendResource
         ));
-        hrManagerRole = createRole("ROLE_HR_MANAGER", "HR Manager", hrManagerResources);
+        hrManagerRole = createRole("HR_MANAGER", "HR Manager", hrManagerResources);
 
         Set<Resource> userResources = new HashSet<>();
         userResources.addAll(Set.of(
-                employeeReadResource, departmentReadResource, positionReadResource
+                employeeReadResource, departmentReadResource, positionReadResource,
+                chatReadResource, chatCreateResource, chatUpdateResource,
+                notificationReadResource
         ));
-        userRole = createRole("ROLE_USER", "Regular User", userResources);
+        userRole = createRole("USER", "Regular User", userResources);
 
         // Create users
         Set<Role> adminRoles = new HashSet<>();
