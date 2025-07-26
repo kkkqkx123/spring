@@ -9,8 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.Set;
-import java.util.HashSet;
 
 import com.example.demo.model.dto.EmployeeSearchCriteria;
 import com.example.demo.model.entity.Employee;
@@ -232,14 +230,12 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testImportEmployees_AsAdmin_ShouldImportFromExcel() throws Exception {
-        // Create a valid Excel template for testing
-        byte[] templateData = employeeService.getEmployeeImportTemplate();
-        
+        // Create a simple mock Excel file with valid test data
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "employees.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                templateData
+                createMockExcelContent()
         );
 
         mockMvc.perform(multipart("/api/employees/import")
@@ -293,5 +289,49 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", 
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+    }
+
+    /**
+     * Create a mock Excel file content for testing import functionality
+     */
+    private byte[] createMockExcelContent() throws Exception {
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+            
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.createSheet("Employees");
+            
+            // Create header row
+            org.apache.poi.ss.usermodel.Row headerRow = sheet.createRow(0);
+            String[] headers = {
+                "Employee Number", "Name", "Email", "Phone", "Department", "Position", 
+                "Hire Date", "Status", "Gender", "Birth Date", "Address", "Salary",
+                "Emergency Contact Name", "Emergency Contact Phone", "Notes"
+            };
+            
+            for (int i = 0; i < headers.length; i++) {
+                headerRow.createCell(i).setCellValue(headers[i]);
+            }
+            
+            // Create a data row with test data that matches our test setup
+            org.apache.poi.ss.usermodel.Row dataRow = sheet.createRow(1);
+            dataRow.createCell(0).setCellValue("EMP999"); // Employee Number
+            dataRow.createCell(1).setCellValue("Test Import Employee"); // Name
+            dataRow.createCell(2).setCellValue("test.import@example.com"); // Email
+            dataRow.createCell(3).setCellValue("+1234567999"); // Phone
+            dataRow.createCell(4).setCellValue("IT Department"); // Department (matches test data)
+            dataRow.createCell(5).setCellValue("Software Developer"); // Position (matches test data)
+            dataRow.createCell(6).setCellValue("2023-01-01"); // Hire Date
+            dataRow.createCell(7).setCellValue("Active"); // Status
+            dataRow.createCell(8).setCellValue("Male"); // Gender
+            dataRow.createCell(9).setCellValue("1990-01-01"); // Birth Date
+            dataRow.createCell(10).setCellValue("123 Test St"); // Address
+            dataRow.createCell(11).setCellValue(50000.0); // Salary
+            dataRow.createCell(12).setCellValue("Emergency Contact"); // Emergency Contact Name
+            dataRow.createCell(13).setCellValue("+1234567888"); // Emergency Contact Phone
+            dataRow.createCell(14).setCellValue("Test notes"); // Notes
+            
+            workbook.write(out);
+            return out.toByteArray();
+        }
     }
 }
