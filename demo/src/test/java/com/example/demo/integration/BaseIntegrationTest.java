@@ -101,6 +101,9 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected com.example.demo.service.PermissionService permissionService;
+    
+    @Autowired
+    protected com.example.demo.service.EmployeeService employeeService;
 
     // Test data
     protected User adminUser;

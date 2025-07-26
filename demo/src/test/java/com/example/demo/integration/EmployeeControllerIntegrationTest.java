@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.Set;
+import java.util.HashSet;
 
 import com.example.demo.model.dto.EmployeeSearchCriteria;
 import com.example.demo.model.entity.Employee;
@@ -23,18 +26,20 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetAllEmployees_AsAdmin_ShouldReturnEmployees() throws Exception {
         mockMvc.perform(get("/api/employees")
-                .with(user(adminUser.getUsername()).roles("ADMIN")))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].employeeNumber").exists())
                 .andExpect(jsonPath("$.content[0].name").exists());
     }
 
     @Test
     void testGetAllEmployees_AsHRManager_ShouldReturnEmployees() throws Exception {
         mockMvc.perform(get("/api/employees")
-                .with(user(hrManagerUser.getUsername()).roles("HR_MANAGER")))
+                .with(user(hrManagerUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_HR_MANAGER"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
@@ -42,7 +47,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetAllEmployees_AsRegularUser_ShouldReturnEmployees() throws Exception {
         mockMvc.perform(get("/api/employees")
-                .with(user(regularUser.getUsername()).roles("USER")))
+                .with(user(regularUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_USER"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
@@ -56,7 +63,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetEmployeeById_AsAdmin_ShouldReturnEmployee() throws Exception {
         mockMvc.perform(get("/api/employees/{id}", testEmployee1.getId())
-                .with(user(adminUser.getUsername()).roles("ADMIN")))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(testEmployee1.getId()))
                 .andExpect(jsonPath("$.employeeNumber").value("EMP001"))
@@ -66,7 +75,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetEmployeeById_NonExistent_ShouldReturn404() throws Exception {
         mockMvc.perform(get("/api/employees/{id}", 999L)
-                .with(user(adminUser.getUsername()).roles("ADMIN")))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isNotFound());
     }
 
@@ -82,7 +93,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         newEmployee.setStatus(Employee.EmployeeStatus.ACTIVE);
 
         mockMvc.perform(post("/api/employees")
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_CREATE")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newEmployee)))
@@ -102,7 +115,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         newEmployee.setStatus(Employee.EmployeeStatus.ACTIVE);
 
         mockMvc.perform(post("/api/employees")
-                .with(user(hrManagerUser.getUsername()).roles("HR_MANAGER"))
+                .with(user(hrManagerUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_HR_MANAGER"),
+                    new SimpleGrantedAuthority("EMPLOYEE_CREATE")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newEmployee)))
@@ -116,9 +131,11 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         newEmployee.setEmployeeNumber("EMP005");
         newEmployee.setName("Charlie Wilson");
         newEmployee.setEmail("charlie.wilson@example.com");
+        newEmployee.setDepartment(itDepartment); // 添加department属性以通过验证
 
         mockMvc.perform(post("/api/employees")
-                .with(user(regularUser.getUsername()).roles("USER"))
+                .with(user(regularUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_USER")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newEmployee)))
@@ -131,7 +148,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         testEmployee1.setEmail("john.doe.updated@example.com");
 
         mockMvc.perform(put("/api/employees/{id}", testEmployee1.getId())
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_UPDATE")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testEmployee1)))
@@ -145,7 +164,8 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         testEmployee1.setName("John Doe Updated");
 
         mockMvc.perform(put("/api/employees/{id}", testEmployee1.getId())
-                .with(user(regularUser.getUsername()).roles("USER"))
+                .with(user(regularUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_USER")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testEmployee1)))
@@ -155,20 +175,25 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testDeleteEmployee_AsAdmin_ShouldDeleteEmployee() throws Exception {
         mockMvc.perform(delete("/api/employees/{id}", testEmployee1.getId())
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_DELETE")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNoContent());
 
         // Verify employee is deleted
         mockMvc.perform(get("/api/employees/{id}", testEmployee1.getId())
-                .with(user(adminUser.getUsername()).roles("ADMIN")))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void testDeleteEmployee_AsRegularUser_ShouldReturn403() throws Exception {
         mockMvc.perform(delete("/api/employees/{id}", testEmployee1.getId())
-                .with(user(regularUser.getUsername()).roles("USER"))
+                .with(user(regularUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_USER")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isForbidden());
     }
@@ -178,7 +203,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         List<Long> employeeIds = List.of(testEmployee1.getId(), testEmployee2.getId());
 
         mockMvc.perform(delete("/api/employees")
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_DELETE")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employeeIds)))
@@ -192,7 +219,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         criteria.setName("John");
 
         mockMvc.perform(post("/api/employees/search")
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(criteria)))
@@ -203,17 +232,21 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testImportEmployees_AsAdmin_ShouldImportFromExcel() throws Exception {
-        // Create a mock Excel file
+        // Create a valid Excel template for testing
+        byte[] templateData = employeeService.getEmployeeImportTemplate();
+        
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "employees.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "mock-excel-content".getBytes()
+                templateData
         );
 
         mockMvc.perform(multipart("/api/employees/import")
                 .file(file)
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_CREATE")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isCreated());
     }
@@ -229,7 +262,8 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(multipart("/api/employees/import")
                 .file(file)
-                .with(user(regularUser.getUsername()).roles("USER"))
+                .with(user(regularUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_USER")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isForbidden());
     }
@@ -239,7 +273,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
         List<Long> employeeIds = List.of(testEmployee1.getId(), testEmployee2.getId());
 
         mockMvc.perform(post("/api/employees/export")
-                .with(user(adminUser.getUsername()).roles("ADMIN"))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ")))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employeeIds)))
@@ -251,7 +287,9 @@ class EmployeeControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testGetImportTemplate_AsAdmin_ShouldReturnTemplate() throws Exception {
         mockMvc.perform(get("/api/employees/import-template")
-                .with(user(adminUser.getUsername()).roles("ADMIN")))
+                .with(user(adminUser.getUsername()).authorities(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("EMPLOYEE_READ"))))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", 
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));

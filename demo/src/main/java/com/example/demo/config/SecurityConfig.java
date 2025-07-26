@@ -140,8 +140,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/hr/**").hasAnyAuthority("ADMIN", "HR_MANAGER")
                         // Department endpoints
                         .requestMatchers("/api/departments/**").hasAnyAuthority("ADMIN", "HR_MANAGER", "USER", "DEPARTMENT_MANAGER")
-                        // Employee endpoints
-                        .requestMatchers("/api/employees/**").hasAnyAuthority("ADMIN", "HR_MANAGER", "EMPLOYEE_MANAGER")
+                        // Employee endpoints - use method-level security
+                        .requestMatchers("/api/employees/**").authenticated()
                         // Position endpoints
                         .requestMatchers("/api/positions/**").hasAnyAuthority("ADMIN", "HR_MANAGER")
                         // Payroll endpoints
