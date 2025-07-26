@@ -99,6 +99,9 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
+    @Autowired
+    protected com.example.demo.service.PermissionService permissionService;
+
     // Test data
     protected User adminUser;
     protected User hrManagerUser;
@@ -146,6 +149,7 @@ public abstract class BaseIntegrationTest {
         Resource payrollReadResource = createResource("PAYROLL_READ", "/api/payroll", "GET");
         Resource payrollCreateResource = createResource("PAYROLL_CREATE", "/api/payroll", "POST");
         Resource payrollUpdateResource = createResource("PAYROLL_UPDATE", "/api/payroll/*", "PUT");
+        Resource payrollDeleteResource = createResource("PAYROLL_DELETE", "/api/payroll/*", "DELETE");
         Resource chatReadResource = createResource("CHAT_READ", "/api/chat", "GET");
         Resource chatCreateResource = createResource("CHAT_CREATE", "/api/chat", "POST");
         Resource chatUpdateResource = createResource("CHAT_UPDATE", "/api/chat/*", "PUT");
@@ -159,7 +163,7 @@ public abstract class BaseIntegrationTest {
                 employeeReadResource, employeeCreateResource, employeeUpdateResource, employeeDeleteResource,
                 departmentReadResource, departmentCreateResource, departmentUpdateResource,
                 positionReadResource, positionCreateResource,
-                payrollReadResource, payrollCreateResource, payrollUpdateResource,
+                payrollReadResource, payrollCreateResource, payrollUpdateResource, payrollDeleteResource,
                 chatReadResource, chatCreateResource, chatUpdateResource,
                 notificationReadResource, notificationCreateResource,
                 emailSendResource
@@ -196,6 +200,11 @@ public abstract class BaseIntegrationTest {
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(userRole);
         regularUser = createUser("user", "user@example.com", "password", userRoles);
+
+        // Load permissions for users
+        permissionService.loadUserPermissions(adminUser);
+        permissionService.loadUserPermissions(hrManagerUser);
+        permissionService.loadUserPermissions(regularUser);
 
         // Create departments
         itDepartment = createDepartment("IT Department", null, null, true);

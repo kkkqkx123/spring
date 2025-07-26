@@ -2,7 +2,6 @@ package com.example.demo.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,11 +22,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
-    @Autowired
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
+
+    public UserDetailsServiceImpl(UserRepository userRepository, PermissionService permissionService) {
+        this.userRepository = userRepository;
+        this.permissionService = permissionService;
+    }
 
     /**
      * Load user by username with caching
