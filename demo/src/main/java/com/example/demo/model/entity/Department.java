@@ -87,9 +87,9 @@ public class Department extends BaseEntity {
     private List<Department> children = new ArrayList<>();
     
     /**
-     * Employees in this department (transient to avoid circular references)
+     * Employees in this department
      */
-    @Transient
+    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Employee> employees = new ArrayList<>();
     
     /**

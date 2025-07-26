@@ -3,6 +3,7 @@ package com.example.demo.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -116,7 +117,7 @@ public class Employee extends BaseEntity {
     
     @NotNull(message = "Department is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", nullable = false)
+    @JoinColumn(name = "department_id", nullable = true)
     private Department department;
     
     @ManyToOne(fetch = FetchType.LAZY)

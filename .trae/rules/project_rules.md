@@ -1,0 +1,1 @@
+使用mvn命令执行maven操作，不要使用maven包装

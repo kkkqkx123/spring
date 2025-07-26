@@ -309,6 +309,13 @@ class DatabaseIntegrationTest extends BaseIntegrationTest {
         assertThat(positionRepository.findById(positionId)).isPresent();
         assertThat(employeeRepository.findById(employeeId)).isPresent();
 
+        // Set department reference to null for all employees in this department
+        List<Employee> deptEmployees = employeeRepository.findByDepartmentId(tempDept.getId());
+        for (Employee emp : deptEmployees) {
+            emp.setDepartment(null);
+            employeeRepository.save(emp);
+        }
+        
         // Delete department (should handle cascading appropriately)
         departmentRepository.delete(tempDept);
 
