@@ -2,6 +2,7 @@ package com.example.demo.integration;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
 import com.example.demo.model.entity.MessageContent;
+import com.example.demo.model.entity.SystemMessage;
 import com.example.demo.repository.MessageRepository;
+import com.example.demo.repository.SystemMessageRepository;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +40,10 @@ class ChatControllerIntegrationTest extends BaseIntegrationTest {
         testChatMessage.setSenderId(adminUser.getId());
         testChatMessage.setMessageType(MessageContent.MessageType.CHAT_MESSAGE);
         testChatMessage = messageRepository.save(testChatMessage);
+        
+        // Create SystemMessage for regularUser to associate with the test message
+        SystemMessage systemMessageForRegularUser = SystemMessage.create(regularUser.getId(), testChatMessage.getId());
+        systemMessageRepository.save(systemMessageForRegularUser);
     }
 
     @Test
@@ -66,6 +73,10 @@ class ChatControllerIntegrationTest extends BaseIntegrationTest {
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newMessage)))
+                .andDo(result -> {
+                    System.out.println("Response Status: " + result.getResponse().getStatus());
+                    System.out.println("Response Body: " + result.getResponse().getContentAsString());
+                })
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.content").value("This is a new chat message from regular user"))
                 .andExpect(jsonPath("$.senderId").value(regularUser.getId()));
@@ -188,9 +199,10 @@ class ChatControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/chat/messages/search")
                 .param("query", "test")
                 .with(user(regularUser.getUsername()).roles("USER")))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].content").value("Hello, this is a test chat message"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].content").value("Hello, this is a test chat message"));
     }
 
     @Test
@@ -202,8 +214,9 @@ class ChatControllerIntegrationTest extends BaseIntegrationTest {
                 .param("startDate", startDate)
                 .param("endDate", endDate)
                 .with(user(regularUser.getUsername()).roles("USER")))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].content").value("Hello, this is a test chat message"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].content").value("Hello, this is a test chat message"));
     }
 }

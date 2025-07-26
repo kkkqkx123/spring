@@ -204,4 +204,146 @@ public class ChatServiceImpl implements ChatService {
         
         return (long) query.getSingleResult();
     }
+    
+    @Override
+    public Page<MessageContent> getAllMessages(Long userId, Pageable pageable) {
+        log.debug("Getting all messages for user ID: {}", userId);
+        
+        // Get messages where user is sender or recipient
+        String jpql = "SELECT m FROM MessageContent m WHERE " +
+                      "m.senderId = :userId OR " +
+                      "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId) " +
+                      "ORDER BY m.createdAt DESC";
+        
+        TypedQuery<MessageContent> query = entityManager.createQuery(jpql, MessageContent.class)
+                .setParameter("userId", userId)
+                .setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize());
+        
+        List<MessageContent> messages = query.getResultList();
+        
+        // Count total elements
+        String countJpql = "SELECT COUNT(m) FROM MessageContent m WHERE " +
+                           "m.senderId = :userId OR " +
+                           "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId)";
+        
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class)
+                .setParameter("userId", userId);
+        
+        long total = countQuery.getSingleResult();
+        
+        return new org.springframework.data.domain.PageImpl<>(messages, pageable, total);
+    }
+    
+    @Override
+    @Transactional
+    public MessageContent saveMessage(MessageContent messageContent) {
+        log.debug("Saving message content: {}", messageContent.getContent());
+        return messageRepository.save(messageContent);
+    }
+    
+    @Override
+    public MessageContent getMessageById(Long id) {
+        log.debug("Getting message by ID: {}", id);
+        return messageRepository.findById(id).orElse(null);
+    }
+    
+    @Override
+    @Transactional
+    public MessageContent updateMessage(MessageContent messageContent) {
+        log.debug("Updating message ID: {}", messageContent.getId());
+        return messageRepository.save(messageContent);
+    }
+    
+    @Override
+    @Transactional
+    public void deleteMessage(Long id) {
+        log.debug("Deleting message ID: {}", id);
+        messageRepository.deleteById(id);
+    }
+    
+    @Override
+    public List<MessageContent> getRecentMessages(Long userId, int limit) {
+        log.debug("Getting recent messages for user ID: {}, limit: {}", userId, limit);
+        
+        String jpql = "SELECT m FROM MessageContent m WHERE " +
+                      "m.senderId = :userId OR " +
+                      "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId) " +
+                      "ORDER BY m.createdAt DESC";
+        
+        TypedQuery<MessageContent> query = entityManager.createQuery(jpql, MessageContent.class)
+                .setParameter("userId", userId)
+                .setMaxResults(limit);
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public Page<MessageContent> searchMessages(Long userId, String query, Pageable pageable) {
+        log.debug("Searching messages for user ID: {}, query: {}", userId, query);
+        
+        String jpql = "SELECT m FROM MessageContent m WHERE " +
+                      "(m.senderId = :userId OR " +
+                      "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId)) " +
+                      "AND LOWER(m.content) LIKE LOWER(:query) " +
+                      "ORDER BY m.createdAt DESC";
+        
+        TypedQuery<MessageContent> searchQuery = entityManager.createQuery(jpql, MessageContent.class)
+                .setParameter("userId", userId)
+                .setParameter("query", "%" + query + "%")
+                .setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize());
+        
+        List<MessageContent> messages = searchQuery.getResultList();
+        
+        // Count total elements
+        String countJpql = "SELECT COUNT(m) FROM MessageContent m WHERE " +
+                           "(m.senderId = :userId OR " +
+                           "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId)) " +
+                           "AND LOWER(m.content) LIKE LOWER(:query)";
+        
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class)
+                .setParameter("userId", userId)
+                .setParameter("query", "%" + query + "%");
+        
+        long total = countQuery.getSingleResult();
+        
+        return new org.springframework.data.domain.PageImpl<>(messages, pageable, total);
+    }
+    
+    @Override
+    public Page<MessageContent> getMessagesByDateRange(Long userId, java.time.LocalDateTime startDate, 
+                                                       java.time.LocalDateTime endDate, Pageable pageable) {
+        log.debug("Getting messages by date range for user ID: {}, start: {}, end: {}", userId, startDate, endDate);
+        
+        String jpql = "SELECT m FROM MessageContent m WHERE " +
+                      "(m.senderId = :userId OR " +
+                      "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId)) " +
+                      "AND m.createdAt >= :startDate AND m.createdAt <= :endDate " +
+                      "ORDER BY m.createdAt DESC";
+        
+        TypedQuery<MessageContent> query = entityManager.createQuery(jpql, MessageContent.class)
+                .setParameter("userId", userId)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize());
+        
+        List<MessageContent> messages = query.getResultList();
+        
+        // Count total elements
+        String countJpql = "SELECT COUNT(m) FROM MessageContent m WHERE " +
+                           "(m.senderId = :userId OR " +
+                           "EXISTS (SELECT sm FROM SystemMessage sm WHERE sm.messageId = m.id AND sm.userId = :userId)) " +
+                           "AND m.createdAt >= :startDate AND m.createdAt <= :endDate";
+        
+        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class)
+                .setParameter("userId", userId)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate);
+        
+        long total = countQuery.getSingleResult();
+        
+        return new org.springframework.data.domain.PageImpl<>(messages, pageable, total);
+    }
 }

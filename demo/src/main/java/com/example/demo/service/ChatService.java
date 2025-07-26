@@ -56,4 +56,74 @@ public interface ChatService {
      * @return the number of unread messages
      */
     long countUnreadMessages(Long userId);
+    
+    /**
+     * Get all messages for a user (paginated)
+     * 
+     * @param userId the user ID
+     * @param pageable pagination information
+     * @return a page of message contents
+     */
+    Page<MessageContent> getAllMessages(Long userId, Pageable pageable);
+    
+    /**
+     * Save a message
+     * 
+     * @param messageContent the message content to save
+     * @return the saved message content
+     */
+    MessageContent saveMessage(MessageContent messageContent);
+    
+    /**
+     * Get a message by ID
+     * 
+     * @param id the message ID
+     * @return the message content or null if not found
+     */
+    MessageContent getMessageById(Long id);
+    
+    /**
+     * Update a message
+     * 
+     * @param messageContent the message content to update
+     * @return the updated message content
+     */
+    MessageContent updateMessage(MessageContent messageContent);
+    
+    /**
+     * Delete a message by ID
+     * 
+     * @param id the message ID
+     */
+    void deleteMessage(Long id);
+    
+    /**
+     * Get recent messages for a user
+     * 
+     * @param userId the user ID
+     * @param limit the maximum number of messages to return
+     * @return a list of recent message contents
+     */
+    List<MessageContent> getRecentMessages(Long userId, int limit);
+    
+    /**
+     * Search messages by content
+     * 
+     * @param userId the user ID
+     * @param query the search query
+     * @param pageable pagination information
+     * @return a page of matching message contents
+     */
+    Page<MessageContent> searchMessages(Long userId, String query, Pageable pageable);
+    
+    /**
+     * Get messages by date range
+     * 
+     * @param userId the user ID
+     * @param startDate the start date
+     * @param endDate the end date
+     * @param pageable pagination information
+     * @return a page of message contents within the date range
+     */
+    Page<MessageContent> getMessagesByDateRange(Long userId, java.time.LocalDateTime startDate, java.time.LocalDateTime endDate, Pageable pageable);
 }

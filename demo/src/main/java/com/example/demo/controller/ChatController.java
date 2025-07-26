@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -202,6 +204,251 @@ public class ChatController {
         User currentUser = userService.getUserFromAuthentication(authentication);
         long count = chatService.countUnreadMessages(currentUser.getId());
         return ResponseEntity.ok(count);
+    }
+    
+    /**
+     * Get all chat messages (paginated)
+     * 
+     * @param authentication the authentication object
+     * @param page the page number
+     * @param size the page size
+     * @return a page of chat message responses
+     */
+    @GetMapping("/messages")
+    public ResponseEntity<Page<ChatMessageResponse>> getAllMessages(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<MessageContent> messages = chatService.getAllMessages(currentUser.getId(), pageable);
+        
+        Page<ChatMessageResponse> response = messages.map(message -> {
+            User sender = userService.getUserById(message.getSenderId());
+            return createChatMessageResponse(message, sender, currentUser);
+        });
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Create a new chat message
+     * 
+     * @param authentication the authentication object
+     * @param messageContent the message content
+     * @return the created message
+     */
+    @PostMapping("/messages")
+    public ResponseEntity<ChatMessageResponse> createMessage(
+            Authentication authentication,
+            @RequestBody MessageContent messageContent) {
+        
+        log.debug("Creating message with authentication: {}", authentication != null ? authentication.getName() : "null");
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        if (currentUser == null) {
+            log.warn("Current user not found from authentication: {}", authentication != null ? authentication.getName() : "null");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        log.debug("Current user found: {} (ID: {})", currentUser.getUsername(), currentUser.getId());
+        
+        // Manual validation for content
+        if (messageContent.getContent() == null || messageContent.getContent().trim().isEmpty()) {
+            log.warn("Message content is empty or null");
+            return ResponseEntity.badRequest().build();
+        }
+        
+        if (messageContent.getContent().length() > 2000) {
+            log.warn("Message content exceeds maximum length of 2000 characters");
+            return ResponseEntity.badRequest().build();
+        }
+        
+        messageContent.setSenderId(currentUser.getId());
+        messageContent.setMessageType(MessageContent.MessageType.CHAT_MESSAGE);
+        
+        MessageContent savedMessage = chatService.saveMessage(messageContent);
+        ChatMessageResponse response = createChatMessageResponse(savedMessage, currentUser, currentUser);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    /**
+     * Get a chat message by ID
+     * 
+     * @param authentication the authentication object
+     * @param id the message ID
+     * @return the chat message response
+     */
+    @GetMapping("/messages/{id}")
+    public ResponseEntity<ChatMessageResponse> getMessageById(
+            Authentication authentication,
+            @PathVariable Long id) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        MessageContent message = chatService.getMessageById(id);
+        
+        if (message == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        User sender = userService.getUserById(message.getSenderId());
+        ChatMessageResponse response = createChatMessageResponse(message, sender, currentUser);
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Update a chat message
+     * 
+     * @param authentication the authentication object
+     * @param id the message ID
+     * @param messageContent the updated message content
+     * @return the updated message
+     */
+    @PutMapping("/messages/{id}")
+    public ResponseEntity<ChatMessageResponse> updateMessage(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody MessageContent messageContent) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        MessageContent existingMessage = chatService.getMessageById(id);
+        
+        if (existingMessage == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Check if user owns the message or is admin
+        if (!existingMessage.getSenderId().equals(currentUser.getId()) && 
+            !currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        existingMessage.setContent(messageContent.getContent());
+        MessageContent updatedMessage = chatService.updateMessage(existingMessage);
+        
+        User sender = userService.getUserById(updatedMessage.getSenderId());
+        ChatMessageResponse response = createChatMessageResponse(updatedMessage, sender, currentUser);
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Delete a chat message
+     * 
+     * @param authentication the authentication object
+     * @param id the message ID
+     * @return no content response
+     */
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity<Void> deleteMessage(
+            Authentication authentication,
+            @PathVariable Long id) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        MessageContent message = chatService.getMessageById(id);
+        
+        if (message == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Check if user owns the message or is admin
+        if (!message.getSenderId().equals(currentUser.getId()) && 
+            !currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        chatService.deleteMessage(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Get recent chat messages
+     * 
+     * @param authentication the authentication object
+     * @param limit the maximum number of messages to return
+     * @return a list of recent chat message responses
+     */
+    @GetMapping("/messages/recent")
+    public ResponseEntity<List<ChatMessageResponse>> getRecentMessages(
+            Authentication authentication,
+            @RequestParam(defaultValue = "10") int limit) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        List<MessageContent> messages = chatService.getRecentMessages(currentUser.getId(), limit);
+        
+        List<ChatMessageResponse> response = messages.stream()
+                .map(message -> {
+                    User sender = userService.getUserById(message.getSenderId());
+                    return createChatMessageResponse(message, sender, currentUser);
+                })
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Search chat messages
+     * 
+     * @param authentication the authentication object
+     * @param query the search query
+     * @param page the page number
+     * @param size the page size
+     * @return a page of matching chat message responses
+     */
+    @GetMapping("/messages/search")
+    public ResponseEntity<Page<ChatMessageResponse>> searchMessages(
+            Authentication authentication,
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<MessageContent> messages = chatService.searchMessages(currentUser.getId(), query, pageable);
+        
+        Page<ChatMessageResponse> response = messages.map(message -> {
+            User sender = userService.getUserById(message.getSenderId());
+            return createChatMessageResponse(message, sender, currentUser);
+        });
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Get chat messages by date range
+     * 
+     * @param authentication the authentication object
+     * @param startDate the start date
+     * @param endDate the end date
+     * @param page the page number
+     * @param size the page size
+     * @return a page of chat message responses within the date range
+     */
+    @GetMapping("/messages/date-range")
+    public ResponseEntity<Page<ChatMessageResponse>> getMessagesByDateRange(
+            Authentication authentication,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        User currentUser = userService.getUserFromAuthentication(authentication);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        
+        LocalDateTime start = LocalDateTime.parse(startDate);
+        LocalDateTime end = LocalDateTime.parse(endDate);
+        
+        Page<MessageContent> messages = chatService.getMessagesByDateRange(currentUser.getId(), start, end, pageable);
+        
+        Page<ChatMessageResponse> response = messages.map(message -> {
+            User sender = userService.getUserById(message.getSenderId());
+            return createChatMessageResponse(message, sender, currentUser);
+        });
+        
+        return ResponseEntity.ok(response);
     }
     
     /**
