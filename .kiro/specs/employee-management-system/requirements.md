@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document outlines the requirements for a comprehensive Employee Management System built with Spring Boot and Vue.js. The system provides role-based access control, employee information management, department processing, payroll management, and communication features. It serves as an enterprise-grade HR management solution with robust security and user experience features.
+This document outlines the requirements for a comprehensive Employee Management System built with Spring Boot and React. The system provides role-based access control, employee information management, department processing, payroll management, and communication features. It serves as an enterprise-grade HR management solution with robust security and user experience features.
 
 ## Requirements
 
