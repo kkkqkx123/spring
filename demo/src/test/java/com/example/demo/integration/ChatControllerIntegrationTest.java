@@ -14,8 +14,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import com.example.demo.model.entity.MessageContent;
 import com.example.demo.model.entity.SystemMessage;
 import com.example.demo.repository.MessageRepository;
-import com.example.demo.repository.SystemMessageRepository;
-
 import java.time.LocalDateTime;
 
 /**

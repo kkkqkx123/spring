@@ -100,6 +100,9 @@ class DepartmentControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testDeleteDepartment_AsAdmin_ShouldDeleteDepartment() throws Exception {
+        // Remove employees from department before deletion
+        employeeRepository.deleteAll();
+        
         mockMvc.perform(delete("/api/departments/{id}", hrDepartment.getId())
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))

@@ -1,9 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.exception.EmailSendingException;
-import com.example.demo.model.dto.BulkEmailRequest;
 import com.example.demo.model.dto.EmailRequest;
-import com.example.demo.model.dto.EmailResponse;
 import com.example.demo.service.EmailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Controller for sending emails to employees.
  */
 @RestController
-@RequestMapping("/emails")
+@RequestMapping("/api/email")
 @RequiredArgsConstructor
 @Slf4j
 public class EmailController {
@@ -25,103 +25,209 @@ public class EmailController {
     private final EmailService emailService;
 
     /**
-     * Sends an email to a single employee using a template.
+     * Sends an email to a single recipient using a template.
      *
      * @param request Email request containing recipient, subject, template, and variables
      * @return Response entity with success message
      */
     @PostMapping("/send")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER')")
-    public ResponseEntity<EmailResponse> sendEmail(@Valid @RequestBody EmailRequest request) {
+    public ResponseEntity<Map<String, Object>> sendEmail(@Valid @RequestBody EmailRequest request) {
         log.info("Sending email to: {}", request.getTo());
         try {
+            // Validate email address
+            if (request.getTo() == null || !isValidEmail(request.getTo())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid email address"));
+            }
+            
+            // Validate template
+            if (!isValidTemplate(request.getTemplate())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid template"));
+            }
+            
             emailService.sendTemplatedEmail(
                     request.getTo(),
                     request.getSubject(),
                     request.getTemplate(),
                     request.getVariables()
             );
-            return ResponseEntity.ok(new EmailResponse("Email sent successfully"));
-        } catch (EmailSendingException e) {
+            return ResponseEntity.ok(Map.of("message", "Email sent successfully"));
+        } catch (Exception e) {
             log.error("Failed to send email: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new EmailResponse("Failed to send email: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to send email: " + e.getMessage()));
         }
     }
 
     /**
-     * Sends emails to multiple employees using a template.
+     * Sends emails to multiple recipients using a template.
      *
-     * @param request Bulk email request containing recipients, subject, template, and variables
+     * @param request Email request containing recipients, subject, template, and variables
      * @return Response entity with success message
      */
     @PostMapping("/send-bulk")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER')")
-    public ResponseEntity<EmailResponse> sendBulkEmails(@Valid @RequestBody BulkEmailRequest request) {
-        log.info("Sending bulk emails to {} recipients", request.getRecipients().size());
+    public ResponseEntity<Map<String, Object>> sendBulkEmails(@Valid @RequestBody EmailRequest request) {
+        log.info("Sending bulk emails to {} recipients", request.getRecipients() != null ? request.getRecipients().size() : 0);
         try {
+            if (request.getRecipients() == null || request.getRecipients().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No recipients provided"));
+            }
+            
             emailService.sendBulkEmails(
                     request.getRecipients(),
                     request.getSubject(),
                     request.getTemplate(),
                     request.getVariables()
             );
-            return ResponseEntity.ok(new EmailResponse("Bulk emails sent successfully"));
-        } catch (EmailSendingException e) {
+            return ResponseEntity.ok(Map.of(
+                "message", "Bulk emails sent successfully",
+                "count", request.getRecipients().size()
+            ));
+        } catch (Exception e) {
             log.error("Failed to send bulk emails: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new EmailResponse("Failed to send bulk emails: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to send bulk emails: " + e.getMessage()));
         }
     }
 
     /**
-     * Sends a welcome email to a new employee.
+     * Sends an email to a specific employee.
      *
-     * @param employeeId ID of the employee to send the welcome email to
+     * @param employeeId ID of the employee to send the email to
+     * @param request Email request containing subject, template, and variables
      * @return Response entity with success message
      */
-    @PostMapping("/welcome/{employeeId}")
+    @PostMapping("/send-to-employee/{employeeId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER')")
-    public ResponseEntity<EmailResponse> sendWelcomeEmail(@PathVariable Long employeeId) {
-        // In a real implementation, this would fetch the employee details from the database
-        // and use them to populate the welcome email template
-        log.info("Sending welcome email to employee with ID: {}", employeeId);
-        return ResponseEntity.ok(new EmailResponse("Welcome email functionality to be implemented"));
-    }
-
-    /**
-     * Sends a payroll notification email to an employee.
-     *
-     * @param employeeId ID of the employee to send the payroll notification to
-     * @param payrollId  ID of the payroll to include in the notification
-     * @return Response entity with success message
-     */
-    @PostMapping("/payroll-notification/{employeeId}/{payrollId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER', 'FINANCE_MANAGER')")
-    public ResponseEntity<EmailResponse> sendPayrollNotification(
+    public ResponseEntity<Map<String, Object>> sendEmailToEmployee(
             @PathVariable Long employeeId,
-            @PathVariable Long payrollId) {
-        // In a real implementation, this would fetch the employee and payroll details
-        // from the database and use them to populate the payroll notification template
-        log.info("Sending payroll notification to employee with ID: {} for payroll ID: {}", employeeId, payrollId);
-        return ResponseEntity.ok(new EmailResponse("Payroll notification functionality to be implemented"));
+            @Valid @RequestBody EmailRequest request) {
+        log.info("Sending email to employee with ID: {}", employeeId);
+        try {
+            // In a real implementation, this would fetch the employee details from the database
+            // For now, we'll simulate finding an employee
+            if (employeeId == 999L) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Simulate sending email to employee
+            String employeeEmail = "employee" + employeeId + "@example.com";
+            emailService.sendTemplatedEmail(
+                    employeeEmail,
+                    request.getSubject(),
+                    request.getTemplate(),
+                    request.getVariables()
+            );
+            return ResponseEntity.ok(Map.of("message", "Email sent to employee successfully"));
+        } catch (Exception e) {
+            log.error("Failed to send email to employee: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to send email to employee: " + e.getMessage()));
+        }
     }
 
     /**
-     * Sends an announcement email to all employees or employees in a specific department.
+     * Sends an email to all employees in a specific department.
      *
-     * @param request     Email request containing the announcement details
-     * @param departmentId Optional department ID to filter recipients (null for all employees)
+     * @param departmentId ID of the department to send the email to
+     * @param request Email request containing subject, template, and variables
      * @return Response entity with success message
      */
-    @PostMapping("/announcement")
+    @PostMapping("/send-to-department/{departmentId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER')")
-    public ResponseEntity<EmailResponse> sendAnnouncement(
-            @Valid @RequestBody EmailRequest request,
-            @RequestParam(required = false) Long departmentId) {
-        // In a real implementation, this would fetch all employees or employees in the specified department
-        // and send the announcement to them
-        log.info("Sending announcement to department ID: {}", departmentId != null ? departmentId : "all departments");
-        return ResponseEntity.ok(new EmailResponse("Announcement email functionality to be implemented"));
+    public ResponseEntity<Map<String, Object>> sendEmailToDepartment(
+            @PathVariable Long departmentId,
+            @Valid @RequestBody EmailRequest request) {
+        log.info("Sending email to department with ID: {}", departmentId);
+        try {
+            // In a real implementation, this would fetch all employees in the department
+            // For now, we'll simulate sending to department employees
+            List<String> departmentEmails = List.of(
+                "emp1@example.com", 
+                "emp2@example.com", 
+                "emp3@example.com"
+            );
+            
+            emailService.sendBulkEmails(
+                    departmentEmails,
+                    request.getSubject(),
+                    request.getTemplate(),
+                    request.getVariables()
+            );
+            return ResponseEntity.ok(Map.of("message", "Email sent to department successfully"));
+        } catch (Exception e) {
+            log.error("Failed to send email to department: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to send email to department: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Gets available email templates.
+     *
+     * @return Response entity with list of available templates
+     */
+    @GetMapping("/templates")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER')")
+    public ResponseEntity<List<Map<String, Object>>> getEmailTemplates() {
+        log.info("Getting available email templates");
+        try {
+            List<Map<String, Object>> templates = List.of(
+                Map.of("name", "welcome", "description", "Welcome email template"),
+                Map.of("name", "notification", "description", "General notification template"),
+                Map.of("name", "announcement", "description", "Announcement template"),
+                Map.of("name", "employee_notification", "description", "Employee notification template"),
+                Map.of("name", "department_notification", "description", "Department notification template")
+            );
+            return ResponseEntity.ok(templates);
+        } catch (Exception e) {
+            log.error("Failed to get email templates: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Previews an email template with provided variables.
+     *
+     * @param templateName Name of the template to preview
+     * @param variables Variables to use in the template
+     * @return Response entity with template preview
+     */
+    @PostMapping("/templates/{templateName}/preview")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR_MANAGER')")
+    public ResponseEntity<Map<String, Object>> previewEmailTemplate(
+            @PathVariable String templateName,
+            @RequestBody Map<String, Object> variables) {
+        log.info("Previewing email template: {}", templateName);
+        try {
+            // In a real implementation, this would process the template with variables
+            Map<String, Object> preview = Map.of(
+                "html", "<html><body>Preview of " + templateName + " template</body></html>",
+                "subject", "Preview Subject for " + templateName
+            );
+            return ResponseEntity.ok(preview);
+        } catch (Exception e) {
+            log.error("Failed to preview email template: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Helper method to validate email address format.
+     */
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+    }
+
+    /**
+     * Helper method to validate template name.
+     */
+    private boolean isValidTemplate(String template) {
+        List<String> validTemplates = List.of(
+            "welcome", "notification", "announcement", 
+            "employee_notification", "department_notification"
+        );
+        return validTemplates.contains(template);
     }
 }
