@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.dto.DepartmentDto;
 import com.example.demo.model.entity.Department;
 import com.example.demo.repository.DepartmentRepository;
@@ -217,6 +218,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Cacheable(value = "departmentChildren", key = "#parentId")
     public List<Department> getChildDepartments(Long parentId) {
+        if (!departmentRepository.existsById(parentId)) {
+            throw new ResourceNotFoundException("父部门不存在 ID: " + parentId);
+        }
         return departmentRepository.findByParentId(parentId);
     }
 

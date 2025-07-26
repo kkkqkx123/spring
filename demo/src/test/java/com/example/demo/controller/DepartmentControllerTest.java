@@ -25,7 +25,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.demo.security.TestSecurityConfig;
-
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.dto.DepartmentDto;
 import com.example.demo.model.entity.Department;
 import com.example.demo.service.DepartmentService;
@@ -104,7 +104,9 @@ class DepartmentControllerTest {
         
         // Act & Assert
         mockMvc.perform(get("/api/departments"))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].parentId").value(1L))
+            .andExpect(jsonPath("$[1].parentId").value(1L));
         
         verify(departmentService).getAllDepartments();
     }
@@ -168,7 +170,15 @@ class DepartmentControllerTest {
         
         List<Department> childDepartments = Arrays.asList(devDepartment, qaDepartment);
         
-        when(departmentService.getChildDepartments(1L)).thenReturn(childDepartments);
+        // 验证父部门存在
+        when(departmentService.getDepartmentById(1L)).thenReturn(new Department());
+        when(departmentService.getChildDepartments(1L)).thenAnswer(invocation -> {
+            Long pid = invocation.getArgument(0);
+            if (!pid.equals(1L)) {
+                throw new ResourceNotFoundException("Invalid parent ID");
+        }
+    return childDepartments;
+});
         when(departmentService.convertToDto(any(Department.class))).thenAnswer(invocation -> {
             Department dept = invocation.getArgument(0);
             DepartmentDto dto = new DepartmentDto();
@@ -178,7 +188,7 @@ class DepartmentControllerTest {
         });
         
         // Act & Assert
-        mockMvc.perform(get("/api/departments/1/children"))
+        mockMvc.perform(get("/api/departments/parent/1"))
             .andExpect(status().isOk());
         
         verify(departmentService).getChildDepartments(1L);

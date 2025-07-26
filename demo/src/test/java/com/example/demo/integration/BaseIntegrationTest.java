@@ -112,6 +112,7 @@ public abstract class BaseIntegrationTest {
     protected void setupTestData() {
         // Clean existing data
         employeeRepository.deleteAll();
+        departmentRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
         resourceRepository.deleteAll();
@@ -168,8 +169,8 @@ public abstract class BaseIntegrationTest {
         regularUser = createUser("user", "user@example.com", "password", userRoles);
 
         // Create departments
-        itDepartment = createDepartment("IT Department", null, "/IT", true);
-        hrDepartment = createDepartment("HR Department", null, "/HR", false);
+        itDepartment = createDepartment("IT Department", null, null, true);
+        hrDepartment = createDepartment("HR Department", null, null, false);
 
         // Create positions
         developerPosition = createPosition("Software Developer", "Senior Developer", itDepartment);
@@ -232,9 +233,20 @@ public abstract class BaseIntegrationTest {
         Department department = new Department();
         department.setName(name);
         department.setParentId(parentId);
-        department.setDepPath(depPath);
         department.setIsParent(isParent);
-        return departmentRepository.save(department);
+        Department savedDepartment = departmentRepository.save(department);
+        
+        // Update depPath after save to match the actual implementation
+        if (parentId != null) {
+            Department parent = departmentRepository.findById(parentId).orElse(null);
+            if (parent != null) {
+                savedDepartment.setDepPath(parent.getDepPath() + savedDepartment.getId() + "/");
+            }
+        } else {
+            savedDepartment.setDepPath("/" + savedDepartment.getId() + "/");
+        }
+        
+        return departmentRepository.save(savedDepartment);
     }
 
     protected Position createPosition(String jobTitle, String professionalTitle, Department department) {

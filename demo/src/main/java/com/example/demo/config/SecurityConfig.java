@@ -138,7 +138,7 @@ public class SecurityConfig {
                         // HR endpoints
                         .requestMatchers("/api/hr/**").hasAnyRole("ADMIN", "HR_MANAGER")
                         // Department endpoints
-                        .requestMatchers("/api/departments/**").hasAnyRole("ADMIN", "HR_MANAGER", "DEPARTMENT_MANAGER")
+                        .requestMatchers("/api/departments/**").hasAnyRole("ADMIN", "HR_MANAGER", "USER", "DEPARTMENT_MANAGER")
                         // Employee endpoints
                         .requestMatchers("/api/employees/**").hasAnyRole("ADMIN", "HR_MANAGER", "EMPLOYEE_MANAGER")
                         // Position endpoints

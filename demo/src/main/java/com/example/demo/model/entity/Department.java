@@ -83,13 +83,10 @@ public class Department extends BaseEntity {
     /**
      * Child departments
      */
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "parent", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     private List<Department> children = new ArrayList<>();
-    
-    /**
-     * Employees in this department
-     */
-    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Employee> employees = new ArrayList<>();
     
     /**
@@ -105,6 +102,10 @@ public class Department extends BaseEntity {
             // Child department - path will be updated after save
             if (parent != null && parent.getDepPath() != null) {
                 depPath = parent.getDepPath() + id + "/";
+            } else if (depPath == null) {
+                // If parent is not loaded but parentId is set, use a placeholder
+                // This will be updated properly when the entity is fully loaded
+                depPath = "/" + parentId + "/" + id + "/";
             }
         }
     }

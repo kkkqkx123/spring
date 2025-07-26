@@ -76,6 +76,7 @@ public interface DepartmentService {
      * 
      * @param parentId the parent department ID
      * @return a list of child departments
+     * @throws jakarta.persistence.EntityNotFoundException if the parent department is not found
      */
     List<Department> getChildDepartments(Long parentId);
     

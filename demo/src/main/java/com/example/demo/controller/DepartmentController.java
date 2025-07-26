@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import com.example.demo.exception.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import com.example.demo.model.dto.DepartmentDto;
 import com.example.demo.model.entity.Department;
@@ -27,6 +31,7 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("/api/departments")
+@ControllerAdvice
 public class DepartmentController {
 
     @Autowired
@@ -38,6 +43,7 @@ public class DepartmentController {
      * @return a list of all departments
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('HR_MANAGER') or hasRole('USER')")
     public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
         List<Department> departments = departmentService.getAllDepartments();
         List<DepartmentDto> departmentDtos = departments.stream()
@@ -115,13 +121,18 @@ public class DepartmentController {
      * @param parentId the parent department ID
      * @return a list of child departments
      */
-    @GetMapping("/{parentId}/children")
+    @GetMapping("/parent/{parentId}")
     public ResponseEntity<List<DepartmentDto>> getChildDepartments(@PathVariable Long parentId) {
         List<Department> children = departmentService.getChildDepartments(parentId);
         List<DepartmentDto> childDtos = children.stream()
                 .map(departmentService::convertToDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(childDtos);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     /**
