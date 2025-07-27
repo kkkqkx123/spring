@@ -135,17 +135,17 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // HR endpoints
-                        .requestMatchers("/api/hr/**").hasAnyAuthority("ADMIN", "HR_MANAGER")
+                        .requestMatchers("/api/hr/**").hasAnyRole("ADMIN", "HR_MANAGER")
                         // Department endpoints
-                        .requestMatchers("/api/departments/**").hasAnyAuthority("ADMIN", "HR_MANAGER", "USER", "DEPARTMENT_MANAGER")
+                        .requestMatchers("/api/departments/**").hasAnyRole("ADMIN", "HR_MANAGER", "USER", "DEPARTMENT_MANAGER")
                         // Employee endpoints - use method-level security
                         .requestMatchers("/api/employees/**").authenticated()
                         // Position endpoints
-                        .requestMatchers("/api/positions/**").hasAnyAuthority("ADMIN", "HR_MANAGER")
+                        .requestMatchers("/api/positions/**").hasAnyRole("ADMIN", "HR_MANAGER")
                         // Payroll endpoints
-                        .requestMatchers("/api/payroll/**").hasAnyAuthority("ADMIN", "PAYROLL_MANAGER", "HR_MANAGER", "PAYROLL_READ", "PAYROLL_CREATE", "PAYROLL_UPDATE", "PAYROLL_DELETE")
+                        .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "PAYROLL_MANAGER", "HR_MANAGER", "PAYROLL_READ", "PAYROLL_CREATE", "PAYROLL_UPDATE", "PAYROLL_DELETE")
                         // All other endpoints require authentication
                         .anyRequest().authenticated())
                 // H2 console support
