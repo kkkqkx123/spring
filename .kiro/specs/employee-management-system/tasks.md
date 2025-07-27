@@ -47,7 +47,8 @@
   - Write unit tests for permission verification logic
   - _Requirements: 1.2, 1.4, 1.5_
 
-- [ ] 3. Implement department management system
+- [x] 3. Implement department management system
+
 - [x] 3.1 Create department entity and repository
 
 
