@@ -19,11 +19,24 @@ public class TestSecurityConfig {
         http
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/api/notifications/user", "/api/notifications/users").hasAnyRole("ADMIN", "MANAGER")
-                                .requestMatchers("/api/notifications/role").hasRole("ADMIN")
-                                .requestMatchers("/api/chat/**").hasAnyRole("USER", "ADMIN", "MANAGER")
-                                .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "MANAGER")
-                                .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        // Admin endpoints
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        // HR endpoints
+                        .requestMatchers("/api/hr/**").hasAnyAuthority("ADMIN", "HR_MANAGER")
+                        // Department endpoints
+                        .requestMatchers("/api/departments/**").hasAnyAuthority("ADMIN", "HR_MANAGER", "USER", "DEPARTMENT_MANAGER")
+                        // Employee endpoints - use method-level security
+                        .requestMatchers("/api/employees/**").authenticated()
+                        // Position endpoints
+                        .requestMatchers("/api/positions/**").hasAnyAuthority("ADMIN", "HR_MANAGER")
+                        // Payroll endpoints
+                        .requestMatchers("/api/payroll/**").hasAnyAuthority("ADMIN", "PAYROLL_MANAGER", "HR_MANAGER", "PAYROLL_READ", "PAYROLL_CREATE", "PAYROLL_UPDATE", "PAYROLL_DELETE")
+                        // All other endpoints require authentication
+                        .anyRequest().authenticated()
                 );
         
         return http.build();

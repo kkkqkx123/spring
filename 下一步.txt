@@ -1,3 +1,4 @@
 Auth:
 testRegister_ValidData_ShouldCreateUser[61]:Status expected:[201] but was:[500]
 
+SecurityIntegrationTest.java:

@@ -42,7 +42,7 @@ public class DepartmentController {
      * @return a list of all departments
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR_MANAGER') or hasRole('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR_MANAGER') or hasAuthority('USER') or hasAuthority('DEPARTMENT_MANAGER')")
     public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
         List<Department> departments = departmentService.getAllDepartments();
         List<DepartmentDto> departmentDtos = departments.stream()
@@ -70,7 +70,7 @@ public class DepartmentController {
      * @return the created department
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR_MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR_MANAGER')")
     public ResponseEntity<DepartmentDto> createDepartment(@Valid @RequestBody DepartmentDto departmentDto) {
         Department department = departmentService.createDepartment(departmentDto);
         return new ResponseEntity<>(departmentService.convertToDto(department), HttpStatus.CREATED);
@@ -84,7 +84,7 @@ public class DepartmentController {
      * @return the updated department
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR_MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR_MANAGER')")
     public ResponseEntity<DepartmentDto> updateDepartment(@PathVariable Long id, @Valid @RequestBody DepartmentDto departmentDto) {
         Department department = departmentService.updateDepartment(id, departmentDto);
         return ResponseEntity.ok(departmentService.convertToDto(department));
@@ -97,7 +97,7 @@ public class DepartmentController {
      * @return no content
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();
@@ -142,7 +142,7 @@ public class DepartmentController {
      * @return the updated department
      */
     @PutMapping("/{departmentId}/move/{newParentId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('HR_MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR_MANAGER')")
     public ResponseEntity<DepartmentDto> moveDepartment(@PathVariable Long departmentId, @PathVariable Long newParentId) {
         Department department = departmentService.moveDepartment(departmentId, newParentId);
         return ResponseEntity.ok(departmentService.convertToDto(department));

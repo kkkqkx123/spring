@@ -49,6 +49,7 @@ import java.util.Set;
 @Testcontainers
 public abstract class BaseIntegrationTest {
 
+    @SuppressWarnings("resource")
     @Container
     static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
             .withReuse(true)
@@ -109,9 +110,11 @@ public abstract class BaseIntegrationTest {
     protected User adminUser;
     protected User hrManagerUser;
     protected User regularUser;
+    protected User newUser;
     protected Role adminRole;
     protected Role hrManagerRole;
     protected Role userRole;
+    protected Role newUserRole;
     protected Department itDepartment;
     protected Department hrDepartment;
     protected Position developerPosition;
@@ -159,6 +162,7 @@ public abstract class BaseIntegrationTest {
         Resource notificationReadResource = createResource("NOTIFICATION_READ", "/api/notifications", "GET");
         Resource notificationCreateResource = createResource("NOTIFICATION_CREATE", "/api/notifications", "POST");
         Resource emailSendResource = createResource("EMAIL_SEND", "/api/email", "POST");
+        Resource registerResource = createResource("AUTH_REGISTER", "/api/auth/register", "POST");
 
         // Create roles
         Set<Resource> adminResources = new HashSet<>();
@@ -191,6 +195,12 @@ public abstract class BaseIntegrationTest {
         ));
         userRole = createRole("USER", "Regular User", userResources);
 
+        Set<Resource> newUserResources = new HashSet<>();
+        userResources.addAll(Set.of(
+                registerResource
+        ));
+        newUserRole = createRole("NEW_USER", "newUser", newUserResources);
+
         // Create users
         Set<Role> adminRoles = new HashSet<>();
         adminRoles.add(adminRole);
@@ -204,10 +214,15 @@ public abstract class BaseIntegrationTest {
         userRoles.add(userRole);
         regularUser = createUser("user", "user@example.com", "password", userRoles);
 
+        Set<Role> newUserRoles = new HashSet<>();
+        userRoles.add(newUserRole);
+        newUser = createUser("newUser", "existinguser@example.com", "password", newUserRoles);
+
         // Load permissions for users
         permissionService.loadUserPermissions(adminUser);
         permissionService.loadUserPermissions(hrManagerUser);
         permissionService.loadUserPermissions(regularUser);
+        permissionService.loadUserPermissions(newUser);
 
         // Create departments
         itDepartment = createDepartment("IT Department", null, null, true);
