@@ -1,5 +1,6 @@
 package com.example.demo.integration;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,10 +50,19 @@ import java.util.Set;
 @Testcontainers
 public abstract class BaseIntegrationTest {
 
+    @SuppressWarnings("resource")
     @Container
-    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine")) //警告为误报
             .withReuse(true)
-            .withExposedPorts(6379);
+            .withExposedPorts(6379)
+            .withCommand("redis-server --appendonly yes");
+
+    @AfterAll
+    static void tearDown() {
+        if (redis != null && redis.isRunning()) {
+            redis.stop();
+        }
+    }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
