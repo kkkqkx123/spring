@@ -1,0 +1,450 @@
+openapi: 3.0.0
+info:
+  title: 员工模块 API
+  description: 提供员工信息的增删改查、搜索、导入导出等功能。
+  version: 1.0.0
+tags:
+  - name: 员工管理
+    description: 员工信息的维护和管理
+
+paths:
+  /api/employees:
+    get:
+      tags:
+        - 员工管理
+      summary: 分页获取员工列表
+      description: 返回系统中的员工信息，支持分页和排序。
+      operationId: getAllEmployees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          description: 排序字段，格式为 "property,direction"
+          schema:
+            type: string
+            default: "id,asc"
+      responses:
+        '200':
+          description: 成功获取员工列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedEmployee'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+    post:
+      tags:
+        - 员工管理
+      summary: 创建新员工
+      description: 创建一个新的员工记录。需要 'EMPLOYEE_CREATE' 权限。
+      operationId: createEmployee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '201':
+          description: 员工创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: 无效的请求数据
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+    delete:
+      tags:
+        - 员工管理
+      summary: 批量删除员工
+      description: 根据提供的ID列表删除多个员工。需要 'EMPLOYEE_DELETE' 权限。
+      operationId: deleteEmployees
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                format: int64
+      responses:
+        '200':
+          description: 成功删除员工
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 已删除的员工数量
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/employees/{id}:
+    get:
+      tags:
+        - 员工管理
+      summary: 根据ID获取员工信息
+      description: 获取指定ID的员工详细信息。需要 'EMPLOYEE_READ' 权限。
+      operationId: getEmployeeById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 员工的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取员工信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 员工未找到
+
+    put:
+      tags:
+        - 员工管理
+      summary: 更新员工信息
+      description: 更新指定ID的员工信息。需要 'EMPLOYEE_UPDATE' 权限。
+      operationId: updateEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 员工的ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: 员工更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: 无效的请求数据
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 员工未找到
+
+    delete:
+      tags:
+        - 员工管理
+      summary: 删除员工
+      description: 删除指定ID的员工。需要 'EMPLOYEE_DELETE' 权限。
+      operationId: deleteEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 员工的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 员工删除成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 员工未找到
+
+  /api/employees/search:
+    post:
+      tags:
+        - 员工管理
+      summary: 搜索员工
+      description: 根据复合条件分页搜索员工。需要 'EMPLOYEE_READ' 权限。
+      operationId: searchEmployees
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeSearchCriteria'
+      responses:
+        '200':
+          description: 成功获取员工列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedEmployee'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/employees/import:
+    post:
+      tags:
+        - 员工管理
+      summary: 从Excel导入员工
+      description: 上传Excel文件批量导入员工信息。需要 'EMPLOYEE_CREATE' 权限。
+      operationId: importEmployees
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: 导入成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '400':
+          description: 文件格式错误或内容无效
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/employees/export:
+    post:
+      tags:
+        - 员工管理
+      summary: 导出员工到Excel
+      description: 将指定（或所有）员工信息导出为Excel文件。需要 'EMPLOYEE_READ' 权限。
+      operationId: exportEmployees
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                format: int64
+      responses:
+        '200':
+          description: 导出成功
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/employees/import-template:
+    get:
+      tags:
+        - 员工管理
+      summary: 获取导入模板
+      description: 下载用于导入员工信息的Excel模板文件。需要 'EMPLOYEE_READ' 权限。
+      operationId: getImportTemplate
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取模板
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        employeeNumber:
+          type: string
+          description: 员工编号
+        name:
+          type: string
+          description: 姓名
+        email:
+          type: string
+          format: email
+          description: 邮箱
+        phone:
+          type: string
+          description: 电话
+        department:
+          $ref: '#/components/schemas/Department'
+        position:
+          $ref: '#/components/schemas/Position'
+        hireDate:
+          type: string
+          format: date
+          description: 入职日期
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, ON_LEAVE, TERMINATED]
+        gender:
+          type: string
+          enum: [MALE, FEMALE, OTHER]
+        birthDate:
+          type: string
+          format: date
+          description: 出生日期
+        address:
+          type: string
+          description: 地址
+        salary:
+          type: number
+          format: double
+          description: 薪水
+        emergencyContactName:
+          type: string
+          description: 紧急联系人姓名
+        emergencyContactPhone:
+          type: string
+          description: 紧急联系人电话
+        notes:
+          type: string
+          description: 备注
+
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        jobTitle:
+          type: string
+
+    EmployeeSearchCriteria:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        employeeNumber:
+          type: string
+        departmentId:
+          type: integer
+          format: int64
+        positionId:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, ON_LEAVE, TERMINATED]
+        hireDateStart:
+          type: string
+          format: date
+        hireDateEnd:
+          type: string
+          format: date
+
+    PagedEmployee:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+        pageable:
+          type: object
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        last:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+        sort:
+          type: object
+        numberOfElements:
+          type: integer
+        first:
+          type: boolean
+        empty:
+          type: boolean

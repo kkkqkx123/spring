@@ -1,0 +1,193 @@
+openapi: 3.0.0
+info:
+  title: 认证模块 API
+  description: 提供用户认证、注册、登出和刷新令牌等功能。
+  version: 1.0.0
+tags:
+  - name: 认证
+    description: 用户认证相关接口
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - 认证
+      summary: 用户登录
+      description: 使用用户名和密码进行认证，成功后返回JWT令牌和用户信息。
+      operationId: authenticateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 认证成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: 认证失败
+
+  /api/auth/register:
+    post:
+      tags:
+        - 认证
+      summary: 用户注册
+      description: 创建一个新用户账户。
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: 用户创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '400':
+          description: 无效的请求，例如用户名或邮箱已存在。
+
+  /api/auth/logout:
+    post:
+      tags:
+        - 认证
+      summary: 用户登出
+      description: 清除当前用户的认证信息。
+      operationId: logoutUser
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User logged out successfully!
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - 认证
+      summary: 刷新JWT令牌
+      description: 为当前已认证的用户生成一个新的JWT令牌。
+      operationId: refreshToken
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 令牌刷新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: 无效的令牌或用户未认证
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: 用户名
+          example: "testuser"
+        password:
+          type: string
+          description: 密码
+          example: "password123"
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: 用户名 (3-50个字符)
+          example: "newuser"
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+          example: "newuser@example.com"
+        password:
+          type: string
+          description: 密码 (至少6个字符)
+          example: "strongpassword"
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT认证令牌
+        type:
+          type: string
+          description: 令牌类型
+          default: "Bearer"
+        id:
+          type: integer
+          format: int64
+          description: 用户ID
+        username:
+          type: string
+          description: 用户名
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+        roles:
+          type: array
+          items:
+            type: string
+          description: 用户角色列表
+
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 用户ID
+        username:
+          type: string
+          description: 用户名
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+        firstName:
+          type: string
+          description: 名字
+        lastName:
+          type: string
+          description: 姓氏
+        enabled:
+          type: boolean
+          description: 账户是否启用
+        roles:
+          type: array
+          items:
+            type: string
+          description: 用户角色

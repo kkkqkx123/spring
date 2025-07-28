@@ -1,0 +1,377 @@
+openapi: 3.0.0
+info:
+  title: 聊天模块 API
+  description: 提供实时聊天、消息管理和会话功能。
+  version: 1.0.0
+tags:
+  - name: 聊天
+    description: 聊天消息和会话管理
+
+paths:
+  /api/chat/send:
+    post:
+      tags:
+        - 聊天
+      summary: 发送聊天消息
+      description: 通过 REST API 发送一条聊天消息给指定用户。
+      operationId: sendMessage
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageRequest'
+      responses:
+        '201':
+          description: 消息发送成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageResponse'
+        '400':
+          description: 无效的请求，例如接收者不存在。
+        '401':
+          description: 未经授权
+
+  /api/chat/conversation/{userId}:
+    get:
+      tags:
+        - 聊天
+      summary: 获取与指定用户的对话
+      description: 分页获取当前用户与另一个用户之间的聊天记录。
+      operationId: getConversation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 对方用户的ID
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功获取对话
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedChatMessageResponse'
+        '400':
+          description: 无效的用户ID
+        '401':
+          description: 未经授权
+
+  /api/chat/conversations:
+    get:
+      tags:
+        - 聊天
+      summary: 获取最近的会话列表
+      description: 获取与当前用户有过对话的用户列表。
+      operationId: getRecentConversations
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取会话列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: 未经授权
+
+  /api/chat/conversation/{userId}/read:
+    put:
+      tags:
+        - 聊天
+      summary: 将对话标记为已读
+      description: 将当前用户与指定用户之间的所有未读消息标记为已读。
+      operationId: markConversationAsRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 对方用户的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功标记为已读
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 被标记为已读的消息数量
+        '401':
+          description: 未经授权
+
+  /api/chat/unread/count:
+    get:
+      tags:
+        - 聊天
+      summary: 获取未读消息总数
+      description: 获取当前用户所有会话中的未读消息总数。
+      operationId: getUnreadCount
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取未读消息数
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+        '401':
+          description: 未经授权
+
+  /api/chat/messages:
+    get:
+      tags:
+        - 聊天
+      summary: 获取所有聊天消息
+      description: 分页获取与当前用户相关的所有聊天消息。
+      operationId: getAllMessages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功获取消息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedChatMessageResponse'
+        '401':
+          description: 未经授权
+
+  /api/chat/messages/{id}:
+    get:
+      tags:
+        - 聊天
+      summary: 根据ID获取单条消息
+      description: 获取指定ID的聊天消息。
+      operationId: getMessageById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 消息的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取消息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageResponse'
+        '401':
+          description: 未经授权
+        '404':
+          description: 消息未找到
+
+    put:
+      tags:
+        - 聊天
+      summary: 更新聊天消息
+      description: 更新一条已存在的聊天消息。只有消息发送者或管理员可以更新。
+      operationId: updateMessage
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 消息的ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: 新的消息内容
+      responses:
+        '200':
+          description: 消息更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageResponse'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 消息未找到
+
+    delete:
+      tags:
+        - 聊天
+      summary: 删除聊天消息
+      description: 删除一条聊天消息。只有消息发送者或管理员可以删除。
+      operationId: deleteMessage
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 消息的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 消息删除成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 消息未找到
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ChatMessageRequest:
+      type: object
+      required:
+        - content
+        - recipientId
+      properties:
+        content:
+          type: string
+          description: 消息内容 (最多2000字符)
+          example: "你好！"
+        recipientId:
+          type: integer
+          format: int64
+          description: 接收者用户的ID
+
+    ChatMessageResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        senderId:
+          type: integer
+          format: int64
+        senderName:
+          type: string
+        recipientId:
+          type: integer
+          format: int64
+        recipientName:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        isRead:
+          type: boolean
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+
+    PagedChatMessageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessageResponse'
+        pageable:
+          type: object
+          properties:
+            sort:
+              type: object
+            offset:
+              type: integer
+            pageNumber:
+              type: integer
+            pageSize:
+              type: integer
+            paged:
+              type: boolean
+            unpaged:
+              type: boolean
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        last:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+        sort:
+          type: object
+        numberOfElements:
+          type: integer
+        first:
+          type: boolean
+        empty:
+          type: boolean

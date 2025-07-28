@@ -1,0 +1,359 @@
+openapi: 3.0.0
+info:
+  title: 通知模块 API
+  description: 提供系统通知的发送、查询、标记已读和删除等功能。
+  version: 1.0.0
+tags:
+  - name: 通知管理
+    description: 用户的系统通知管理
+
+paths:
+  /api/notifications:
+    get:
+      tags:
+        - 通知管理
+      summary: 获取当前用户的通知
+      description: 分页获取认证用户的通知列表，可选择只看未读。
+      operationId: getNotifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 10
+        - name: unreadOnly
+          in: query
+          description: 是否只返回未读通知
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 成功获取通知列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedNotificationResponse'
+        '401':
+          description: 未经授权
+
+  /api/notifications/count:
+    get:
+      tags:
+        - 通知管理
+      summary: 获取未读通知数量
+      description: 获取当前认证用户的未读通知总数。
+      operationId: getUnreadCount
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取数量
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+        '401':
+          description: 未经授权
+
+  /api/notifications/{id}/read:
+    put:
+      tags:
+        - 通知管理
+      summary: 标记单条通知为已读
+      description: 将指定的通知标记为已读。
+      operationId: markAsRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 通知的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 标记成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问（非本人通知）
+        '404':
+          description: 通知未找到
+
+  /api/notifications/read:
+    put:
+      tags:
+        - 通知管理
+      summary: 批量标记通知为已读
+      description: 将ID列表中的多条通知标记为已读。
+      operationId: markMultipleAsRead
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                format: int64
+      responses:
+        '200':
+          description: 成功标记
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 被标记为已读的通知数量
+        '401':
+          description: 未经授权
+
+  /api/notifications/read-all:
+    put:
+      tags:
+        - 通知管理
+      summary: 标记所有通知为已读
+      description: 将当前用户的所有未读通知标记为已读。
+      operationId: markAllAsRead
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功标记
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 被标记为已读的通知数量
+        '401':
+          description: 未经授权
+
+  /api/notifications/{id}:
+    delete:
+      tags:
+        - 通知管理
+      summary: 删除单条通知
+      description: 删除指定的通知。
+      operationId: deleteNotification
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 通知的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 删除成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问（非本人通知）
+        '404':
+          description: 通知未找到
+
+  /api/notifications/user:
+    post:
+      tags:
+        - 通知管理
+      summary: 向指定用户发送通知
+      description: 创建一条通知并发送给单个指定用户。需要管理员或经理权限。
+      operationId: createUserNotification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '201':
+          description: 通知创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: 无效的请求
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/notifications/users:
+    post:
+      tags:
+        - 通知管理
+      summary: 向多用户发送通知
+      description: 创建一条通知并发送给列表中的多个用户。需要管理员或经理权限。
+      operationId: createMultiUserNotification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '201':
+          description: 通知创建成功
+        '400':
+          description: 无效的请求
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/notifications/role:
+    post:
+      tags:
+        - 通知管理
+      summary: 向指定角色发送通知
+      description: 创建一条通知并发送给拥有特定角色的所有用户。需要管理员权限。
+      operationId: createRoleNotification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '201':
+          description: 通知创建成功
+        '400':
+          description: 无效的请求
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/notifications/broadcast:
+    post:
+      tags:
+        - 通知管理
+      summary: 广播通知
+      description: 创建一条通知并广播给所有用户。需要管理员权限。
+      operationId: broadcastNotification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        '201':
+          description: 广播成功
+        '400':
+          description: 无效的请求
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    NotificationRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          description: 通知内容 (最多2000字符)
+        userId:
+          type: integer
+          format: int64
+          description: 目标用户ID (用于单用户通知)
+        userIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: 目标用户ID列表 (用于多用户通知)
+        roleName:
+          type: string
+          description: 目标角色名称 (用于角色通知)
+
+    NotificationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 系统消息ID
+        messageId:
+          type: integer
+          format: int64
+          description: 消息内容ID
+        content:
+          type: string
+        messageType:
+          type: string
+          enum: [CHAT_MESSAGE, SYSTEM_NOTIFICATION, BROADCAST]
+        createdAt:
+          type: string
+          format: date-time
+        isRead:
+          type: boolean
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    PagedNotificationResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationResponse'
+        pageable:
+          type: object
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        last:
+          type: boolean
+        size:
+          type: integer
+        number:
+          type: integer
+        sort:
+          type: object
+        numberOfElements:
+          type: integer
+        first:
+          type: boolean
+        empty:
+          type: boolean

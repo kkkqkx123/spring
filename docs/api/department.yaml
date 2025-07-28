@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: 部门模块 API
+  description: 提供部门的增删改查、层级结构管理等功能。
+  version: 1.0.0
+tags:
+  - name: 部门管理
+    description: 部门的创建、查询、更新、删除和层级操作
+
+paths:
+  /api/departments:
+    get:
+      tags:
+        - 部门管理
+      summary: 获取所有部门列表
+      description: 返回系统中的所有部门信息。
+      operationId: getAllDepartments
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取部门列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentDto'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+    post:
+      tags:
+        - 部门管理
+      summary: 创建新部门
+      description: 创建一个新的部门。需要管理员或HR经理权限。
+      operationId: createDepartment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentDto'
+      responses:
+        '201':
+          description: 部门创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '400':
+          description: 无效的请求数据
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/departments/{id}:
+    get:
+      tags:
+        - 部门管理
+      summary: 根据ID获取部门信息
+      description: 获取指定ID的部门详细信息。
+      operationId: getDepartmentById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 部门的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取部门信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '401':
+          description: 未经授权
+        '404':
+          description: 部门未找到
+
+    put:
+      tags:
+        - 部门管理
+      summary: 更新部门信息
+      description: 更新指定ID的部门信息。需要管理员或HR经理权限。
+      operationId: updateDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 部门的ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentDto'
+      responses:
+        '200':
+          description: 部门更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '400':
+          description: 无效的请求数据
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 部门未找到
+
+    delete:
+      tags:
+        - 部门管理
+      summary: 删除部门
+      description: 删除指定ID的部门。需要管理员权限。
+      operationId: deleteDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 部门的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 部门删除成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 部门未找到
+
+  /api/departments/tree:
+    get:
+      tags:
+        - 部门管理
+      summary: 获取部门树形结构
+      description: 以树形结构返回所有部门。
+      operationId: getDepartmentTree
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取部门树
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentDto'
+        '401':
+          description: 未经授权
+
+  /api/departments/parent/{parentId}:
+    get:
+      tags:
+        - 部门管理
+      summary: 获取子部门列表
+      description: 获取指定父部门下的所有直接子部门。
+      operationId: getChildDepartments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          description: 父部门的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取子部门列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentDto'
+        '401':
+          description: 未经授权
+        '404':
+          description: 父部门未找到
+
+  /api/departments/{departmentId}/move/{newParentId}:
+    put:
+      tags:
+        - 部门管理
+      summary: 移动部门
+      description: 将一个部门移动到另一个部门下面。需要管理员或HR经理权限。
+      operationId: moveDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: 要移动的部门ID
+          schema:
+            type: integer
+            format: int64
+        - name: newParentId
+          in: path
+          required: true
+          description: 新的父部门ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 部门移动成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 部门或父部门未找到
+
+  /api/departments/by-name:
+    get:
+      tags:
+        - 部门管理
+      summary: 根据名称获取部门
+      description: 根据部门名称精确查找部门信息。
+      operationId: getDepartmentByName
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: 部门的名称
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取部门信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDto'
+        '401':
+          description: 未经授权
+        '404':
+          description: 部门未找到
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    DepartmentDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          description: 部门名称 (2-100个字符)
+          example: "研发部"
+        parentId:
+          type: integer
+          format: int64
+          description: 父部门ID
+          nullable: true
+        parentName:
+          type: string
+          description: 父部门名称
+          readOnly: true
+        isParent:
+          type: boolean
+          description: 是否为父部门
+          readOnly: true
+        depPath:
+          type: string
+          description: 部门路径
+          readOnly: true
+        employeeCount:
+          type: integer
+          description: 部门员工数量
+          readOnly: true
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentDto'
+          description: 子部门列表
+          readOnly: true

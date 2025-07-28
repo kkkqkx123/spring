@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: 职位模块 API
+  description: 提供职位的增删改查和搜索功能。
+  version: 1.0.0
+tags:
+  - name: 职位管理
+    description: 职位信息的维护和管理
+
+paths:
+  /api/positions:
+    get:
+      tags:
+        - 职位管理
+      summary: 获取所有职位列表
+      description: 返回系统中的所有职位信息。
+      operationId: getAllPositions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取职位列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PositionDto'
+        '401':
+          description: 未经授权
+
+    post:
+      tags:
+        - 职位管理
+      summary: 创建新职位
+      description: 创建一个新的职位。需要管理员或HR经理权限。
+      operationId: createPosition
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PositionDto'
+      responses:
+        '201':
+          description: 职位创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionDto'
+        '400':
+          description: 无效的请求数据
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/positions/{id}:
+    get:
+      tags:
+        - 职位管理
+      summary: 根据ID获取职位信息
+      description: 获取指定ID的职位详细信息。
+      operationId: getPositionById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 职位的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取职位信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionDto'
+        '401':
+          description: 未经授权
+        '404':
+          description: 职位未找到
+
+    put:
+      tags:
+        - 职位管理
+      summary: 更新职位信息
+      description: 更新指定ID的职位信息。需要管理员或HR经理权限。
+      operationId: updatePosition
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 职位的ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PositionDto'
+      responses:
+        '200':
+          description: 职位更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionDto'
+        '400':
+          description: 无效的请求数据
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 职位未找到
+
+    delete:
+      tags:
+        - 职位管理
+      summary: 删除职位
+      description: 删除指定ID的职位。需要管理员权限。
+      operationId: deletePosition
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 职位的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 职位删除成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 职位未找到
+
+  /api/positions/department/{departmentId}:
+    get:
+      tags:
+        - 职位管理
+      summary: 获取部门下的职位
+      description: 获取指定部门下的所有职位列表。
+      operationId: getPositionsByDepartmentId
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: 部门的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取职位列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PositionDto'
+        '401':
+          description: 未经授权
+        '404':
+          description: 部门未找到
+
+  /api/positions/search:
+    get:
+      tags:
+        - 职位管理
+      summary: 搜索职位
+      description: 根据职位名称或专业职称搜索职位。
+      operationId: searchPositions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: searchTerm
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取职位列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PositionDto'
+        '401':
+          description: 未经授权
+
+  /api/positions/{id}/has-employees:
+    get:
+      tags:
+        - 职位管理
+      summary: 检查职位下是否有员工
+      description: 检查指定职位当前是否关联了任何员工。需要管理员或HR经理权限。
+      operationId: hasEmployees
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 职位的ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 职位未找到
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PositionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        jobTitle:
+          type: string
+          description: 职位名称 (2-100个字符)
+        professionalTitle:
+          type: string
+          description: 专业职称 (最多100个字符)
+        description:
+          type: string
+          description: 职位描述 (最多255个字符)
+        departmentId:
+          type: integer
+          format: int64
+          description: 所属部门ID
+        departmentName:
+          type: string
+          readOnly: true
+        salaryMin:
+          type: number
+          format: double
+          description: 最低薪资
+        salaryMax:
+          type: number
+          format: double
+          description: 最高薪资
+        isActive:
+          type: boolean
+          default: true
+        employeeCount:
+          type: integer
+          readOnly: true
+          description: 该职位的员工数量

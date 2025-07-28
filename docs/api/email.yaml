@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  title: 邮件模块 API
+  description: 提供发送邮件、批量发送邮件以及管理邮件模板的功能。
+  version: 1.0.0
+tags:
+  - name: 邮件服务
+    description: 发送邮件和管理模板
+
+paths:
+  /api/email/send:
+    post:
+      tags:
+        - 邮件服务
+      summary: 发送单封邮件
+      description: 使用模板向单个收件人发送邮件。需要管理员或HR经理权限。
+      operationId: sendEmail
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+      responses:
+        '200':
+          description: 邮件发送成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email sent successfully"
+        '400':
+          description: 无效的请求，例如邮箱地址或模板无效
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '500':
+          description: 服务器内部错误
+
+  /api/email/send-bulk:
+    post:
+      tags:
+        - 邮件服务
+      summary: 批量发送邮件
+      description: 使用模板向多个收件人发送邮件。需要管理员或HR经理权限。
+      operationId: sendBulkEmails
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+      responses:
+        '200':
+          description: 批量邮件发送成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Bulk emails sent successfully"
+                  count:
+                    type: integer
+                    example: 10
+        '400':
+          description: 无效的请求，例如没有提供收件人
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '500':
+          description: 服务器内部错误
+
+  /api/email/send-to-employee/{employeeId}:
+    post:
+      tags:
+        - 邮件服务
+      summary: 发送邮件给指定员工
+      description: 向指定的单个员工发送邮件。需要管理员或HR经理权限。
+      operationId: sendEmailToEmployee
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          description: 员工的ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+      responses:
+        '200':
+          description: 邮件发送成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '404':
+          description: 员工未找到
+        '500':
+          description: 服务器内部错误
+
+  /api/email/send-to-department/{departmentId}:
+    post:
+      tags:
+        - 邮件服务
+      summary: 发送邮件到整个部门
+      description: 向指定部门的所有员工发送邮件。需要管理员或HR经理权限。
+      operationId: sendEmailToDepartment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          description: 部门的ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+      responses:
+        '200':
+          description: 邮件发送成功
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '500':
+          description: 服务器内部错误
+
+  /api/email/templates:
+    get:
+      tags:
+        - 邮件服务
+      summary: 获取可用的邮件模板
+      description: 返回所有可用的邮件模板列表。需要管理员或HR经理权限。
+      operationId: getEmailTemplates
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功获取模板列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmailTemplate'
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+
+  /api/email/templates/{templateName}/preview:
+    post:
+      tags:
+        - 邮件服务
+      summary: 预览邮件模板
+      description: 使用给定的变量预览邮件模板的HTML内容和主题。需要管理员或HR经理权限。
+      operationId: previewEmailTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: templateName
+          in: path
+          required: true
+          description: 要预览的模板名称
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 成功生成预览
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  html:
+                    type: string
+                    description: 渲染后的HTML内容
+                  subject:
+                    type: string
+                    description: 渲染后的主题
+        '401':
+          description: 未经授权
+        '403':
+          description: 禁止访问
+        '500':
+          description: 服务器内部错误
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    EmailRequest:
+      type: object
+      properties:
+        to:
+          type: string
+          format: email
+          description: 单个收件人的邮箱地址
+        recipients:
+          type: array
+          items:
+            type: string
+            format: email
+          description: 多个收件人的邮箱地址列表
+        subject:
+          type: string
+          description: 邮件主题
+        template:
+          type: string
+          description: 邮件模板的名称
+        variables:
+          type: object
+          additionalProperties: true
+          description: 用于替换模板中占位符的键值对
+
+    EmailTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 模板名称
+        description:
+          type: string
+          description: 模板描述
