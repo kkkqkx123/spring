@@ -48,7 +48,7 @@ public class PayrollController {
      * @return page of payroll ledgers
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('PAYROLL_MANAGER') or hasAuthority('HR_MANAGER') or hasAuthority('PAYROLL_READ')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PAYROLL_MANAGER') or hasRole('HR_MANAGER') or hasAuthority('PAYROLL_READ')")
     public ResponseEntity<Page<PayrollLedgerDTO>> getAllPayrollLedgers(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         log.info("REST request to get all payroll ledgers with pagination");

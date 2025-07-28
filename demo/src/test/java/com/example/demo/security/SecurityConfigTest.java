@@ -106,7 +106,7 @@ class SecurityConfigTest {
     class AdminRoleTests {
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Admin should have access to admin endpoints")
         void testAdminEndpoint_WithAdminRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/admin/users"))
@@ -115,7 +115,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Admin should have access to HR endpoints")
         void testHrEndpoint_WithAdminRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/hr/employees"))
@@ -124,7 +124,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Admin should have access to department endpoints")
         void testDepartmentEndpoint_WithAdminRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/departments"))
@@ -133,7 +133,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Admin should have access to employee endpoints")
         void testEmployeeEndpoint_WithAdminRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/employees"))
@@ -143,7 +143,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Admin should have access to payroll endpoints")
         void testPayrollEndpoint_WithAdminRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/payroll"))
@@ -157,7 +157,7 @@ class SecurityConfigTest {
     class HrManagerRoleTests {
 
         @Test
-        @WithMockUser(authorities = "HR_MANAGER")
+        @WithMockUser(roles = "HR_MANAGER")
         @DisplayName("HR Manager should have access to HR endpoints")
         void testHrEndpoint_WithHrRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/hr/employees"))
@@ -166,7 +166,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "HR_MANAGER")
+        @WithMockUser(roles = "HR_MANAGER")
         @DisplayName("HR Manager should have access to department endpoints")
         void testDepartmentEndpoint_WithHrRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/departments"))
@@ -175,7 +175,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "HR_MANAGER")
+        @WithMockUser(roles = "HR_MANAGER")
         @DisplayName("HR Manager should have access to employee endpoints")
         void testEmployeeEndpoint_WithHrRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/employees"))
@@ -185,7 +185,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "HR_MANAGER")
+        @WithMockUser(roles = "HR_MANAGER")
         @DisplayName("HR Manager should NOT have access to admin endpoints")
         void testAdminEndpoint_WithHrRole_ShouldDenyAccess() throws Exception {
             mockMvc.perform(get("/api/admin/users"))
@@ -193,7 +193,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "HR_MANAGER")
+        @WithMockUser(roles = "HR_MANAGER")
         @DisplayName("HR Manager should have access to payroll endpoints")
         void testPayrollEndpoint_WithHrRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/payroll"))
@@ -207,7 +207,7 @@ class SecurityConfigTest {
     class DepartmentManagerRoleTests {
 
         @Test
-        @WithMockUser(authorities = "DEPARTMENT_MANAGER")
+        @WithMockUser(roles = "DEPARTMENT_MANAGER")
         @DisplayName("Department Manager should have access to department endpoints")
         void testDepartmentEndpoint_WithDepartmentManagerRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/departments"))
@@ -216,7 +216,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "DEPARTMENT_MANAGER")
+        @WithMockUser(roles = "DEPARTMENT_MANAGER")
         @DisplayName("Department Manager should NOT have access to admin endpoints")
         void testAdminEndpoint_WithDepartmentManagerRole_ShouldDenyAccess() throws Exception {
             mockMvc.perform(get("/api/admin/users"))
@@ -224,7 +224,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "DEPARTMENT_MANAGER")
+        @WithMockUser(roles = "DEPARTMENT_MANAGER")
         @DisplayName("Department Manager should NOT have access to HR endpoints")
         void testHrEndpoint_WithDepartmentManagerRole_ShouldDenyAccess() throws Exception {
             mockMvc.perform(get("/api/hr/employees"))
@@ -237,7 +237,7 @@ class SecurityConfigTest {
     class RegularUserRoleTests {
 
         @Test
-        @WithMockUser(authorities = "USER")
+        @WithMockUser(roles = "USER")
         @DisplayName("Regular user should NOT have access to admin endpoints")
         void testAdminEndpoint_WithUserRole_ShouldDenyAccess() throws Exception {
             mockMvc.perform(get("/api/admin/users"))
@@ -245,7 +245,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "USER")
+        @WithMockUser(roles = "USER")
         @DisplayName("Regular user should NOT have access to HR endpoints")
         void testHrEndpoint_WithUserRole_ShouldDenyAccess() throws Exception {
             mockMvc.perform(get("/api/hr/employees"))
@@ -253,7 +253,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "USER")
+        @WithMockUser(roles = "USER")
         @DisplayName("Regular user should have access to department endpoints")
         void testDepartmentEndpoint_WithUserRole_ShouldAllowAccess() throws Exception {
             mockMvc.perform(get("/api/departments"))
@@ -267,7 +267,7 @@ class SecurityConfigTest {
     class HttpMethodsSecurityTests {
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Should allow POST requests for authorized users")
         void testPostRequest_WithAuthorization_ShouldAllowAccess() throws Exception {
             mockMvc.perform(post("/api/departments")
@@ -280,7 +280,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Should allow PUT requests for authorized users")
         void testPutRequest_WithAuthorization_ShouldAllowAccess() throws Exception {
             mockMvc.perform(put("/api/departments/1")
@@ -293,7 +293,7 @@ class SecurityConfigTest {
         }
 
         @Test
-        @WithMockUser(authorities = "ADMIN")
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("Should allow DELETE requests for authorized users")
         void testDeleteRequest_WithAuthorization_ShouldAllowAccess() throws Exception {
             mockMvc.perform(delete("/api/departments/1"))
