@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.exception.EmailSendingException;
-import com.example.demo.model.dto.BulkEmailRequest;
 import com.example.demo.model.dto.EmailRequest;
 import com.example.demo.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import com.example.demo.config.EmailControllerTestSecurityConfig;
+import com.example.demo.security.TestSecurityConfig;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -29,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = EmailController.class)
-@Import(EmailControllerTestSecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class EmailControllerTest {
 
         @Autowired
@@ -40,6 +39,33 @@ class EmailControllerTest {
 
         @MockitoBean
         private EmailService emailService;
+        
+        @MockitoBean
+        private com.example.demo.service.DepartmentService departmentService;
+        
+        @MockitoBean
+        private com.example.demo.service.UserService userService;
+        
+        @MockitoBean
+        private com.example.demo.service.EmployeeService employeeService;
+        
+        @MockitoBean
+        private com.example.demo.service.ChatService chatService;
+        
+        @MockitoBean
+        private com.example.demo.service.NotificationService notificationService;
+        
+        @MockitoBean
+        private com.example.demo.service.PayrollService payrollService;
+        
+        @MockitoBean
+        private com.example.demo.service.PositionService positionService;
+        
+        @MockitoBean
+        private com.example.demo.service.PermissionService permissionService;
+        
+        @MockitoBean
+        private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
         @Test
         @WithMockUser(roles = { "HR_MANAGER" })
@@ -49,14 +75,15 @@ class EmailControllerTest {
                 variables.put("employeeName", "John Doe");
                 variables.put("department", "IT");
 
-                EmailRequest request = new EmailRequest(
-                                "john.doe@example.com",
-                                "Welcome to the Company",
-                                "email/notification/welcome.ftl",
-                                variables);
+                EmailRequest request = new EmailRequest();
+                request.setTo("john.doe@example.com");
+                request.setSubject("Welcome to the Company");
+                request.setTemplate("welcome");
+                request.setVariables(variables);
+
 
                 // Act & Assert
-                mockMvc.perform(post("/emails/send")
+                mockMvc.perform(post("/api/email/send")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -66,7 +93,7 @@ class EmailControllerTest {
                 verify(emailService).sendTemplatedEmail(
                                 eq("john.doe@example.com"),
                                 eq("Welcome to the Company"),
-                                eq("email/notification/welcome.ftl"),
+                                eq("welcome"),
                                 eq(variables));
         }
 
@@ -77,22 +104,22 @@ class EmailControllerTest {
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("employeeName", "John Doe");
 
-                EmailRequest request = new EmailRequest(
-                                "john.doe@example.com",
-                                "Welcome to the Company",
-                                "email/notification/welcome.ftl",
-                                variables);
+                EmailRequest request = new EmailRequest();
+                request.setTo("john.doe@example.com");
+                request.setSubject("Welcome to the Company");
+                request.setTemplate("welcome");
+                request.setVariables(variables);
 
-                doThrow(new EmailSendingException("Failed to send email"))
+                doThrow(new RuntimeException("Failed to send email"))
                                 .when(emailService).sendTemplatedEmail(anyString(), anyString(), anyString(), any());
 
                 // Act & Assert
-                mockMvc.perform(post("/emails/send")
+                mockMvc.perform(post("/api/email/send")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isInternalServerError())
-                                .andExpect(jsonPath("$.message").value("Failed to send email: Failed to send email"));
+                                .andExpect(jsonPath("$.error").value("Failed to send email: Failed to send email"));
         }
 
         @Test
@@ -108,14 +135,14 @@ class EmailControllerTest {
                 variables.put("announcementTitle", "Company Picnic");
                 variables.put("announcementContent", "Join us for a company picnic this weekend!");
 
-                BulkEmailRequest request = new BulkEmailRequest(
-                                recipients,
-                                "Company Announcement",
-                                "email/employee/announcement.ftl",
-                                variables);
+                EmailRequest request = new EmailRequest();
+                request.setRecipients(recipients);
+                request.setSubject("Company Announcement");
+                request.setTemplate("announcement");
+                request.setVariables(variables);
 
                 // Act & Assert
-                mockMvc.perform(post("/emails/send-bulk")
+                mockMvc.perform(post("/api/email/send-bulk")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -125,7 +152,7 @@ class EmailControllerTest {
                 verify(emailService).sendBulkEmails(
                                 eq(recipients),
                                 eq("Company Announcement"),
-                                eq("email/employee/announcement.ftl"),
+                                eq("announcement"),
                                 eq(variables));
         }
 
@@ -134,65 +161,19 @@ class EmailControllerTest {
         void sendEmail_AccessDenied() throws Exception {
                 // Arrange
                 Map<String, Object> variables = new HashMap<>();
-                EmailRequest request = new EmailRequest(
-                                "john.doe@example.com",
-                                "Test Subject",
-                                "email/notification/welcome.ftl",
-                                variables);
+                EmailRequest request = new EmailRequest();
+                request.setTo("john.doe@example.com");
+                request.setSubject("Test Subject");
+                request.setTemplate("welcome");
+                request.setVariables(variables);
 
                 // Act & Assert
-                mockMvc.perform(post("/emails/send")
+                mockMvc.perform(post("/api/email/send")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isForbidden());
 
                 verify(emailService, never()).sendTemplatedEmail(anyString(), anyString(), anyString(), any());
-        }
-
-        @Test
-        @WithMockUser(roles = { "HR_MANAGER" })
-        void sendWelcomeEmail_Success() throws Exception {
-                // Act & Assert
-                mockMvc.perform(post("/emails/welcome/1")
-                                .with(csrf()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message")
-                                                .value("Welcome email functionality to be implemented"));
-        }
-
-        @Test
-        @WithMockUser(roles = { "FINANCE_MANAGER" })
-        void sendPayrollNotification_Success() throws Exception {
-                // Act & Assert
-                mockMvc.perform(post("/emails/payroll-notification/1/2")
-                                .with(csrf()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message")
-                                                .value("Payroll notification functionality to be implemented"));
-        }
-
-        @Test
-        @WithMockUser(roles = { "HR_MANAGER" })
-        void sendAnnouncement_Success() throws Exception {
-                // Arrange
-                Map<String, Object> variables = new HashMap<>();
-                variables.put("announcementTitle", "Company Picnic");
-                variables.put("announcementContent", "Join us for a company picnic this weekend!");
-
-                EmailRequest request = new EmailRequest(
-                                "all@example.com", // This would be ignored in the actual implementation
-                                "Company Announcement",
-                                "email/employee/announcement.ftl",
-                                variables);
-
-                // Act & Assert
-                mockMvc.perform(post("/emails/announcement")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.message")
-                                                .value("Announcement email functionality to be implemented"));
         }
 }

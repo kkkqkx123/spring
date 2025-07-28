@@ -31,8 +31,11 @@ import com.example.demo.model.dto.PayrollSearchCriteria;
 import com.example.demo.model.entity.PayrollLedger.PayrollStatus;
 import com.example.demo.service.PayrollService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Import;
+import com.example.demo.security.TestSecurityConfig;
 
 @WebMvcTest(PayrollController.class)
+@Import(TestSecurityConfig.class)
 public class PayrollControllerTest {
 
     @Autowired
@@ -43,6 +46,33 @@ public class PayrollControllerTest {
 
     @MockitoBean
     private PayrollService payrollService;
+    
+    @MockitoBean
+    private com.example.demo.service.DepartmentService departmentService;
+    
+    @MockitoBean
+    private com.example.demo.service.UserService userService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmailService emailService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmployeeService employeeService;
+    
+    @MockitoBean
+    private com.example.demo.service.ChatService chatService;
+    
+    @MockitoBean
+    private com.example.demo.service.NotificationService notificationService;
+    
+    @MockitoBean
+    private com.example.demo.service.PositionService positionService;
+    
+    @MockitoBean
+    private com.example.demo.service.PermissionService permissionService;
+    
+    @MockitoBean
+    private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
     private PayrollLedgerDTO payrollLedgerDTO;
     private List<PayrollLedgerDTO> payrollLedgers;

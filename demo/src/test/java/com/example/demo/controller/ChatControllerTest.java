@@ -41,6 +41,7 @@ import com.example.demo.model.entity.MessageContent;
 import com.example.demo.model.entity.MessageContent.MessageType;
 import com.example.demo.model.entity.User;
 import com.example.demo.service.ChatService;
+import com.example.demo.service.DepartmentService;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -83,6 +84,9 @@ class ChatControllerTest {
     
     @MockitoBean
     private SimpMessagingTemplate messagingTemplate;
+
+    @MockitoBean
+    private DepartmentService departmentService;
     
     private User currentUser;
     private User otherUser;
