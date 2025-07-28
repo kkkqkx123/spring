@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Page<Employee> getAllEmployees(Pageable pageable) {
         log.info("Fetching all employees with pagination: {}", pageable);
-        return employeeRepository.findAll(pageable);
+        try {
+            return employeeRepository.findAll(pageable);
+        } catch (Exception e) {
+            // 捕获并记录异常，避免500错误无日志
+            log.error("Failed to fetch employees", e);
+            throw new ServiceException("Error fetching employees", e);
+        }
     }
     
     @Override

@@ -145,7 +145,8 @@ public class SecurityConfig {
                         // Position endpoints
                         .requestMatchers("/api/positions/**").hasAnyRole("ADMIN", "HR_MANAGER")
                         // Payroll endpoints
-                        .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "PAYROLL_MANAGER", "HR_MANAGER", "PAYROLL_READ", "PAYROLL_CREATE", "PAYROLL_UPDATE", "PAYROLL_DELETE")
+                        .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "PAYROLL_MANAGER", "HR_MANAGER")
+                        .requestMatchers("/api/payroll/**").hasAnyAuthority("PAYROLL_READ", "PAYROLL_CREATE", "PAYROLL_UPDATE", "PAYROLL_DELETE")
                         // All other endpoints require authentication
                         .anyRequest().authenticated())
                 // H2 console support

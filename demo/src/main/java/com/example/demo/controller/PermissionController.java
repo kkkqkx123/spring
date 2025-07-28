@@ -23,7 +23,7 @@ import com.example.demo.service.PermissionService;
  * Controller for permission management
  */
 @RestController
-@RequestMapping("/api/admin/permissions")
+@RequestMapping("/api/permissions")
 @PreAuthorize("hasRole('ADMIN')")
 public class PermissionController {
 

@@ -1,3 +1,5 @@
+Permission
+
 SecurityConfigTest
 
 run \demo\src\test\java\com\example\demo\security\SecurityConfigTest.java and fix issues. if test file conflict with config file, edit test file, not config file. 
