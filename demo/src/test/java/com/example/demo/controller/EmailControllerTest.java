@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("unused")
 @WebMvcTest(controllers = EmailController.class)
 @Import(TestSecurityConfig.class)
 class EmailControllerTest {
@@ -39,31 +40,31 @@ class EmailControllerTest {
 
         @MockitoBean
         private EmailService emailService;
-        
+
         @MockitoBean
         private com.example.demo.service.DepartmentService departmentService;
-        
+
         @MockitoBean
         private com.example.demo.service.UserService userService;
-        
+
         @MockitoBean
         private com.example.demo.service.EmployeeService employeeService;
-        
+
         @MockitoBean
         private com.example.demo.service.ChatService chatService;
-        
+
         @MockitoBean
         private com.example.demo.service.NotificationService notificationService;
-        
+
         @MockitoBean
         private com.example.demo.service.PayrollService payrollService;
-        
+
         @MockitoBean
         private com.example.demo.service.PositionService positionService;
-        
+
         @MockitoBean
         private com.example.demo.service.PermissionService permissionService;
-        
+
         @MockitoBean
         private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
@@ -80,7 +81,6 @@ class EmailControllerTest {
                 request.setSubject("Welcome to the Company");
                 request.setTemplate("welcome");
                 request.setVariables(variables);
-
 
                 // Act & Assert
                 mockMvc.perform(post("/api/email/send")

@@ -20,7 +20,7 @@ export function LoadingSpinner({
   const loaderSize = sizeMap[size];
 
   const LoaderContent = (
-    <Stack align="center" gap="sm">
+    <Stack align="center" gap="sm" role="status" aria-label="Loading">
       <Loader size={loaderSize} />
       {message && (
         <Text size="sm" c="dimmed" ta="center">

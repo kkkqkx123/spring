@@ -1,16 +1,36 @@
 // Employees feature public API
-// Components will be exported here when implemented
-// export { EmployeeList } from './components/EmployeeList';
-// export { EmployeeForm } from './components/EmployeeForm';
 
-// Hooks will be exported here when implemented
-// export { useEmployees } from './hooks/useEmployees';
-// export { useEmployee } from './hooks/useEmployee';
+// Components
+export { EmployeeList } from './components/EmployeeList';
+export { EmployeeSearch } from './components/EmployeeSearch';
+export { EmployeeCard } from './components/EmployeeCard';
+export { EmployeeForm } from './components/EmployeeForm';
+export { EmployeeDetail } from './components/EmployeeDetail';
 
-// Services will be exported here when implemented
-// export { employeeApi } from './services/employeeApi';
+// Pages
+export { EmployeePage } from './pages/EmployeePage';
 
-// Types will be exported here when implemented
-// export type { Employee, EmployeeSearchCriteria } from './types';
+// Hooks
+export {
+  useEmployees,
+  useEmployee,
+  useEmployeeSearch,
+  useCreateEmployee,
+  useUpdateEmployee,
+  useDeleteEmployee,
+  useDeleteEmployees,
+  useEmployeeImport,
+  useEmployeeExport,
+  useUploadProfilePicture,
+  useEmployeeListState,
+} from './hooks/useEmployees';
 
-export {}; // Temporary export to make this a valid module
+// Services
+export { employeeApi } from './services/employeeApi';
+
+// Types
+export type {
+  EmployeeSearchCriteria,
+  EmployeeCreateRequest,
+  EmployeeUpdateRequest,
+} from './services/employeeApi';
