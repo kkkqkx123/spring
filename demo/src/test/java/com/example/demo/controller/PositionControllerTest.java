@@ -52,6 +52,33 @@ class PositionControllerTest {
     @MockitoBean
     private PositionService positionService;
     
+    @MockitoBean
+    private com.example.demo.service.DepartmentService departmentService;
+    
+    @MockitoBean
+    private com.example.demo.service.UserService userService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmailService emailService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmployeeService employeeService;
+    
+    @MockitoBean
+    private com.example.demo.service.ChatService chatService;
+    
+    @MockitoBean
+    private com.example.demo.service.NotificationService notificationService;
+    
+    @MockitoBean
+    private com.example.demo.service.PayrollService payrollService;
+    
+    @MockitoBean
+    private com.example.demo.service.PermissionService permissionService;
+    
+    @MockitoBean
+    private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
+    
     private Position position;
     private PositionDto positionDto;
     private Department department;

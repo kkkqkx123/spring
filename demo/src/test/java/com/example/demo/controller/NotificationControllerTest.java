@@ -8,31 +8,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import com.example.demo.config.TestSecurityConfig;
-import com.example.demo.service.MockUserService;
+import org.springframework.context.annotation.Import;
+import com.example.demo.security.TestSecurityConfig;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 
 import com.example.demo.model.dto.NotificationRequest;
 import com.example.demo.model.entity.MessageContent;
@@ -46,30 +37,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Unit tests for NotificationController
  */
-@WebMvcTest(controllers = NotificationController.class, 
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
-    classes = {TestSecurityConfig.class, MockUserService.class}))
+@WebMvcTest(NotificationController.class)
+@Import(TestSecurityConfig.class)
 class NotificationControllerTest {
     
     @Autowired
-    private WebApplicationContext context;
-    
     private MockMvc mockMvc;
-    
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();
-                
-        // Set up authentication for tests that don't use @WithMockUser
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                "testuser", 
-                "password",
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-    }
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -79,6 +52,30 @@ class NotificationControllerTest {
     
     @MockitoBean
     private UserService userService;
+    
+    @MockitoBean
+    private com.example.demo.service.DepartmentService departmentService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmailService emailService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmployeeService employeeService;
+    
+    @MockitoBean
+    private com.example.demo.service.ChatService chatService;
+    
+    @MockitoBean
+    private com.example.demo.service.PayrollService payrollService;
+    
+    @MockitoBean
+    private com.example.demo.service.PositionService positionService;
+    
+    @MockitoBean
+    private com.example.demo.service.PermissionService permissionService;
+    
+    @MockitoBean
+    private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
     
     private User user;
     private MessageContent messageContent;
@@ -145,6 +142,7 @@ class NotificationControllerTest {
     void testMarkAsRead_WhenSuccessful_ReturnsOk() throws Exception {
         // Arrange
         when(userService.getUserFromAuthentication(any())).thenReturn(user);
+        when(notificationService.getNotificationById(1L)).thenReturn(Optional.of(systemMessage));
         when(notificationService.markAsRead(1L, 1L)).thenReturn(true);
         
         // Act & Assert
@@ -159,13 +157,43 @@ class NotificationControllerTest {
     void testMarkAsRead_WhenNotFound_ReturnsNotFound() throws Exception {
         // Arrange
         when(userService.getUserFromAuthentication(any())).thenReturn(user);
+        when(notificationService.getNotificationById(1L)).thenReturn(Optional.of(systemMessage));
         when(notificationService.markAsRead(1L, 1L)).thenReturn(false);
         
         // Act & Assert
         mockMvc.perform(put("/api/notifications/1/read")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
+    void testMarkAsRead_WhenNotificationDoesNotExist_ReturnsNotFound() throws Exception {
+        // Arrange
+        when(userService.getUserFromAuthentication(any())).thenReturn(user);
+        when(notificationService.getNotificationById(1L)).thenReturn(Optional.empty());
+        
+        // Act & Assert
+        mockMvc.perform(put("/api/notifications/1/read")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
+    void testMarkAsRead_WhenUserNotOwner_ReturnsForbidden() throws Exception {
+        // Arrange
+        systemMessage.setUserId(2L); // Different user
+        when(userService.getUserFromAuthentication(any())).thenReturn(user);
+        when(notificationService.getNotificationById(1L)).thenReturn(Optional.of(systemMessage));
+        
+        // Act & Assert
+        mockMvc.perform(put("/api/notifications/1/read")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
     
     @Test

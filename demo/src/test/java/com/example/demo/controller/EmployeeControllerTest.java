@@ -41,11 +41,15 @@ import com.example.demo.model.entity.Position;
 import com.example.demo.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.context.annotation.Import;
+import com.example.demo.security.TestSecurityConfig;
+
 /**
  * Test class for EmployeeController
  * Tests all CRUD operations and Excel import/export functionality
  */
 @WebMvcTest(EmployeeController.class)
+@Import(TestSecurityConfig.class)
 class EmployeeControllerTest {
 
     @Autowired
@@ -56,6 +60,33 @@ class EmployeeControllerTest {
     
     @MockitoBean
     private EmployeeService employeeService;
+    
+    @MockitoBean
+    private com.example.demo.service.DepartmentService departmentService;
+    
+    @MockitoBean
+    private com.example.demo.service.UserService userService;
+    
+    @MockitoBean
+    private com.example.demo.service.EmailService emailService;
+    
+    @MockitoBean
+    private com.example.demo.service.ChatService chatService;
+    
+    @MockitoBean
+    private com.example.demo.service.NotificationService notificationService;
+    
+    @MockitoBean
+    private com.example.demo.service.PayrollService payrollService;
+    
+    @MockitoBean
+    private com.example.demo.service.PositionService positionService;
+    
+    @MockitoBean
+    private com.example.demo.service.PermissionService permissionService;
+    
+    @MockitoBean
+    private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
     
     private List<Employee> employees;
     private Employee employee1;
@@ -179,7 +210,7 @@ class EmployeeControllerTest {
         mockMvc.perform(multipart("/api/employees/import")
                 .file(file)
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
     
     // Note: This test is commented out because the security configuration in the test environment
@@ -328,7 +359,7 @@ class EmployeeControllerTest {
         // Perform request without authentication
         mockMvc.perform(get("/api/employees")
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
     
     // Note: This test is commented out because the security configuration in the test environment

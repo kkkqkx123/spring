@@ -1,7 +1,7 @@
 // Auth feature public API
-// Components will be exported here when implemented
-// export { LoginForm } from './components/LoginForm';
-// export { RegisterForm } from './components/RegisterForm';
+// Components
+export { LoginForm, RegisterForm, ForgotPasswordForm } from './components';
+export type { LoginFormProps, RegisterFormProps, ForgotPasswordFormProps } from './components';
 
 // Hooks will be exported here when implemented
 // export { useAuth } from './hooks/useAuth';
@@ -12,5 +12,3 @@
 
 // Types will be exported here when implemented
 // export type { LoginRequest, RegisterRequest } from './types';
-
-export {}; // Temporary export to make this a valid module

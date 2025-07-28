@@ -101,12 +101,14 @@ class DepartmentControllerTest {
     void testGetAllDepartments_ReturnsAllDepartments() throws Exception {
         // Arrange
         when(departmentService.getAllDepartments()).thenReturn(departments);
+        when(departmentService.convertToDto(itDepartment)).thenReturn(itDepartmentDto);
+        when(departmentService.convertToDto(hrDepartment)).thenReturn(hrDepartmentDto);
         
         // Act & Assert
         mockMvc.perform(get("/api/departments"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].parentId").value(1L))
-            .andExpect(jsonPath("$[1].parentId").value(1L));
+            .andExpect(jsonPath("$[0].id").value(1L))
+            .andExpect(jsonPath("$[1].id").value(2L));
         
         verify(departmentService).getAllDepartments();
     }
