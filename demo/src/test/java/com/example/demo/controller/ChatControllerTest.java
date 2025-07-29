@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import com.example.demo.config.TestSecurityConfig;
+import com.example.demo.security.TestSecurityConfig;
 import com.example.demo.service.MockUserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
