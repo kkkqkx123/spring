@@ -221,7 +221,7 @@ class NotificationServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<SystemMessage> messagePage = new PageImpl<>(Collections.singletonList(systemMessage));
-        when(systemMessageRepository.findByUserId(1L, pageable)).thenReturn(messagePage);
+        when(systemMessageRepository.findWithContentByUserId(1L, pageable)).thenReturn(messagePage);
 
         // Act
         Page<SystemMessage> result = notificationService.getUserNotifications(1L, pageable);
@@ -237,7 +237,7 @@ class NotificationServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<SystemMessage> messagePage = new PageImpl<>(Collections.singletonList(systemMessage));
-        when(systemMessageRepository.findByUserIdAndIsReadFalse(1L, pageable)).thenReturn(messagePage);
+        when(systemMessageRepository.findWithContentByUserIdAndIsReadFalse(1L, pageable)).thenReturn(messagePage);
 
         // Act
         Page<SystemMessage> result = notificationService.getUnreadNotifications(1L, pageable);

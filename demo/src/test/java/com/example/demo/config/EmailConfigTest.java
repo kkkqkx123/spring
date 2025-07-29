@@ -30,8 +30,8 @@ class EmailConfigTest {
         // Verify mail properties
         assertEquals("true", mailSender.getJavaMailProperties().getProperty("mail.smtp.auth"),
                 "SMTP auth should be enabled for test");
-        assertEquals("false", mailSender.getJavaMailProperties().getProperty("mail.smtp.starttls.enable"),
-                "STARTTLS should be disabled for dev");
+        assertEquals("true", mailSender.getJavaMailProperties().getProperty("mail.smtp.starttls.enable"),
+                "STARTTLS should be enabled for dev");
         assertEquals("smtp", mailSender.getJavaMailProperties().getProperty("mail.transport.protocol"),
                 "Transport protocol should be SMTP");
         assertEquals("true", mailSender.getJavaMailProperties().getProperty("mail.debug"),

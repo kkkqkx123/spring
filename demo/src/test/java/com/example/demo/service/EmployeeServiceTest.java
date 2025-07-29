@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.example.demo.exception.DuplicateResourceException;
+import com.example.demo.exception.EmployeeNotFoundException;
 import com.example.demo.exception.InvalidDataException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.dto.EmployeeSearchCriteria;
@@ -131,7 +132,7 @@ public class EmployeeServiceTest {
         when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
+        assertThrows(EmployeeNotFoundException.class, () -> {
             employeeService.getEmployeeById(99L);
         });
         verify(employeeRepository).findById(99L);
@@ -289,7 +290,7 @@ public class EmployeeServiceTest {
         when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
+        assertThrows(EmployeeNotFoundException.class, () -> {
             employeeService.updateEmployee(99L, employee1);
         });
         verify(employeeRepository).findById(99L);

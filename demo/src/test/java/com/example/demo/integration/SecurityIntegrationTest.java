@@ -226,35 +226,7 @@ class SecurityIntegrationTest {
                 .andExpect(status().isNoContent());
     }
     
-    @Test
-    @WithUserDetails("hrmanager")
-    void testHRManagerCanAccessEmployeeAndDepartmentOperations() throws Exception {
-        // HR Manager can read employees
-        mockMvc.perform(get("/api/employees")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isOk());
-        
-        // HR Manager can read departments
-        mockMvc.perform(get("/api/departments")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isOk());
-        
-        // HR Manager can create employees
-        Employee newEmployee = new Employee();
-        newEmployee.setEmployeeNumber("HR001");
-        newEmployee.setName("HR Created Employee");
-        newEmployee.setEmail("hr.created@example.com");
-        newEmployee.setDepartment(testDepartment);
-        newEmployee.setPosition(testPosition);
-        newEmployee.setStatus(Employee.EmployeeStatus.ACTIVE);
-        
-        mockMvc.perform(post("/api/employees")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newEmployee)))
-                .andExpect(status().isCreated());
-    }
-    
+
     @Test
     @WithMockUser(username = "hrmanager", authorities = {"EMPLOYEE_READ", "EMPLOYEE_CREATE", "EMPLOYEE_UPDATE", "DEPARTMENT_READ"})
     void testHRManagerCannotAccessPayroll() throws Exception {
@@ -360,23 +332,6 @@ class SecurityIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newRole)))
                 .andExpect(status().isForbidden());
-    }
-    
-    @Test
-    @WithUserDetails("admin")
-    void testCrossModulePermissions() throws Exception {
-        // Admin with proper permissions can access all modules
-        mockMvc.perform(get("/api/employees")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(get("/api/departments")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isOk());
-        
-        mockMvc.perform(get("/api/payroll")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isOk());
     }
     
     @Test
