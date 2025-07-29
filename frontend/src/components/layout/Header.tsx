@@ -3,26 +3,20 @@ import {
   Group,
   Burger,
   TextInput,
-  ActionIcon,
   Menu,
   Avatar,
   Text,
-  Badge,
-  Indicator,
   UnstyledButton,
-  Divider,
-  Stack,
-  ScrollArea,
 } from '@mantine/core';
 import {
   IconSearch,
-  IconBell,
   IconUser,
   IconSettings,
   IconLogout,
   IconChevronDown,
 } from '@tabler/icons-react';
-import { User, Notification } from '../../types';
+import { User } from '../../types';
+import { NotificationDropdown } from '../../features/notifications';
 
 export interface HeaderProps {
   user: User;
@@ -31,37 +25,6 @@ export interface HeaderProps {
   isMobile: boolean;
 }
 
-// Mock notifications for demo
-const mockNotifications: Notification[] = [
-  {
-    id: 1,
-    title: 'New Employee Added',
-    message: 'John Doe has been added to the system',
-    type: 'info',
-    userId: 1,
-    read: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: 'Department Updated',
-    message: 'Engineering department structure has been updated',
-    type: 'success',
-    userId: 1,
-    read: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    title: 'System Maintenance',
-    message: 'Scheduled maintenance tonight at 2 AM',
-    type: 'warning',
-    userId: 1,
-    read: true,
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export function Header({
   user,
   navbarOpened,
@@ -69,17 +32,10 @@ export function Header({
   isMobile,
 }: HeaderProps) {
   const [searchValue, setSearchValue] = useState('');
-  const [notifications] = useState(mockNotifications);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     console.log('Search:', searchValue);
-  };
-
-  const handleNotificationClick = (notification: Notification) => {
-    console.log('Notification clicked:', notification);
   };
 
   const handleProfileClick = () => {
@@ -94,17 +50,8 @@ export function Header({
     console.log('Logout clicked');
   };
 
-  const getNotificationColor = (type: Notification['type']) => {
-    switch (type) {
-      case 'success':
-        return 'green';
-      case 'warning':
-        return 'yellow';
-      case 'error':
-        return 'red';
-      default:
-        return 'blue';
-    }
+  const handleViewAllNotifications = () => {
+    console.log('View all notifications clicked');
   };
 
   return (
@@ -142,93 +89,7 @@ export function Header({
       {/* Right Section */}
       <Group gap="sm">
         {/* Notifications */}
-        <Menu shadow="md" width={320} position="bottom-end">
-          <Menu.Target>
-            <ActionIcon variant="subtle" size="lg" aria-label="Notifications">
-              <Indicator
-                color="red"
-                size={16}
-                disabled={unreadCount === 0}
-                label={unreadCount > 9 ? '9+' : unreadCount}
-              >
-                <IconBell size={20} />
-              </Indicator>
-            </ActionIcon>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Label>
-              <Group justify="space-between">
-                <Text>Notifications</Text>
-                {unreadCount > 0 && (
-                  <Badge size="sm" variant="filled" color="red">
-                    {unreadCount} new
-                  </Badge>
-                )}
-              </Group>
-            </Menu.Label>
-
-            <Divider />
-
-            <ScrollArea.Autosize mah={300}>
-              <Stack gap="xs" p="xs">
-                {notifications.length === 0 ? (
-                  <Text size="sm" c="dimmed" ta="center" py="md">
-                    No notifications
-                  </Text>
-                ) : (
-                  notifications.map(notification => (
-                    <UnstyledButton
-                      key={notification.id}
-                      onClick={() => handleNotificationClick(notification)}
-                      p="xs"
-                      style={{
-                        borderRadius: 'var(--mantine-radius-sm)',
-                        backgroundColor: notification.read
-                          ? 'transparent'
-                          : 'var(--mantine-color-blue-0)',
-                        border: '1px solid var(--mantine-color-gray-2)',
-                        width: '100%',
-                      }}
-                    >
-                      <Group gap="sm" align="flex-start">
-                        <Badge
-                          size="xs"
-                          color={getNotificationColor(notification.type)}
-                          variant="dot"
-                        />
-                        <div style={{ flex: 1 }}>
-                          <Text size="sm" fw={notification.read ? 400 : 600}>
-                            {notification.title}
-                          </Text>
-                          <Text size="xs" c="dimmed" lineClamp={2}>
-                            {notification.message}
-                          </Text>
-                          <Text size="xs" c="dimmed" mt="xs">
-                            {new Date(
-                              notification.createdAt
-                            ).toLocaleTimeString()}
-                          </Text>
-                        </div>
-                      </Group>
-                    </UnstyledButton>
-                  ))
-                )}
-              </Stack>
-            </ScrollArea.Autosize>
-
-            {notifications.length > 0 && (
-              <>
-                <Divider />
-                <Menu.Item>
-                  <Text size="sm" ta="center" c="blue">
-                    View all notifications
-                  </Text>
-                </Menu.Item>
-              </>
-            )}
-          </Menu.Dropdown>
-        </Menu>
+        <NotificationDropdown onViewAll={handleViewAllNotifications} />
 
         {/* User Menu */}
         <Menu shadow="md" width={200} position="bottom-end">
