@@ -3,7 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { ChatInterface } from './ChatInterface';
 import { useAuth } from '../../../hooks/useAuth';
-import { useConversation, useConversations, useSendMessage } from '../hooks/useChat';
+import {
+  useConversation,
+  useConversations,
+  useSendMessage,
+} from '../hooks/useChat';
 import { useRealTimeChat, useTypingIndicator } from '../hooks/useRealTimeChat';
 import type { ChatMessage, PaginatedResponse } from '../../../types';
 import { vi } from 'vitest';
@@ -88,9 +92,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {component}
-      </MantineProvider>
+      <MantineProvider>{component}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -148,7 +150,9 @@ describe('ChatInterface', () => {
   it('renders chat interface with conversation list', () => {
     renderWithProviders(<ChatInterface />);
 
-    expect(screen.getByPlaceholderText('Search conversations...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Search conversations...')
+    ).toBeInTheDocument();
     expect(screen.getByText('Select a conversation')).toBeInTheDocument();
   });
 
@@ -159,9 +163,7 @@ describe('ChatInterface', () => {
       error: null,
     } as any);
 
-    renderWithProviders(
-      <ChatInterface defaultSelectedUserId={2} />
-    );
+    renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
     expect(screen.getByText('Hello!')).toBeInTheDocument();
     expect(screen.getByText('Hi there!')).toBeInTheDocument();
@@ -174,9 +176,7 @@ describe('ChatInterface', () => {
       error: null,
     } as any);
 
-    renderWithProviders(
-      <ChatInterface defaultSelectedUserId={2} />
-    );
+    renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
     expect(document.querySelector('.mantine-Loader-root')).toBeInTheDocument();
   });
@@ -188,9 +188,7 @@ describe('ChatInterface', () => {
       error: new Error('Failed to load'),
     } as any);
 
-    renderWithProviders(
-      <ChatInterface defaultSelectedUserId={2} />
-    );
+    renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
     expect(screen.getByText('Error loading messages')).toBeInTheDocument();
   });
@@ -202,9 +200,7 @@ describe('ChatInterface', () => {
       error: null,
     } as any);
 
-    renderWithProviders(
-      <ChatInterface defaultSelectedUserId={2} />
-    );
+    renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
     expect(screen.getByText('No messages yet')).toBeInTheDocument();
   });

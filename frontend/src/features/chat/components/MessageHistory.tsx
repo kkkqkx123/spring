@@ -33,7 +33,7 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
   const [pageable, setPageable] = useState<Pageable>({ page: 0, size: 20 });
   const [allMessages, setAllMessages] = useState<ChatMessage[]>([]);
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
-  
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { typingUsers } = useRealTimeChat();
 
@@ -73,11 +73,19 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
     if (autoScroll && hasLoadedInitial && pageable.page === 0) {
       scrollToBottom();
     }
-  }, [allMessages.length, typingUser, autoScroll, hasLoadedInitial, pageable.page]);
+  }, [
+    allMessages.length,
+    typingUser,
+    autoScroll,
+    hasLoadedInitial,
+    pageable.page,
+  ]);
 
   const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollElement = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
       if (scrollElement) {
         scrollElement.scrollTop = scrollElement.scrollHeight;
       }
@@ -95,19 +103,25 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
   };
 
   // Group consecutive messages from the same sender
-  const groupedMessages = allMessages.reduce((groups: ChatMessage[][], message, index) => {
-    const prevMessage = allMessages[index - 1];
-    const isConsecutive = prevMessage && 
-      prevMessage.senderId === message.senderId &&
-      new Date(message.createdAt).getTime() - new Date(prevMessage.createdAt).getTime() < 60000; // 1 minute
+  const groupedMessages = allMessages.reduce(
+    (groups: ChatMessage[][], message, index) => {
+      const prevMessage = allMessages[index - 1];
+      const isConsecutive =
+        prevMessage &&
+        prevMessage.senderId === message.senderId &&
+        new Date(message.createdAt).getTime() -
+          new Date(prevMessage.createdAt).getTime() <
+          60000; // 1 minute
 
-    if (isConsecutive) {
-      groups[groups.length - 1].push(message);
-    } else {
-      groups.push([message]);
-    }
-    return groups;
-  }, []);
+      if (isConsecutive) {
+        groups[groups.length - 1].push(message);
+      } else {
+        groups.push([message]);
+      }
+      return groups;
+    },
+    []
+  );
 
   if (error && !hasLoadedInitial) {
     return (
@@ -212,10 +226,7 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
 
           {/* Typing indicator */}
           {typingUser && (
-            <TypingIndicator
-              userName={typingUser}
-              isVisible={true}
-            />
+            <TypingIndicator userName={typingUser} isVisible={true} />
           )}
 
           {/* Loading indicator for pagination */}

@@ -41,7 +41,8 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
   onValidationChange,
 }) => {
   const validateVariablesMutation = useValidateVariables();
-  const [validationResult, setValidationResult] = React.useState<ValidationResult | null>(null);
+  const [validationResult, setValidationResult] =
+    React.useState<ValidationResult | null>(null);
 
   // Perform client-side validation
   const performClientValidation = React.useCallback((): ValidationResult => {
@@ -72,7 +73,9 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     recipients.forEach(recipient => {
       if (!emailRegex.test(recipient.email)) {
-        result.recipientErrors.push(`Invalid email address: ${recipient.email}`);
+        result.recipientErrors.push(
+          `Invalid email address: ${recipient.email}`
+        );
         result.valid = false;
       }
     });
@@ -101,15 +104,21 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
       });
 
       const clientResult = performClientValidation();
-      
+
       const combinedResult: ValidationResult = {
         ...clientResult,
         valid: clientResult.valid && serverResult.valid,
         missingVariables: [
-          ...new Set([...clientResult.missingVariables, ...serverResult.missingVariables])
+          ...new Set([
+            ...clientResult.missingVariables,
+            ...serverResult.missingVariables,
+          ]),
         ],
         invalidVariables: [
-          ...new Set([...clientResult.invalidVariables, ...serverResult.invalidVariables])
+          ...new Set([
+            ...clientResult.invalidVariables,
+            ...serverResult.invalidVariables,
+          ]),
         ],
       };
 
@@ -120,7 +129,10 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
       setValidationResult({
         ...clientResult,
         valid: false,
-        contentErrors: [...clientResult.contentErrors, 'Server validation failed'],
+        contentErrors: [
+          ...clientResult.contentErrors,
+          'Server validation failed',
+        ],
       });
       onValidationChange?.(false);
     }
@@ -152,7 +164,8 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
               </Badge>
             )}
             <Text size="sm">
-              {recipients.length} recipient(s), {template.variables.length} variable(s)
+              {recipients.length} recipient(s), {template.variables.length}{' '}
+              variable(s)
             </Text>
           </Group>
           <Button
@@ -174,7 +187,9 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
           {validationResult.missingVariables.length > 0 && (
             <Alert icon={<IconAlertCircle size={16} />} color="red">
               <Stack gap="xs">
-                <Text size="sm" fw={500}>Missing Required Variables</Text>
+                <Text size="sm" fw={500}>
+                  Missing Required Variables
+                </Text>
                 <List size="sm">
                   {validationResult.missingVariables.map(variable => (
                     <List.Item key={variable}>{variable}</List.Item>
@@ -188,7 +203,9 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
           {validationResult.invalidVariables.length > 0 && (
             <Alert icon={<IconAlertCircle size={16} />} color="orange">
               <Stack gap="xs">
-                <Text size="sm" fw={500}>Invalid Variables</Text>
+                <Text size="sm" fw={500}>
+                  Invalid Variables
+                </Text>
                 <List size="sm">
                   {validationResult.invalidVariables.map(variable => (
                     <List.Item key={variable}>{variable}</List.Item>
@@ -202,7 +219,9 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
           {validationResult.recipientErrors.length > 0 && (
             <Alert icon={<IconAlertCircle size={16} />} color="red">
               <Stack gap="xs">
-                <Text size="sm" fw={500}>Recipient Issues</Text>
+                <Text size="sm" fw={500}>
+                  Recipient Issues
+                </Text>
                 <List size="sm">
                   {validationResult.recipientErrors.map((error, index) => (
                     <List.Item key={index}>{error}</List.Item>
@@ -216,7 +235,9 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
           {validationResult.subjectErrors.length > 0 && (
             <Alert icon={<IconAlertCircle size={16} />} color="red">
               <Stack gap="xs">
-                <Text size="sm" fw={500}>Subject Issues</Text>
+                <Text size="sm" fw={500}>
+                  Subject Issues
+                </Text>
                 <List size="sm">
                   {validationResult.subjectErrors.map((error, index) => (
                     <List.Item key={index}>{error}</List.Item>
@@ -230,7 +251,9 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
           {validationResult.contentErrors.length > 0 && (
             <Alert icon={<IconAlertCircle size={16} />} color="red">
               <Stack gap="xs">
-                <Text size="sm" fw={500}>Content Issues</Text>
+                <Text size="sm" fw={500}>
+                  Content Issues
+                </Text>
                 <List size="sm">
                   {validationResult.contentErrors.map((error, index) => (
                     <List.Item key={index}>{error}</List.Item>
@@ -246,7 +269,8 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
       {validationResult?.valid && (
         <Alert icon={<IconCheck size={16} />} color="green">
           <Text size="sm">
-            Email is ready to send! All variables are properly filled and recipients are valid.
+            Email is ready to send! All variables are properly filled and
+            recipients are valid.
           </Text>
         </Alert>
       )}
@@ -255,22 +279,30 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
       {validationResult && (
         <Card withBorder>
           <Stack gap="xs">
-            <Text size="sm" fw={500}>Validation Details</Text>
+            <Text size="sm" fw={500}>
+              Validation Details
+            </Text>
             <Group gap="md">
               <div>
-                <Text size="xs" c="dimmed">Recipients</Text>
+                <Text size="xs" c="dimmed">
+                  Recipients
+                </Text>
                 <Text size="sm">{recipients.length}</Text>
               </div>
               <div>
-                <Text size="xs" c="dimmed">Variables</Text>
+                <Text size="xs" c="dimmed">
+                  Variables
+                </Text>
                 <Text size="sm">
                   {Object.keys(variables).length} / {template.variables.length}
                 </Text>
               </div>
               <div>
-                <Text size="xs" c="dimmed">Status</Text>
-                <Badge 
-                  size="sm" 
+                <Text size="xs" c="dimmed">
+                  Status
+                </Text>
+                <Badge
+                  size="sm"
                   color={validationResult.valid ? 'green' : 'red'}
                 >
                   {validationResult.valid ? 'Ready' : 'Needs Attention'}

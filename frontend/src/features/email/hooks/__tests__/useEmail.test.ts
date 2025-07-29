@@ -26,7 +26,7 @@ const createWrapper = () => {
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => 
+  return ({ children }: { children: React.ReactNode }) =>
     React.createElement(QueryClientProvider, { client: queryClient }, children);
 };
 
@@ -182,7 +182,9 @@ describe('useEmail hooks', () => {
         variables: {},
       };
 
-      await expect(result.current.mutateAsync(emailRequest)).rejects.toThrow('Send failed');
+      await expect(result.current.mutateAsync(emailRequest)).rejects.toThrow(
+        'Send failed'
+      );
     });
   });
 
@@ -313,11 +315,9 @@ describe('useEmail hooks', () => {
         variables: {},
       };
 
-      await expect(result.current.mutateAsync(validationRequest)).rejects.toThrow(
-        'Validation failed'
-      );
+      await expect(
+        result.current.mutateAsync(validationRequest)
+      ).rejects.toThrow('Validation failed');
     });
   });
-
-
 });

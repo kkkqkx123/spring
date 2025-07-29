@@ -60,9 +60,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -119,7 +117,9 @@ describe('DepartmentTree', () => {
 
     render(<DepartmentTree />, { wrapper: createWrapper() });
 
-    expect(screen.getByText(/Failed to load department tree/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Failed to load department tree/)
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no departments', () => {
@@ -163,7 +163,9 @@ describe('DepartmentTree', () => {
 
   it('calls onSelectDepartment when department is clicked', () => {
     const mockOnSelect = vi.fn();
-    render(<DepartmentTree onSelectDepartment={mockOnSelect} />, { wrapper: createWrapper() });
+    render(<DepartmentTree onSelectDepartment={mockOnSelect} />, {
+      wrapper: createWrapper(),
+    });
 
     fireEvent.click(screen.getByText('Engineering'));
 
@@ -171,13 +173,18 @@ describe('DepartmentTree', () => {
   });
 
   it('highlights selected department', () => {
-    render(<DepartmentTree selectedDepartmentId={1} />, { wrapper: createWrapper() });
+    render(<DepartmentTree selectedDepartmentId={1} />, {
+      wrapper: createWrapper(),
+    });
 
-    const engineeringNode = screen.getByText('Engineering').closest('[data-testid]') || 
-                           screen.getByText('Engineering').closest('div');
-    
+    const engineeringNode =
+      screen.getByText('Engineering').closest('[data-testid]') ||
+      screen.getByText('Engineering').closest('div');
+
     // Check if the selected department has different styling
-    expect(engineeringNode).toHaveStyle({ borderColor: 'var(--mantine-color-blue-4)' });
+    expect(engineeringNode).toHaveStyle({
+      borderColor: 'var(--mantine-color-blue-4)',
+    });
   });
 
   it('opens context menu and shows options', async () => {
@@ -185,10 +192,12 @@ describe('DepartmentTree', () => {
 
     // Click the menu button (dots icon)
     const menuButtons = screen.getAllByRole('button');
-    const menuButton = menuButtons.find(button => 
-      button.querySelector('svg') && button.getAttribute('aria-expanded') !== null
+    const menuButton = menuButtons.find(
+      button =>
+        button.querySelector('svg') &&
+        button.getAttribute('aria-expanded') !== null
     );
-    
+
     if (menuButton) {
       fireEvent.click(menuButton);
 
@@ -202,14 +211,18 @@ describe('DepartmentTree', () => {
 
   it('calls onEditDepartment when edit is clicked', async () => {
     const mockOnEdit = vi.fn();
-    render(<DepartmentTree onEditDepartment={mockOnEdit} />, { wrapper: createWrapper() });
+    render(<DepartmentTree onEditDepartment={mockOnEdit} />, {
+      wrapper: createWrapper(),
+    });
 
     // Open context menu
     const menuButtons = screen.getAllByRole('button');
-    const menuButton = menuButtons.find(button => 
-      button.querySelector('svg') && button.getAttribute('aria-expanded') !== null
+    const menuButton = menuButtons.find(
+      button =>
+        button.querySelector('svg') &&
+        button.getAttribute('aria-expanded') !== null
     );
-    
+
     if (menuButton) {
       fireEvent.click(menuButton);
 
@@ -218,23 +231,29 @@ describe('DepartmentTree', () => {
         fireEvent.click(editButton);
       });
 
-      expect(mockOnEdit).toHaveBeenCalledWith(expect.objectContaining({
-        id: expect.any(Number),
-        name: expect.any(String),
-      }));
+      expect(mockOnEdit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: expect.any(Number),
+          name: expect.any(String),
+        })
+      );
     }
   });
 
   it('calls onCreateDepartment when add subdepartment is clicked', async () => {
     const mockOnCreate = vi.fn();
-    render(<DepartmentTree onCreateDepartment={mockOnCreate} />, { wrapper: createWrapper() });
+    render(<DepartmentTree onCreateDepartment={mockOnCreate} />, {
+      wrapper: createWrapper(),
+    });
 
     // Open context menu
     const menuButtons = screen.getAllByRole('button');
-    const menuButton = menuButtons.find(button => 
-      button.querySelector('svg') && button.getAttribute('aria-expanded') !== null
+    const menuButton = menuButtons.find(
+      button =>
+        button.querySelector('svg') &&
+        button.getAttribute('aria-expanded') !== null
     );
-    
+
     if (menuButton) {
       fireEvent.click(menuButton);
 
@@ -254,7 +273,7 @@ describe('DepartmentTree', () => {
     const menuButtons = screen.getAllByRole('button');
     // Find the menu button for Marketing department
     const marketingMenuButton = menuButtons[menuButtons.length - 1]; // Assuming it's the last one
-    
+
     fireEvent.click(marketingMenuButton);
 
     await waitFor(() => {
@@ -263,8 +282,12 @@ describe('DepartmentTree', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/Are you sure you want to delete/)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+      expect(
+        screen.getByText(/Are you sure you want to delete/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Delete' })
+      ).toBeInTheDocument();
     });
   });
 
@@ -274,7 +297,7 @@ describe('DepartmentTree', () => {
     // Open context menu for Engineering (has children)
     const menuButtons = screen.getAllByRole('button');
     const engineeringMenuButton = menuButtons[0];
-    
+
     fireEvent.click(engineeringMenuButton);
 
     await waitFor(() => {
@@ -321,12 +344,16 @@ describe('DepartmentTree', () => {
     render(<DepartmentTree compact />, { wrapper: createWrapper() });
 
     // In compact mode, descriptions should not be visible
-    expect(screen.queryByText('Software development team')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Software development team')
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Engineering')).toBeInTheDocument();
   });
 
   it('hides employee count when showEmployeeCount is false', () => {
-    render(<DepartmentTree showEmployeeCount={false} />, { wrapper: createWrapper() });
+    render(<DepartmentTree showEmployeeCount={false} />, {
+      wrapper: createWrapper(),
+    });
 
     expect(screen.queryByText('15')).not.toBeInTheDocument();
     expect(screen.queryByText('10')).not.toBeInTheDocument();

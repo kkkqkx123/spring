@@ -1,7 +1,12 @@
 import { vi } from 'vitest';
 import { emailApi, EmailApi } from '../emailApi';
 import { apiClient } from '../../../../services/api';
-import type { EmailTemplate, EmailRequest, PaginatedResponse, EmailHistory } from '../../../../types';
+import type {
+  EmailTemplate,
+  EmailRequest,
+  PaginatedResponse,
+  EmailHistory,
+} from '../../../../types';
 
 // Mock the API client
 vi.mock('../../../../services/api');
@@ -58,7 +63,10 @@ describe('EmailApi', () => {
 
       const result = await api.createTemplate(templateRequest);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/email/templates', templateRequest);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/email/templates',
+        templateRequest
+      );
       expect(result).toEqual(mockTemplate);
     });
 
@@ -73,7 +81,10 @@ describe('EmailApi', () => {
 
       const result = await api.updateTemplate(1, templateRequest);
 
-      expect(mockApiClient.put).toHaveBeenCalledWith('/api/email/templates/1', templateRequest);
+      expect(mockApiClient.put).toHaveBeenCalledWith(
+        '/api/email/templates/1',
+        templateRequest
+      );
       expect(result).toEqual(mockTemplate);
     });
 
@@ -82,7 +93,9 @@ describe('EmailApi', () => {
 
       await api.deleteTemplate(1);
 
-      expect(mockApiClient.delete).toHaveBeenCalledWith('/api/email/templates/1');
+      expect(mockApiClient.delete).toHaveBeenCalledWith(
+        '/api/email/templates/1'
+      );
     });
   });
 
@@ -97,7 +110,10 @@ describe('EmailApi', () => {
 
       await api.sendEmail(emailRequest);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/email/send', emailRequest);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/email/send',
+        emailRequest
+      );
     });
 
     it('should send bulk email', async () => {
@@ -112,7 +128,10 @@ describe('EmailApi', () => {
 
       const result = await api.sendBulkEmail(bulkRequest);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/email/send-bulk', bulkRequest);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/email/send-bulk',
+        bulkRequest
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -128,7 +147,9 @@ describe('EmailApi', () => {
 
       const result = await api.getBulkEmailProgress('job-123');
 
-      expect(mockApiClient.get).toHaveBeenCalledWith('/api/email/bulk-progress/job-123');
+      expect(mockApiClient.get).toHaveBeenCalledWith(
+        '/api/email/bulk-progress/job-123'
+      );
       expect(result).toEqual(mockProgress);
     });
   });
@@ -136,8 +157,18 @@ describe('EmailApi', () => {
   describe('Recipient Management', () => {
     it('should get available recipients', async () => {
       const mockRecipients = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', type: 'individual' },
-        { id: 2, name: 'Engineering', email: 'eng@example.com', type: 'department' },
+        {
+          id: 1,
+          name: 'John Doe',
+          email: 'john@example.com',
+          type: 'individual',
+        },
+        {
+          id: 2,
+          name: 'Engineering',
+          email: 'eng@example.com',
+          type: 'department',
+        },
       ];
       mockApiClient.get.mockResolvedValue(mockRecipients);
 
@@ -149,13 +180,20 @@ describe('EmailApi', () => {
 
     it('should get department recipients', async () => {
       const mockRecipients = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', type: 'individual' },
+        {
+          id: 1,
+          name: 'John Doe',
+          email: 'john@example.com',
+          type: 'individual',
+        },
       ];
       mockApiClient.get.mockResolvedValue(mockRecipients);
 
       const result = await api.getDepartmentRecipients(1);
 
-      expect(mockApiClient.get).toHaveBeenCalledWith('/api/email/recipients/department/1');
+      expect(mockApiClient.get).toHaveBeenCalledWith(
+        '/api/email/recipients/department/1'
+      );
       expect(result).toEqual(mockRecipients);
     });
   });
@@ -201,7 +239,12 @@ describe('EmailApi', () => {
         templateName: 'Test Template',
         content: 'Email content',
         recipients: [
-          { id: 1, name: 'John Doe', email: 'john@example.com', type: 'individual' as const },
+          {
+            id: 1,
+            name: 'John Doe',
+            email: 'john@example.com',
+            type: 'individual' as const,
+          },
         ],
       };
       mockApiClient.get.mockResolvedValue(mockDetails);
@@ -224,9 +267,12 @@ describe('EmailApi', () => {
 
       const result = await api.previewTemplate(1, variables);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/email/templates/1/preview', {
-        variables,
-      });
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/email/templates/1/preview',
+        {
+          variables,
+        }
+      );
       expect(result).toEqual(mockPreview);
     });
 
@@ -241,9 +287,12 @@ describe('EmailApi', () => {
 
       const result = await api.validateVariables(1, variables);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/email/templates/1/validate', {
-        variables,
-      });
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/email/templates/1/validate',
+        {
+          variables,
+        }
+      );
       expect(result).toEqual(mockValidation);
     });
   });
@@ -272,7 +321,9 @@ describe('EmailApi', () => {
       const error = new Error('Validation failed');
       mockApiClient.post.mockRejectedValue(error);
 
-      await expect(api.validateVariables(1, {})).rejects.toThrow('Validation failed');
+      await expect(api.validateVariables(1, {})).rejects.toThrow(
+        'Validation failed'
+      );
     });
   });
 

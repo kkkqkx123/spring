@@ -5,7 +5,10 @@ export { DepartmentsPage } from './pages/DepartmentsPage';
 
 // Components
 export { DepartmentTree } from './components/DepartmentTree';
-export { DepartmentSelect, SimpleDepartmentSelect } from './components/DepartmentSelect';
+export {
+  DepartmentSelect,
+  SimpleDepartmentSelect,
+} from './components/DepartmentSelect';
 export { DepartmentForm } from './components/DepartmentForm';
 export { DepartmentDetail } from './components/DepartmentDetail';
 export { DepartmentMoveDialog } from './components/DepartmentMoveDialog';

@@ -28,11 +28,7 @@ const mockMessage: ChatMessage = {
 };
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('MessageBubble', () => {
@@ -51,9 +47,7 @@ describe('MessageBubble', () => {
   });
 
   it('renders received message correctly', () => {
-    renderWithProvider(
-      <MessageBubble message={mockMessage} />
-    );
+    renderWithProvider(<MessageBubble message={mockMessage} />);
 
     expect(screen.getByText('Hello, how are you?')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -62,25 +56,28 @@ describe('MessageBubble', () => {
 
   it('renders sent message correctly', () => {
     const sentMessage = { ...mockMessage, senderId: 1, recipientId: 2 };
-    
-    renderWithProvider(
-      <MessageBubble message={sentMessage} />
-    );
+
+    renderWithProvider(<MessageBubble message={sentMessage} />);
 
     expect(screen.getByText('Hello, how are you?')).toBeInTheDocument();
     expect(screen.queryByText('John Doe')).not.toBeInTheDocument(); // No sender name for own messages
   });
 
   it('shows read status for sent messages', () => {
-    const sentMessage = { ...mockMessage, senderId: 1, recipientId: 2, read: true };
-    
-    renderWithProvider(
-      <MessageBubble message={sentMessage} />
-    );
+    const sentMessage = {
+      ...mockMessage,
+      senderId: 1,
+      recipientId: 2,
+      read: true,
+    };
+
+    renderWithProvider(<MessageBubble message={sentMessage} />);
 
     // Check for read indicator (double check icon)
     const readIcon = document.querySelector('[data-testid="read-icon"]');
-    expect(readIcon || screen.getByText('Hello, how are you?')).toBeInTheDocument();
+    expect(
+      readIcon || screen.getByText('Hello, how are you?')
+    ).toBeInTheDocument();
   });
 
   it('hides avatar for consecutive messages', () => {
@@ -95,24 +92,21 @@ describe('MessageBubble', () => {
   it('handles long message content', () => {
     const longMessage = {
       ...mockMessage,
-      content: 'This is a very long message that should wrap properly and maintain good readability even when it spans multiple lines in the chat interface.',
+      content:
+        'This is a very long message that should wrap properly and maintain good readability even when it spans multiple lines in the chat interface.',
     };
 
-    renderWithProvider(
-      <MessageBubble message={longMessage} />
-    );
+    renderWithProvider(<MessageBubble message={longMessage} />);
 
     expect(screen.getByText(longMessage.content)).toBeInTheDocument();
   });
 
   it('shows tooltip with full timestamp on hover', () => {
-    renderWithProvider(
-      <MessageBubble message={mockMessage} />
-    );
+    renderWithProvider(<MessageBubble message={mockMessage} />);
 
     const timestamp = screen.getByText('Jan 1, 2024');
     expect(timestamp).toBeInTheDocument();
-    
+
     // The tooltip content would be tested with user interactions
     // For now, we just verify the timestamp element exists
   });

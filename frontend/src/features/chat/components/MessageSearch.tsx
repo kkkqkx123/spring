@@ -66,11 +66,14 @@ export const MessageSearch: React.FC<MessageSearchProps> = ({
   return (
     <Box h={height}>
       {/* Search input */}
-      <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+      <Box
+        p="md"
+        style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}
+      >
         <TextInput
           placeholder="Search messages..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
+          onChange={e => setSearchQuery(e.currentTarget.value)}
           leftSection={<IconSearch size={16} />}
           rightSection={
             searchQuery && (
@@ -122,14 +125,17 @@ export const MessageSearch: React.FC<MessageSearchProps> = ({
         ) : (
           <Stack gap={0}>
             {/* Results count */}
-            <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}>
+            <Box
+              p="md"
+              style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}
+            >
               <Text size="sm" c="dimmed">
                 Found {searchResults?.totalElements || 0} messages
               </Text>
             </Box>
 
             {/* Message results */}
-            {messages.map((message) => (
+            {messages.map(message => (
               <MessageSearchResult
                 key={message.id}
                 message={message}
@@ -142,7 +148,8 @@ export const MessageSearch: React.FC<MessageSearchProps> = ({
             {searchResults && !searchResults.last && (
               <Center p="md">
                 <Text size="xs" c="dimmed">
-                  Showing {messages.length} of {searchResults.totalElements} results
+                  Showing {messages.length} of {searchResults.totalElements}{' '}
+                  results
                 </Text>
               </Center>
             )}

@@ -10,7 +10,7 @@ import { useSendMessage } from '../hooks/useChat';
 vi.mock('../hooks/useRealTimeChat');
 vi.mock('../hooks/useChat');
 vi.mock('../../../utils', () => ({
-  debounce: vi.fn((fn) => fn),
+  debounce: vi.fn(fn => fn),
 }));
 
 const mockUseTypingIndicator = useTypingIndicator as any;
@@ -26,9 +26,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {component}
-      </MantineProvider>
+      <MantineProvider>{component}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -60,7 +58,9 @@ describe('MessageInput', () => {
       <MessageInput recipientId={1} recipientName="John Doe" />
     );
 
-    expect(screen.getByPlaceholderText('Message John Doe...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Message John Doe...')
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Send message')).toBeInTheDocument();
     expect(screen.getByLabelText('Add emoji')).toBeInTheDocument();
     expect(screen.getByLabelText('Attach file')).toBeInTheDocument();
@@ -148,9 +148,9 @@ describe('MessageInput', () => {
 
     const input = screen.getByPlaceholderText('Message John Doe...');
     const emojiButton = screen.getByLabelText('Add emoji');
-    
+
     await user.click(emojiButton);
-    
+
     // Find and click the first emoji
     const firstEmoji = screen.getByText('😀');
     await user.click(firstEmoji);
@@ -205,7 +205,7 @@ describe('MessageInput', () => {
 
     const input = screen.getByPlaceholderText('Message John Doe...');
     await user.type(input, 'Test message');
-    
+
     const sendButton = screen.getByLabelText('Send message');
     await user.click(sendButton);
 

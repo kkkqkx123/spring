@@ -50,7 +50,10 @@ export class EmailApi {
     return apiClient.post<EmailTemplate>('/api/email/templates', template);
   }
 
-  async updateTemplate(id: number, template: EmailTemplateRequest): Promise<EmailTemplate> {
+  async updateTemplate(
+    id: number,
+    template: EmailTemplateRequest
+  ): Promise<EmailTemplate> {
     return apiClient.put<EmailTemplate>(`/api/email/templates/${id}`, template);
   }
 
@@ -68,7 +71,9 @@ export class EmailApi {
   }
 
   async getBulkEmailProgress(jobId: string): Promise<EmailSendProgress> {
-    return apiClient.get<EmailSendProgress>(`/api/email/bulk-progress/${jobId}`);
+    return apiClient.get<EmailSendProgress>(
+      `/api/email/bulk-progress/${jobId}`
+    );
   }
 
   // Recipient management
@@ -76,36 +81,57 @@ export class EmailApi {
     return apiClient.get<EmailRecipient[]>('/api/email/recipients');
   }
 
-  async getDepartmentRecipients(departmentId: number): Promise<EmailRecipient[]> {
-    return apiClient.get<EmailRecipient[]>(`/api/email/recipients/department/${departmentId}`);
+  async getDepartmentRecipients(
+    departmentId: number
+  ): Promise<EmailRecipient[]> {
+    return apiClient.get<EmailRecipient[]>(
+      `/api/email/recipients/department/${departmentId}`
+    );
   }
 
   // Email history
-  async getEmailHistory(pageable: Pageable): Promise<PaginatedResponse<EmailHistory>> {
-    return apiClient.get<PaginatedResponse<EmailHistory>>('/api/email/history', {
-      params: pageable,
-    });
+  async getEmailHistory(
+    pageable: Pageable
+  ): Promise<PaginatedResponse<EmailHistory>> {
+    return apiClient.get<PaginatedResponse<EmailHistory>>(
+      '/api/email/history',
+      {
+        params: pageable,
+      }
+    );
   }
 
-  async getEmailDetails(id: number): Promise<EmailHistory & { content: string; recipients: EmailRecipient[] }> {
+  async getEmailDetails(
+    id: number
+  ): Promise<EmailHistory & { content: string; recipients: EmailRecipient[] }> {
     return apiClient.get(`/api/email/history/${id}`);
   }
 
   // Template preview
-  async previewTemplate(templateId: number, variables: Record<string, string>): Promise<{
+  async previewTemplate(
+    templateId: number,
+    variables: Record<string, string>
+  ): Promise<{
     subject: string;
     content: string;
   }> {
-    return apiClient.post(`/api/email/templates/${templateId}/preview`, { variables });
+    return apiClient.post(`/api/email/templates/${templateId}/preview`, {
+      variables,
+    });
   }
 
   // Variable validation
-  async validateVariables(templateId: number, variables: Record<string, string>): Promise<{
+  async validateVariables(
+    templateId: number,
+    variables: Record<string, string>
+  ): Promise<{
     valid: boolean;
     missingVariables: string[];
     invalidVariables: string[];
   }> {
-    return apiClient.post(`/api/email/templates/${templateId}/validate`, { variables });
+    return apiClient.post(`/api/email/templates/${templateId}/validate`, {
+      variables,
+    });
   }
 }
 

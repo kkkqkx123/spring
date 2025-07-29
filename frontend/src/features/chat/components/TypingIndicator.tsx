@@ -18,7 +18,7 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
       duration={200}
       timingFunction="ease"
     >
-      {(styles) => (
+      {styles => (
         <Group gap="sm" align="flex-start" mb="xs" style={styles}>
           <Avatar size="sm" radius="xl" color="gray">
             {userName.charAt(0).toUpperCase()}
@@ -26,7 +26,7 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
 
           <Box
             p="xs"
-            style={(theme) => ({
+            style={theme => ({
               backgroundColor: theme.colors.gray[1],
               borderRadius: theme.radius.md,
               minWidth: 60,
@@ -49,10 +49,10 @@ export const TypingIndicator: React.FC<TypingIndicatorProps> = ({
 const TypingDots: React.FC = () => {
   return (
     <Group gap={2} align="center">
-      {[0, 1, 2].map((index) => (
+      {[0, 1, 2].map(index => (
         <Box
           key={index}
-          style={(theme) => ({
+          style={theme => ({
             width: 4,
             height: 4,
             borderRadius: '50%',

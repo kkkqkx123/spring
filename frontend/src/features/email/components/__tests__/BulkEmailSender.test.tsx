@@ -174,12 +174,14 @@ describe('BulkEmailSender', () => {
     expect(screen.getByLabelText(/email template/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/departments/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/individual employees/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send to \d+ recipients/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /send to \d+ recipients/i })
+    ).toBeInTheDocument();
   });
 
   it('shows recipient count based on selections', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <BulkEmailSender onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -202,7 +204,7 @@ describe('BulkEmailSender', () => {
 
   it('validates template selection', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <BulkEmailSender onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -210,7 +212,9 @@ describe('BulkEmailSender', () => {
     );
 
     // Try to submit without selecting template
-    const sendButton = screen.getByRole('button', { name: /send to \d+ recipients/i });
+    const sendButton = screen.getByRole('button', {
+      name: /send to \d+ recipients/i,
+    });
     await user.click(sendButton);
 
     await waitFor(() => {
@@ -220,7 +224,7 @@ describe('BulkEmailSender', () => {
 
   it('shows template variables when template is selected', async () => {
     const user = userEvent.setup();
-    
+
     mockUseEmailTemplate.mockReturnValue({
       data: mockTemplates[0],
     });
@@ -246,7 +250,7 @@ describe('BulkEmailSender', () => {
   it('sends bulk email with valid data', async () => {
     const user = userEvent.setup();
     const mockSendBulkEmail = vi.fn().mockResolvedValue({ jobId: 'job-123' });
-    
+
     mockUseSendBulkEmail.mockReturnValue({
       mutateAsync: mockSendBulkEmail,
       isPending: false,
@@ -281,7 +285,9 @@ describe('BulkEmailSender', () => {
     await user.click(screen.getByText('Engineering'));
 
     // Submit form
-    const sendButton = screen.getByRole('button', { name: /send to \d+ recipients/i });
+    const sendButton = screen.getByRole('button', {
+      name: /send to \d+ recipients/i,
+    });
     await user.click(sendButton);
 
     await waitFor(() => {
@@ -291,14 +297,15 @@ describe('BulkEmailSender', () => {
         employeeIds: [],
         variables: { name: 'Team', topic: 'New Policy' },
         subject: 'Important Company Update',
-        customContent: 'Hello {{name}}, we have an important update about {{topic}}.',
+        customContent:
+          'Hello {{name}}, we have an important update about {{topic}}.',
       });
     });
   });
 
   it('shows progress when bulk email is started', async () => {
     const user = userEvent.setup();
-    
+
     mockUseBulkEmailProgress.mockReturnValue({
       data: {
         total: 25,
@@ -319,7 +326,7 @@ describe('BulkEmailSender', () => {
     // Simulate job started by setting internal state
     // This would normally happen after successful submission
     // For testing, we'll mock the progress hook to return data
-    
+
     await waitFor(() => {
       expect(screen.getByText('Bulk Email Progress')).toBeInTheDocument();
       expect(screen.getByText('SENDING')).toBeInTheDocument();
@@ -330,7 +337,7 @@ describe('BulkEmailSender', () => {
 
   it('shows warning for large recipient counts', async () => {
     const user = userEvent.setup();
-    
+
     // Mock large department
     const largeDepartments = [
       {
@@ -356,13 +363,15 @@ describe('BulkEmailSender', () => {
     await user.click(screen.getByText('Engineering'));
 
     await waitFor(() => {
-      expect(screen.getByText(/you are about to send emails to 150 recipients/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/you are about to send emails to 150 recipients/i)
+      ).toBeInTheDocument();
     });
   });
 
   it('calls onCancel when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <BulkEmailSender onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -387,7 +396,9 @@ describe('BulkEmailSender', () => {
       </TestWrapper>
     );
 
-    const sendButton = screen.getByRole('button', { name: /send to \d+ recipients/i });
+    const sendButton = screen.getByRole('button', {
+      name: /send to \d+ recipients/i,
+    });
     expect(sendButton).toBeDisabled();
   });
 });

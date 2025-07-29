@@ -8,9 +8,15 @@ import { Department } from '../../../types';
 
 // Mock the components
 vi.mock('../components/DepartmentTree', () => ({
-  DepartmentTree: ({ onSelectDepartment, onCreateDepartment, onEditDepartment }: any) => (
+  DepartmentTree: ({
+    onSelectDepartment,
+    onCreateDepartment,
+    onEditDepartment,
+  }: any) => (
     <div data-testid="department-tree">
-      <button onClick={() => onSelectDepartment({ id: 1, name: 'Engineering' })}>
+      <button
+        onClick={() => onSelectDepartment({ id: 1, name: 'Engineering' })}
+      >
         Select Engineering
       </button>
       <button onClick={() => onCreateDepartment()}>Create Root</button>
@@ -23,7 +29,12 @@ vi.mock('../components/DepartmentTree', () => ({
 }));
 
 vi.mock('../components/DepartmentDetail', () => ({
-  DepartmentDetail: ({ departmentId, onCreateChild, onDelete, onClose }: any) => (
+  DepartmentDetail: ({
+    departmentId,
+    onCreateChild,
+    onDelete,
+    onClose,
+  }: any) => (
     <div data-testid="department-detail">
       <span>Department ID: {departmentId}</span>
       <button onClick={() => onCreateChild()}>Add Child</button>
@@ -64,9 +75,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -80,8 +89,12 @@ describe('DepartmentsPage', () => {
     render(<DepartmentsPage />, { wrapper: createWrapper() });
 
     expect(screen.getByText('Department Management')).toBeInTheDocument();
-    expect(screen.getByText(/manage your organization's department structure/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add department/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/manage your organization's department structure/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /add department/i })
+    ).toBeInTheDocument();
   });
 
   it('renders department tree', () => {
@@ -253,7 +266,9 @@ describe('DepartmentsPage', () => {
     render(<DepartmentsPage />, { wrapper: createWrapper() });
 
     // Initially, tree should take full width
-    const treeColumn = screen.getByTestId('department-tree').closest('[class*="mantine-Grid-col"]');
+    const treeColumn = screen
+      .getByTestId('department-tree')
+      .closest('[class*="mantine-Grid-col"]');
     expect(treeColumn).toHaveClass('mantine-Grid-col');
 
     // Select a department

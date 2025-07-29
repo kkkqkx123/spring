@@ -28,13 +28,13 @@ export const useSendMessage = () => {
 
   return useMutation({
     mutationFn: chatApi.sendMessage,
-    onSuccess: (newMessage) => {
+    onSuccess: newMessage => {
       // Update conversation cache
       const conversationKey = queryKeys.chat.conversation(
         newMessage.recipientId,
         { page: 0, size: 20 }
       );
-      
+
       queryClient.setQueryData(conversationKey, (old: any) => {
         if (!old) return old;
         return {
@@ -45,7 +45,7 @@ export const useSendMessage = () => {
 
       // Invalidate conversations list to update last message
       queryClient.invalidateQueries({ queryKey: queryKeys.chat.conversations });
-      
+
       // Invalidate unread count
       queryClient.invalidateQueries({ queryKey: queryKeys.chat.unreadCount });
     },
@@ -77,7 +77,7 @@ export const useMarkAsRead = () => {
       // Update conversations list to reset unread count
       queryClient.setQueryData(queryKeys.chat.conversations, (old: any) => {
         if (!old) return old;
-        return old.map((conversation: any) => 
+        return old.map((conversation: any) =>
           conversation.userId === userId
             ? { ...conversation, unreadCount: 0 }
             : conversation

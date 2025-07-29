@@ -28,7 +28,10 @@ import {
 } from '@tabler/icons-react';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEmailHistory, useEmailDetails } from '../hooks/useEmail';
-import type { EmailHistory as EmailHistoryType, EmailStatus } from '../../../types';
+import type {
+  EmailHistory as EmailHistoryType,
+  EmailStatus,
+} from '../../../types';
 
 interface EmailHistoryProps {
   onResend?: (emailId: number) => void;
@@ -43,7 +46,11 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
   const [debouncedSearch] = useDebouncedValue(searchQuery, 300);
 
   // API hooks
-  const { data: emailHistory, isLoading, refetch } = useEmailHistory({
+  const {
+    data: emailHistory,
+    isLoading,
+    refetch,
+  } = useEmailHistory({
     page,
     size: pageSize,
     sort: 'sentAt,desc',
@@ -105,12 +112,17 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
     setSelectedEmailId(null);
   };
 
-  const filteredEmails = emailHistory?.content.filter(email => {
-    const matchesSearch = email.subject.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-                         email.templateName?.toLowerCase().includes(debouncedSearch.toLowerCase());
-    const matchesStatus = statusFilter === '' || email.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  }) || [];
+  const filteredEmails =
+    emailHistory?.content.filter(email => {
+      const matchesSearch =
+        email.subject.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        email.templateName
+          ?.toLowerCase()
+          .includes(debouncedSearch.toLowerCase());
+      const matchesStatus =
+        statusFilter === '' || email.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    }) || [];
 
   return (
     <>
@@ -118,7 +130,9 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
         <Stack gap="md">
           {/* Header */}
           <Group justify="space-between">
-            <Text size="lg" fw={600}>Email History</Text>
+            <Text size="lg" fw={600}>
+              Email History
+            </Text>
             <Group gap="sm">
               <Button
                 variant="light"
@@ -137,7 +151,7 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
               placeholder="Search by subject or template..."
               leftSection={<IconSearch size={16} />}
               value={searchQuery}
-              onChange={(event) => setSearchQuery(event.currentTarget.value)}
+              onChange={event => setSearchQuery(event.currentTarget.value)}
               style={{ flex: 1 }}
             />
             <Select
@@ -151,7 +165,7 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                 { value: 'CANCELLED', label: 'Cancelled' },
               ]}
               value={statusFilter}
-              onChange={(value) => setStatusFilter(value as EmailStatus | '')}
+              onChange={value => setStatusFilter(value as EmailStatus | '')}
               clearable
             />
             <Select
@@ -162,7 +176,7 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                 { value: '50', label: '50 per page' },
               ]}
               value={pageSize.toString()}
-              onChange={(value) => {
+              onChange={value => {
                 setPageSize(parseInt(value || '10'));
                 setPage(0);
               }}
@@ -186,17 +200,21 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                 {isLoading ? (
                   <Table.Tr>
                     <Table.Td colSpan={6}>
-                      <Text ta="center" c="dimmed">Loading...</Text>
+                      <Text ta="center" c="dimmed">
+                        Loading...
+                      </Text>
                     </Table.Td>
                   </Table.Tr>
                 ) : filteredEmails.length === 0 ? (
                   <Table.Tr>
                     <Table.Td colSpan={6}>
-                      <Text ta="center" c="dimmed">No emails found</Text>
+                      <Text ta="center" c="dimmed">
+                        No emails found
+                      </Text>
                     </Table.Td>
                   </Table.Tr>
                 ) : (
-                  filteredEmails.map((email) => (
+                  filteredEmails.map(email => (
                     <Table.Tr key={email.id}>
                       <Table.Td>
                         <Text size="sm" fw={500} lineClamp={1}>
@@ -264,7 +282,7 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
             <Group justify="center">
               <Pagination
                 value={page + 1}
-                onChange={(value) => setPage(value - 1)}
+                onChange={value => setPage(value - 1)}
                 total={emailHistory.totalPages}
                 size="sm"
               />
@@ -287,7 +305,9 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
             <Card withBorder>
               <Stack gap="sm">
                 <Group justify="space-between">
-                  <Text size="sm" fw={600}>{emailDetails.subject}</Text>
+                  <Text size="sm" fw={600}>
+                    {emailDetails.subject}
+                  </Text>
                   <Badge
                     color={getStatusColor(emailDetails.status)}
                     leftSection={getStatusIcon(emailDetails.status)}
@@ -295,18 +315,26 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                     {emailDetails.status}
                   </Badge>
                 </Group>
-                
+
                 <Group gap="md">
                   <div>
-                    <Text size="xs" c="dimmed">Template</Text>
-                    <Text size="sm">{emailDetails.templateName || 'Custom'}</Text>
+                    <Text size="xs" c="dimmed">
+                      Template
+                    </Text>
+                    <Text size="sm">
+                      {emailDetails.templateName || 'Custom'}
+                    </Text>
                   </div>
                   <div>
-                    <Text size="xs" c="dimmed">Recipients</Text>
+                    <Text size="xs" c="dimmed">
+                      Recipients
+                    </Text>
                     <Text size="sm">{emailDetails.recipientCount}</Text>
                   </div>
                   <div>
-                    <Text size="xs" c="dimmed">Sent At</Text>
+                    <Text size="xs" c="dimmed">
+                      Sent At
+                    </Text>
                     <Text size="sm">{formatDate(emailDetails.sentAt)}</Text>
                   </div>
                 </Group>
@@ -322,10 +350,12 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
             {/* Recipients */}
             <Card withBorder>
               <Stack gap="sm">
-                <Text size="sm" fw={500}>Recipients ({emailDetails.recipients.length})</Text>
+                <Text size="sm" fw={500}>
+                  Recipients ({emailDetails.recipients.length})
+                </Text>
                 <ScrollArea.Autosize mah={200}>
                   <Stack gap="xs">
-                    {emailDetails.recipients.map((recipient) => (
+                    {emailDetails.recipients.map(recipient => (
                       <Group key={recipient.id} gap="sm">
                         {recipient.type === 'department' ? (
                           <IconBuilding size={16} />
@@ -334,7 +364,9 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                         )}
                         <div>
                           <Text size="sm">{recipient.name}</Text>
-                          <Text size="xs" c="dimmed">{recipient.email}</Text>
+                          <Text size="xs" c="dimmed">
+                            {recipient.email}
+                          </Text>
                         </div>
                       </Group>
                     ))}
@@ -346,11 +378,13 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
             {/* Content */}
             <Card withBorder>
               <Stack gap="sm">
-                <Text size="sm" fw={500}>Email Content</Text>
+                <Text size="sm" fw={500}>
+                  Email Content
+                </Text>
                 <ScrollArea.Autosize mah={300}>
-                  <Text 
-                    size="sm" 
-                    style={{ 
+                  <Text
+                    size="sm"
+                    style={{
                       whiteSpace: 'pre-wrap',
                       fontFamily: 'monospace',
                       fontSize: '12px',
@@ -381,9 +415,11 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
             </Group>
           </Stack>
         )}
-        
+
         {detailsLoading && (
-          <Text ta="center" c="dimmed">Loading email details...</Text>
+          <Text ta="center" c="dimmed">
+            Loading email details...
+          </Text>
         )}
       </Modal>
     </>

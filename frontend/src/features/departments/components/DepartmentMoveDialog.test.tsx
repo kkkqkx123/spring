@@ -41,9 +41,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -75,9 +73,13 @@ describe('DepartmentMoveDialog', () => {
     );
 
     expect(screen.getByText('Move Department')).toBeInTheDocument();
-    expect(screen.getByText(/moving department: frontend/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/moving department: frontend/i)
+    ).toBeInTheDocument();
     expect(screen.getByTestId('department-select')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /move department/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /move department/i })
+    ).toBeInTheDocument();
   });
 
   it('does not render when closed', () => {
@@ -111,7 +113,7 @@ describe('DepartmentMoveDialog', () => {
 
   it('shows root level for departments without parent', () => {
     const rootDepartment = { ...mockDepartment, parentId: undefined };
-    
+
     render(
       <DepartmentMoveDialog
         opened={true}
@@ -143,7 +145,9 @@ describe('DepartmentMoveDialog', () => {
     fireEvent.change(select, { target: { value: '3' } });
 
     // Submit form
-    const submitButton = screen.getByRole('button', { name: /move department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /move department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -175,7 +179,9 @@ describe('DepartmentMoveDialog', () => {
     fireEvent.change(select, { target: { value: '' } });
 
     // Submit form
-    const submitButton = screen.getByRole('button', { name: /move department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /move department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -200,7 +206,9 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    const submitButton = screen.getByRole('button', { name: /move department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /move department/i,
+    });
     expect(submitButton).toBeDisabled();
   });
 
@@ -221,7 +229,9 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    const submitButton = screen.getByRole('button', { name: /move department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /move department/i,
+    });
     expect(submitButton).toHaveAttribute('data-loading', 'true');
   });
 
@@ -250,7 +260,9 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText(/cannot move department to its own child/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/cannot move department to its own child/i)
+    ).toBeInTheDocument();
   });
 
   it('shows warning for departments with children', () => {
@@ -272,8 +284,14 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText(/this department has 2 subdepartment/i)).toBeInTheDocument();
-    expect(screen.getByText(/moving this department will also move all its subdepartments/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/this department has 2 subdepartment/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /moving this department will also move all its subdepartments/i
+      )
+    ).toBeInTheDocument();
   });
 
   it('shows warning for departments with employees', () => {
@@ -287,8 +305,12 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText(/this department has 8 employee/i)).toBeInTheDocument();
-    expect(screen.getByText(/they will remain in this department after the move/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/this department has 8 employee/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/they will remain in this department after the move/i)
+    ).toBeInTheDocument();
   });
 
   it('calls onClose when cancel button is clicked', () => {

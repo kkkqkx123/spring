@@ -40,18 +40,26 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
   selectedTemplateId,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(
+    null
+  );
   const [debouncedSearch] = useDebouncedValue(searchQuery, 300);
 
   // API hooks
   const { data: templates, isLoading } = useEmailTemplates();
 
   // Filter templates based on search
-  const filteredTemplates = templates?.filter(template =>
-    template.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-    template.subject.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-    template.description?.toLowerCase().includes(debouncedSearch.toLowerCase())
-  ) || [];
+  const filteredTemplates =
+    templates?.filter(
+      template =>
+        template.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        template.subject
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase()) ||
+        template.description
+          ?.toLowerCase()
+          .includes(debouncedSearch.toLowerCase())
+    ) || [];
 
   const handleSelect = (template: EmailTemplate) => {
     onSelect(template);
@@ -90,35 +98,38 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
             placeholder="Search templates by name, subject, or description..."
             leftSection={<IconSearch size={16} />}
             value={searchQuery}
-            onChange={(event) => setSearchQuery(event.currentTarget.value)}
+            onChange={event => setSearchQuery(event.currentTarget.value)}
           />
 
           {/* Templates List */}
           {isLoading ? (
-            <Text size="sm" c="dimmed">Loading templates...</Text>
+            <Text size="sm" c="dimmed">
+              Loading templates...
+            </Text>
           ) : filteredTemplates.length === 0 ? (
             <Alert icon={<IconInfoCircle size={16} />} color="blue">
-              {templates?.length === 0 
+              {templates?.length === 0
                 ? 'No email templates available. Create your first template to get started.'
-                : 'No templates found matching your search criteria.'
-              }
+                : 'No templates found matching your search criteria.'}
             </Alert>
           ) : (
             <ScrollArea.Autosize mah={500}>
               <Stack gap="sm">
-                {filteredTemplates.map((template) => (
+                {filteredTemplates.map(template => (
                   <Card
                     key={template.id}
                     withBorder
                     p="md"
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: selectedTemplateId === template.id 
-                        ? 'var(--mantine-color-blue-0)' 
-                        : undefined,
-                      borderColor: selectedTemplateId === template.id 
-                        ? 'var(--mantine-color-blue-4)' 
-                        : undefined,
+                      backgroundColor:
+                        selectedTemplateId === template.id
+                          ? 'var(--mantine-color-blue-0)'
+                          : undefined,
+                      borderColor:
+                        selectedTemplateId === template.id
+                          ? 'var(--mantine-color-blue-4)'
+                          : undefined,
                     }}
                     onClick={() => handleSelect(template)}
                   >
@@ -126,9 +137,14 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
                       {/* Header */}
                       <Group justify="space-between">
                         <Group gap="sm">
-                          <IconTemplate size={20} color="var(--mantine-color-blue-6)" />
+                          <IconTemplate
+                            size={20}
+                            color="var(--mantine-color-blue-6)"
+                          />
                           <div>
-                            <Text size="sm" fw={600}>{template.name}</Text>
+                            <Text size="sm" fw={600}>
+                              {template.name}
+                            </Text>
                             <Text size="xs" c="dimmed">
                               Created {formatDate(template.createdAt)}
                             </Text>
@@ -139,7 +155,7 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
                             <ActionIcon
                               variant="light"
                               size="sm"
-                              onClick={(e) => {
+                              onClick={e => {
                                 e.stopPropagation();
                                 handlePreview(template);
                               }}
@@ -148,21 +164,29 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
                             </ActionIcon>
                           </Tooltip>
                           {selectedTemplateId === template.id && (
-                            <Badge color="blue" size="sm">Selected</Badge>
+                            <Badge color="blue" size="sm">
+                              Selected
+                            </Badge>
                           )}
                         </Group>
                       </Group>
 
                       {/* Subject */}
                       <div>
-                        <Text size="xs" c="dimmed" mb={2}>Subject:</Text>
-                        <Text size="sm" fw={500}>{template.subject}</Text>
+                        <Text size="xs" c="dimmed" mb={2}>
+                          Subject:
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          {template.subject}
+                        </Text>
                       </div>
 
                       {/* Description */}
                       {template.description && (
                         <div>
-                          <Text size="xs" c="dimmed" mb={2}>Description:</Text>
+                          <Text size="xs" c="dimmed" mb={2}>
+                            Description:
+                          </Text>
                           <Text size="sm">{template.description}</Text>
                         </div>
                       )}
@@ -170,9 +194,11 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
                       {/* Variables */}
                       {template.variables.length > 0 && (
                         <div>
-                          <Text size="xs" c="dimmed" mb={4}>Variables:</Text>
+                          <Text size="xs" c="dimmed" mb={4}>
+                            Variables:
+                          </Text>
                           <Group gap="xs">
-                            {template.variables.map((variable) => (
+                            {template.variables.map(variable => (
                               <Badge key={variable} variant="light" size="xs">
                                 {variable}
                               </Badge>
@@ -183,10 +209,12 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
 
                       {/* Content Preview */}
                       <div>
-                        <Text size="xs" c="dimmed" mb={2}>Content Preview:</Text>
-                        <Text 
-                          size="xs" 
-                          c="dimmed" 
+                        <Text size="xs" c="dimmed" mb={2}>
+                          Content Preview:
+                        </Text>
+                        <Text
+                          size="xs"
+                          c="dimmed"
                           lineClamp={2}
                           style={{ fontFamily: 'monospace' }}
                         >
@@ -223,14 +251,18 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
             <Card withBorder>
               <Stack gap="sm">
                 <Group justify="space-between">
-                  <Text size="sm" fw={600}>{previewTemplate.name}</Text>
+                  <Text size="sm" fw={600}>
+                    {previewTemplate.name}
+                  </Text>
                   <Badge variant="light">
                     {previewTemplate.variables.length} variables
                   </Badge>
                 </Group>
-                
+
                 {previewTemplate.description && (
-                  <Text size="sm" c="dimmed">{previewTemplate.description}</Text>
+                  <Text size="sm" c="dimmed">
+                    {previewTemplate.description}
+                  </Text>
                 )}
 
                 <Group gap="xs">
@@ -246,16 +278,19 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
             {previewTemplate.variables.length > 0 && (
               <Card withBorder>
                 <Stack gap="sm">
-                  <Text size="sm" fw={500}>Required Variables</Text>
+                  <Text size="sm" fw={500}>
+                    Required Variables
+                  </Text>
                   <Group gap="xs">
-                    {previewTemplate.variables.map((variable) => (
+                    {previewTemplate.variables.map(variable => (
                       <Badge key={variable} variant="outline">
                         {variable}
                       </Badge>
                     ))}
                   </Group>
                   <Text size="xs" c="dimmed">
-                    These variables will need to be filled when composing the email.
+                    These variables will need to be filled when composing the
+                    email.
                   </Text>
                 </Stack>
               </Card>
@@ -263,7 +298,9 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
 
             {/* Subject */}
             <div>
-              <Text size="sm" fw={500} mb="xs">Subject</Text>
+              <Text size="sm" fw={500} mb="xs">
+                Subject
+              </Text>
               <Card withBorder p="sm">
                 <Text size="sm">{previewTemplate.subject}</Text>
               </Card>
@@ -271,12 +308,14 @@ export const EmailTemplateSelector: React.FC<EmailTemplateSelectorProps> = ({
 
             {/* Content */}
             <div>
-              <Text size="sm" fw={500} mb="xs">Content</Text>
+              <Text size="sm" fw={500} mb="xs">
+                Content
+              </Text>
               <Card withBorder p="sm">
                 <ScrollArea.Autosize mah={300}>
-                  <Text 
-                    size="sm" 
-                    style={{ 
+                  <Text
+                    size="sm"
+                    style={{
                       whiteSpace: 'pre-wrap',
                       fontFamily: 'monospace',
                       fontSize: '12px',

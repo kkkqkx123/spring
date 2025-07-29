@@ -47,7 +47,9 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
     try {
       await moveDepartment.mutateAsync({
         departmentId: department.id,
-        newParentId: values.newParentId ? parseInt(values.newParentId) : undefined,
+        newParentId: values.newParentId
+          ? parseInt(values.newParentId)
+          : undefined,
       });
 
       onSuccess?.();
@@ -90,11 +92,16 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <LoadingOverlay visible={isLoading} />
-        
+
         <Stack gap="md">
           {error && (
-            <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-              {error.response?.data?.message || 'An error occurred while moving the department'}
+            <Alert
+              icon={<IconAlertCircle size={16} />}
+              color="red"
+              variant="light"
+            >
+              {error.response?.data?.message ||
+                'An error occurred while moving the department'}
             </Alert>
           )}
 
@@ -106,7 +113,9 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
 
           {/* Current Location */}
           <Stack gap="xs">
-            <Text size="sm" fw={500}>Current Location</Text>
+            <Text size="sm" fw={500}>
+              Current Location
+            </Text>
             <Text size="sm" c="dimmed">
               {getCurrentParentName()}
             </Text>
@@ -123,7 +132,8 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
           />
 
           {/* Preview */}
-          {form.values.newParentId !== (department.parentId?.toString() || '') && (
+          {form.values.newParentId !==
+            (department.parentId?.toString() || '') && (
             <Alert color="green" variant="light">
               <Group gap="xs" align="center">
                 <Text size="sm">
@@ -141,8 +151,9 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
           {department.children && department.children.length > 0 && (
             <Alert color="yellow" variant="light">
               <Text size="sm">
-                This department has {department.children.length} subdepartment(s). 
-                Moving this department will also move all its subdepartments.
+                This department has {department.children.length}{' '}
+                subdepartment(s). Moving this department will also move all its
+                subdepartments.
               </Text>
             </Alert>
           )}
@@ -151,8 +162,8 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
           {department.employeeCount > 0 && (
             <Alert color="orange" variant="light">
               <Text size="sm">
-                This department has {department.employeeCount} employee(s). 
-                They will remain in this department after the move.
+                This department has {department.employeeCount} employee(s). They
+                will remain in this department after the move.
               </Text>
             </Alert>
           )}
@@ -161,10 +172,13 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
             <Button variant="subtle" onClick={handleClose} disabled={isLoading}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               loading={isLoading}
-              disabled={form.values.newParentId === (department.parentId?.toString() || '')}
+              disabled={
+                form.values.newParentId ===
+                (department.parentId?.toString() || '')
+              }
             >
               Move Department
             </Button>

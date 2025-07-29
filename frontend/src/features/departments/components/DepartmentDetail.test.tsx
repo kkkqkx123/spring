@@ -67,9 +67,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -129,7 +127,9 @@ describe('DepartmentDetail', () => {
 
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    expect(screen.getByText(/failed to load department details/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/failed to load department details/i)
+    ).toBeInTheDocument();
   });
 
   it('opens edit modal when edit button is clicked', async () => {
@@ -138,7 +138,7 @@ describe('DepartmentDetail', () => {
     const editButton = screen.getAllByRole('button').find(
       button => button.querySelector('svg') // Edit icon button
     );
-    
+
     if (editButton) {
       fireEvent.click(editButton);
 
@@ -151,12 +151,14 @@ describe('DepartmentDetail', () => {
 
   it('calls onEdit callback when provided', () => {
     const mockOnEdit = vi.fn();
-    render(<DepartmentDetail departmentId={1} onEdit={mockOnEdit} />, { wrapper: createWrapper() });
+    render(<DepartmentDetail departmentId={1} onEdit={mockOnEdit} />, {
+      wrapper: createWrapper(),
+    });
 
     const editButton = screen.getAllByRole('button').find(
       button => button.querySelector('svg') // Edit icon button
     );
-    
+
     if (editButton) {
       fireEvent.click(editButton);
       expect(mockOnEdit).toHaveBeenCalled();
@@ -165,7 +167,11 @@ describe('DepartmentDetail', () => {
 
   it('shows delete confirmation dialog', async () => {
     // Mock department with no employees or children to allow deletion
-    const emptyDepartment = { ...mockDepartment, employeeCount: 0, children: [] };
+    const emptyDepartment = {
+      ...mockDepartment,
+      employeeCount: 0,
+      children: [],
+    };
     vi.mocked(departmentHooks.useDepartment).mockReturnValue({
       data: emptyDepartment,
       isLoading: false,
@@ -174,15 +180,17 @@ describe('DepartmentDetail', () => {
 
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    const deleteButton = screen.getAllByRole('button').find(
-      button => button.querySelector('svg') && !button.disabled
-    );
-    
+    const deleteButton = screen
+      .getAllByRole('button')
+      .find(button => button.querySelector('svg') && !button.disabled);
+
     if (deleteButton) {
       fireEvent.click(deleteButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/are you sure you want to delete/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/are you sure you want to delete/i)
+        ).toBeInTheDocument();
       });
     }
   });
@@ -190,10 +198,14 @@ describe('DepartmentDetail', () => {
   it('disables delete button for departments with employees', () => {
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    const deleteButton = screen.getAllByRole('button').find(
-      button => button.querySelector('svg') && button.getAttribute('data-disabled') === 'true'
-    );
-    
+    const deleteButton = screen
+      .getAllByRole('button')
+      .find(
+        button =>
+          button.querySelector('svg') &&
+          button.getAttribute('data-disabled') === 'true'
+      );
+
     expect(deleteButton).toBeInTheDocument();
   });
 
@@ -210,7 +222,9 @@ describe('DepartmentDetail', () => {
     });
 
     // Click on subdepartments tab
-    const subdepartmentsTab = screen.getByRole('tab', { name: /subdepartments/i });
+    const subdepartmentsTab = screen.getByRole('tab', {
+      name: /subdepartments/i,
+    });
     fireEvent.click(subdepartmentsTab);
 
     await waitFor(() => {
@@ -231,7 +245,9 @@ describe('DepartmentDetail', () => {
     const employeesTab = screen.getByRole('tab', { name: /employees/i });
     fireEvent.click(employeesTab);
 
-    expect(screen.getByText(/no employees in this department/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/no employees in this department/i)
+    ).toBeInTheDocument();
   });
 
   it('calls onCreateChild when add subdepartment button is clicked', () => {
@@ -241,7 +257,9 @@ describe('DepartmentDetail', () => {
       { wrapper: createWrapper() }
     );
 
-    const addButton = screen.getByRole('button', { name: /add subdepartment/i });
+    const addButton = screen.getByRole('button', {
+      name: /add subdepartment/i,
+    });
     fireEvent.click(addButton);
 
     expect(mockOnCreateChild).toHaveBeenCalled();
@@ -249,10 +267,9 @@ describe('DepartmentDetail', () => {
 
   it('calls onClose when close button is clicked', () => {
     const mockOnClose = vi.fn();
-    render(
-      <DepartmentDetail departmentId={1} onClose={mockOnClose} />,
-      { wrapper: createWrapper() }
-    );
+    render(<DepartmentDetail departmentId={1} onClose={mockOnClose} />, {
+      wrapper: createWrapper(),
+    });
 
     const closeButton = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeButton);
@@ -262,7 +279,11 @@ describe('DepartmentDetail', () => {
 
   it('deletes department successfully', async () => {
     // Mock department with no employees or children to allow deletion
-    const emptyDepartment = { ...mockDepartment, employeeCount: 0, children: [] };
+    const emptyDepartment = {
+      ...mockDepartment,
+      employeeCount: 0,
+      children: [],
+    };
     vi.mocked(departmentHooks.useDepartment).mockReturnValue({
       data: emptyDepartment,
       isLoading: false,
@@ -272,16 +293,15 @@ describe('DepartmentDetail', () => {
     const mockOnDelete = vi.fn();
     mockDeleteMutate.mockResolvedValue({});
 
-    render(
-      <DepartmentDetail departmentId={1} onDelete={mockOnDelete} />,
-      { wrapper: createWrapper() }
-    );
+    render(<DepartmentDetail departmentId={1} onDelete={mockOnDelete} />, {
+      wrapper: createWrapper(),
+    });
 
     // Click delete button
-    const deleteButton = screen.getAllByRole('button').find(
-      button => button.querySelector('svg') && !button.disabled
-    );
-    
+    const deleteButton = screen
+      .getAllByRole('button')
+      .find(button => button.querySelector('svg') && !button.disabled);
+
     if (deleteButton) {
       fireEvent.click(deleteButton);
 

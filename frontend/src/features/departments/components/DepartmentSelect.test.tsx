@@ -59,9 +59,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -92,7 +90,9 @@ describe('DepartmentSelect', () => {
   });
 
   it('shows employee count when enabled', async () => {
-    render(<DepartmentSelect showEmployeeCount />, { wrapper: createWrapper() });
+    render(<DepartmentSelect showEmployeeCount />, {
+      wrapper: createWrapper(),
+    });
 
     const select = screen.getByRole('combobox');
     fireEvent.click(select);
@@ -106,7 +106,9 @@ describe('DepartmentSelect', () => {
   });
 
   it('includes root option when includeRoot is true', async () => {
-    render(<DepartmentSelect includeRoot rootLabel="No Department" />, { wrapper: createWrapper() });
+    render(<DepartmentSelect includeRoot rootLabel="No Department" />, {
+      wrapper: createWrapper(),
+    });
 
     const select = screen.getByRole('combobox');
     fireEvent.click(select);
@@ -160,7 +162,9 @@ describe('DepartmentSelect', () => {
 
   it('handles selection correctly', async () => {
     const mockOnChange = vi.fn();
-    render(<DepartmentSelect onChange={mockOnChange} />, { wrapper: createWrapper() });
+    render(<DepartmentSelect onChange={mockOnChange} />, {
+      wrapper: createWrapper(),
+    });
 
     const select = screen.getByRole('combobox');
     fireEvent.click(select);
@@ -189,7 +193,9 @@ describe('DepartmentSelect', () => {
 
   it('is clearable', async () => {
     const mockOnChange = vi.fn();
-    render(<DepartmentSelect value="1" onChange={mockOnChange} />, { wrapper: createWrapper() });
+    render(<DepartmentSelect value="1" onChange={mockOnChange} />, {
+      wrapper: createWrapper(),
+    });
 
     // Find and click the clear button
     const clearButton = screen.getByLabelText('Clear input');

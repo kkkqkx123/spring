@@ -40,9 +40,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -73,25 +71,37 @@ describe('DepartmentForm', () => {
     expect(screen.getByLabelText(/department name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
     expect(screen.getByTestId('department-select')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create department/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create department/i })
+    ).toBeInTheDocument();
   });
 
   it('renders edit form correctly', () => {
-    render(<DepartmentForm department={mockDepartment} />, { wrapper: createWrapper() });
+    render(<DepartmentForm department={mockDepartment} />, {
+      wrapper: createWrapper(),
+    });
 
     expect(screen.getByDisplayValue('Engineering')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Software development team')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /update department/i })).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Software development team')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /update department/i })
+    ).toBeInTheDocument();
   });
 
   it('validates required fields', async () => {
     render(<DepartmentForm />, { wrapper: createWrapper() });
 
-    const submitButton = screen.getByRole('button', { name: /create department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/department name is required/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/department name is required/i)
+      ).toBeInTheDocument();
     });
 
     expect(mockCreateMutate).not.toHaveBeenCalled();
@@ -101,7 +111,9 @@ describe('DepartmentForm', () => {
     const mockOnSuccess = vi.fn();
     mockCreateMutate.mockResolvedValue({});
 
-    render(<DepartmentForm onSuccess={mockOnSuccess} />, { wrapper: createWrapper() });
+    render(<DepartmentForm onSuccess={mockOnSuccess} />, {
+      wrapper: createWrapper(),
+    });
 
     fireEvent.change(screen.getByLabelText(/department name/i), {
       target: { value: 'New Department' },
@@ -110,7 +122,9 @@ describe('DepartmentForm', () => {
       target: { value: 'New department description' },
     });
 
-    const submitButton = screen.getByRole('button', { name: /create department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -137,7 +151,9 @@ describe('DepartmentForm', () => {
       target: { value: 'Updated Engineering' },
     });
 
-    const submitButton = screen.getByRole('button', { name: /update department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /update department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -161,7 +177,9 @@ describe('DepartmentForm', () => {
 
     render(<DepartmentForm />, { wrapper: createWrapper() });
 
-    const submitButton = screen.getByRole('button', { name: /create department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create department/i,
+    });
     expect(submitButton).toHaveAttribute('data-loading', 'true');
   });
 
@@ -182,13 +200,17 @@ describe('DepartmentForm', () => {
 
     render(<DepartmentForm />, { wrapper: createWrapper() });
 
-    expect(screen.getByText(/department name already exists/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/department name already exists/i)
+    ).toBeInTheDocument();
   });
 
   it('calls onCancel when cancel button is clicked', () => {
     const mockOnCancel = vi.fn();
 
-    render(<DepartmentForm onCancel={mockOnCancel} />, { wrapper: createWrapper() });
+    render(<DepartmentForm onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     fireEvent.click(cancelButton);
@@ -211,11 +233,15 @@ describe('DepartmentForm', () => {
       target: { value: 'a'.repeat(101) }, // 101 characters
     });
 
-    const submitButton = screen.getByRole('button', { name: /create department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/name must be less than 100 characters/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/name must be less than 100 characters/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -230,11 +256,15 @@ describe('DepartmentForm', () => {
       target: { value: 'a'.repeat(501) }, // 501 characters
     });
 
-    const submitButton = screen.getByRole('button', { name: /create department/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create department/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/description must be less than 500 characters/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/description must be less than 500 characters/i)
+      ).toBeInTheDocument();
     });
   });
 });

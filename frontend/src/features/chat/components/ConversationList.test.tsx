@@ -68,9 +68,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {component}
-      </MantineProvider>
+      <MantineProvider>{component}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -148,7 +146,11 @@ describe('ConversationList', () => {
       <ConversationList onSelectConversation={mockOnSelectConversation} />
     );
 
-    const johnConversation = screen.getByText('John Doe').closest('[role="button"], div[style*="cursor"]') || screen.getByText('John Doe').parentElement;
+    const johnConversation =
+      screen
+        .getByText('John Doe')
+        .closest('[role="button"], div[style*="cursor"]') ||
+      screen.getByText('John Doe').parentElement;
 
     if (johnConversation) {
       fireEvent.click(johnConversation);
@@ -216,7 +218,9 @@ describe('ConversationList', () => {
       <ConversationList onSelectConversation={mockOnSelectConversation} />
     );
 
-    expect(screen.getByText('Failed to load conversations')).toBeInTheDocument();
+    expect(
+      screen.getByText('Failed to load conversations')
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no conversations', () => {

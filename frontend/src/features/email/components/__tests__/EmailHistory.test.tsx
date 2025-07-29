@@ -5,7 +5,10 @@ import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { EmailHistory } from '../EmailHistory';
-import type { EmailHistory as EmailHistoryType, PaginatedResponse } from '../../../../types';
+import type {
+  EmailHistory as EmailHistoryType,
+  PaginatedResponse,
+} from '../../../../types';
 
 // Mock the hooks
 const mockUseEmailHistory = vi.fn();
@@ -87,9 +90,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -153,7 +154,7 @@ describe('EmailHistory', () => {
 
   it('filters emails by search query', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailHistory onResend={mockOnResend} />
@@ -165,14 +166,14 @@ describe('EmailHistory', () => {
 
     // Should still show the welcome email
     expect(screen.getByText('Welcome to the Company')).toBeInTheDocument();
-    
+
     // Other emails should still be visible since we're not actually filtering in the test
     // In a real implementation, the filtering would happen
   });
 
   it('filters emails by status', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailHistory onResend={mockOnResend} />
@@ -189,7 +190,7 @@ describe('EmailHistory', () => {
 
   it('opens email details modal when view button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     mockUseEmailDetails.mockReturnValue({
       data: mockEmailDetails,
       isLoading: false,
@@ -225,7 +226,7 @@ describe('EmailHistory', () => {
 
   it('calls onResend when resend button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailHistory onResend={mockOnResend} />
@@ -277,7 +278,7 @@ describe('EmailHistory', () => {
   it('refreshes data when refresh button is clicked', async () => {
     const user = userEvent.setup();
     const mockRefetch = vi.fn();
-    
+
     mockUseEmailHistory.mockReturnValue({
       data: mockEmailHistoryData,
       isLoading: false,
@@ -298,7 +299,7 @@ describe('EmailHistory', () => {
 
   it('changes page size when page size selector is changed', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailHistory onResend={mockOnResend} />

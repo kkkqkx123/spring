@@ -3,14 +3,20 @@ import { useQueryClient } from '@tanstack/react-query';
 import { webSocketService, eventBus } from '../../../services/websocket';
 import { queryKeys } from '../../../services/queryKeys';
 import { useAuth } from '../../../hooks/useAuth';
-import type { ChatMessage, Conversation, PaginatedResponse } from '../../../types';
+import type {
+  ChatMessage,
+  Conversation,
+  PaginatedResponse,
+} from '../../../types';
 
 // Hook for managing real-time chat functionality
 export const useRealTimeChat = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set());
-  const [typingUsers, setTypingUsers] = useState<Map<number, string>>(new Map());
+  const [typingUsers, setTypingUsers] = useState<Map<number, string>>(
+    new Map()
+  );
 
   // Handle new messages
   const handleNewMessage = useCallback(
@@ -18,16 +24,15 @@ export const useRealTimeChat = () => {
       if (!user) return;
 
       // Determine which user's conversation this affects
-      const otherUserId = message.senderId === user.id 
-        ? message.recipientId 
-        : message.senderId;
+      const otherUserId =
+        message.senderId === user.id ? message.recipientId : message.senderId;
 
       // Update conversation cache
       queryClient.setQueriesData(
         { queryKey: queryKeys.chat.conversation(otherUserId) },
         (old: PaginatedResponse<ChatMessage> | undefined) => {
           if (!old) return old;
-          
+
           // Check if message already exists to avoid duplicates
           const messageExists = old.content.some(m => m.id === message.id);
           if (messageExists) return old;
@@ -51,22 +56,26 @@ export const useRealTimeChat = () => {
               return {
                 ...conv,
                 lastMessage: message,
-                unreadCount: message.senderId !== user.id 
-                  ? conv.unreadCount + 1 
-                  : conv.unreadCount,
+                unreadCount:
+                  message.senderId !== user.id
+                    ? conv.unreadCount + 1
+                    : conv.unreadCount,
               };
             }
             return conv;
           });
 
           // If conversation doesn't exist, add it
-          const conversationExists = old.some(conv => conv.userId === otherUserId);
+          const conversationExists = old.some(
+            conv => conv.userId === otherUserId
+          );
           if (!conversationExists) {
             const newConversation: Conversation = {
               userId: otherUserId,
-              userName: message.senderId === otherUserId 
-                ? message.senderName 
-                : message.recipientName,
+              userName:
+                message.senderId === otherUserId
+                  ? message.senderName
+                  : message.recipientName,
               lastMessage: message,
               unreadCount: message.senderId !== user.id ? 1 : 0,
             };
@@ -155,7 +164,7 @@ export const useRealTimeChat = () => {
         queryKeys.chat.onlineUsers,
         (old: number[] | undefined) => {
           if (!old) return old;
-          
+
           if (data.isOnline) {
             return old.includes(data.userId) ? old : [...old, data.userId];
           } else {
@@ -169,10 +178,19 @@ export const useRealTimeChat = () => {
 
   // Set up event listeners
   useEffect(() => {
-    const unsubscribeNewMessage = eventBus.subscribe('chat:new-message', handleNewMessage);
-    const unsubscribeMessageRead = eventBus.subscribe('chat:message-read', handleMessageRead);
+    const unsubscribeNewMessage = eventBus.subscribe(
+      'chat:new-message',
+      handleNewMessage
+    );
+    const unsubscribeMessageRead = eventBus.subscribe(
+      'chat:message-read',
+      handleMessageRead
+    );
     const unsubscribeTyping = eventBus.subscribe('chat:typing', handleTyping);
-    const unsubscribeUserOnline = eventBus.subscribe('chat:user-online', handleUserOnline);
+    const unsubscribeUserOnline = eventBus.subscribe(
+      'chat:user-online',
+      handleUserOnline
+    );
 
     return () => {
       unsubscribeNewMessage();
@@ -195,29 +213,23 @@ export const useRealTimeChat = () => {
   );
 
   // Send message via WebSocket
-  const sendMessage = useCallback(
-    (recipientId: number, content: string) => {
-      try {
-        webSocketService.sendChatMessage(recipientId, content);
-      } catch (error) {
-        console.error('Failed to send message via WebSocket:', error);
-        throw error;
-      }
-    },
-    []
-  );
+  const sendMessage = useCallback((recipientId: number, content: string) => {
+    try {
+      webSocketService.sendChatMessage(recipientId, content);
+    } catch (error) {
+      console.error('Failed to send message via WebSocket:', error);
+      throw error;
+    }
+  }, []);
 
   // Mark message as read
-  const markAsRead = useCallback(
-    (messageId: number) => {
-      try {
-        webSocketService.markMessageAsRead(messageId);
-      } catch (error) {
-        console.warn('Failed to mark message as read:', error);
-      }
-    },
-    []
-  );
+  const markAsRead = useCallback((messageId: number) => {
+    try {
+      webSocketService.markMessageAsRead(messageId);
+    } catch (error) {
+      console.warn('Failed to mark message as read:', error);
+    }
+  }, []);
 
   return {
     onlineUsers,

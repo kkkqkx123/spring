@@ -69,8 +69,8 @@ export const useSendEmail = () => {
     mutationFn: emailApi.sendEmail,
     onSuccess: () => {
       // Invalidate email history to show the new sent email
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.email.history({}) 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.email.history({}),
       });
     },
   });
@@ -82,8 +82,8 @@ export const useSendBulkEmail = () => {
   return useMutation({
     mutationFn: emailApi.sendBulkEmail,
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.email.history({}) 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.email.history({}),
       });
     },
   });
@@ -94,7 +94,7 @@ export const useBulkEmailProgress = (jobId: string, enabled = false) => {
     queryKey: queryKeys.email.bulkProgress(jobId),
     queryFn: () => emailApi.getBulkEmailProgress(jobId),
     enabled: enabled && !!jobId,
-    refetchInterval: (data) => {
+    refetchInterval: data => {
       // Stop polling when job is completed or failed
       if (data?.status === 'COMPLETED' || data?.status === 'FAILED') {
         return false;
@@ -155,9 +155,12 @@ export const useTemplatePreview = (
 
 export const useValidateVariables = () => {
   return useMutation({
-    mutationFn: ({ templateId, variables }: { 
-      templateId: number; 
-      variables: Record<string, string> 
+    mutationFn: ({
+      templateId,
+      variables,
+    }: {
+      templateId: number;
+      variables: Record<string, string>;
     }) => emailApi.validateVariables(templateId, variables),
   });
 };

@@ -36,13 +36,20 @@ export class DepartmentApi {
     return response.data;
   }
 
-  static async createDepartment(department: DepartmentCreateRequest): Promise<Department> {
+  static async createDepartment(
+    department: DepartmentCreateRequest
+  ): Promise<Department> {
     const response = await apiClient.post('/api/departments', department);
     return response.data;
   }
 
-  static async updateDepartment(department: DepartmentUpdateRequest): Promise<Department> {
-    const response = await apiClient.put(`/api/departments/${department.id}`, department);
+  static async updateDepartment(
+    department: DepartmentUpdateRequest
+  ): Promise<Department> {
+    const response = await apiClient.put(
+      `/api/departments/${department.id}`,
+      department
+    );
     return response.data;
   }
 
@@ -50,8 +57,13 @@ export class DepartmentApi {
     await apiClient.delete(`/api/departments/${id}`);
   }
 
-  static async moveDepartment(moveRequest: DepartmentMoveRequest): Promise<Department> {
-    const response = await apiClient.put(`/api/departments/${moveRequest.departmentId}/move`, moveRequest);
+  static async moveDepartment(
+    moveRequest: DepartmentMoveRequest
+  ): Promise<Department> {
+    const response = await apiClient.put(
+      `/api/departments/${moveRequest.departmentId}/move`,
+      moveRequest
+    );
     return response.data;
   }
 

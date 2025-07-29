@@ -33,7 +33,8 @@ const mockTemplates: EmailTemplate[] = [
     id: 2,
     name: 'Meeting Reminder',
     subject: 'Meeting Reminder: {{meeting_title}}',
-    content: 'Don\'t forget about the meeting: {{meeting_title}} at {{meeting_time}}',
+    content:
+      "Don't forget about the meeting: {{meeting_title}} at {{meeting_time}}",
     variables: ['meeting_title', 'meeting_time'],
     description: 'Remind about meetings',
     createdAt: '2024-01-01T00:00:00Z',
@@ -162,7 +163,9 @@ describe('EmailComposer', () => {
     expect(screen.getByLabelText(/recipients/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/subject/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/content/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send email/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /send email/i })
+    ).toBeInTheDocument();
   });
 
   it('loads and displays email templates', () => {
@@ -181,7 +184,7 @@ describe('EmailComposer', () => {
 
   it('loads and displays recipients', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailComposer onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -198,7 +201,7 @@ describe('EmailComposer', () => {
 
   it('updates form when template is selected', async () => {
     const user = userEvent.setup();
-    
+
     mockUseEmailTemplate.mockReturnValue({
       data: mockTemplates[0],
     });
@@ -214,14 +217,18 @@ describe('EmailComposer', () => {
     await user.click(screen.getByText('Welcome Template'));
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Welcome to {{company}}')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('Hello {{name}}, welcome to {{company}}!')).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue('Welcome to {{company}}')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue('Hello {{name}}, welcome to {{company}}!')
+      ).toBeInTheDocument();
     });
   });
 
   it('shows template variables when template is selected', async () => {
     const user = userEvent.setup();
-    
+
     mockUseEmailTemplate.mockReturnValue({
       data: mockTemplates[0],
     });
@@ -245,7 +252,7 @@ describe('EmailComposer', () => {
 
   it('validates required fields', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailComposer onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -256,7 +263,9 @@ describe('EmailComposer', () => {
     await user.click(sendButton);
 
     await waitFor(() => {
-      expect(screen.getByText('At least one recipient is required')).toBeInTheDocument();
+      expect(
+        screen.getByText('At least one recipient is required')
+      ).toBeInTheDocument();
       expect(screen.getByText('Subject is required')).toBeInTheDocument();
       expect(screen.getByText('Content is required')).toBeInTheDocument();
     });
@@ -265,7 +274,7 @@ describe('EmailComposer', () => {
   it('sends email with valid data', async () => {
     const user = userEvent.setup();
     const mockSendEmail = vi.fn().mockResolvedValue({});
-    
+
     mockUseSendEmail.mockReturnValue({
       mutateAsync: mockSendEmail,
       isPending: false,
@@ -311,7 +320,7 @@ describe('EmailComposer', () => {
       missingVariables: ['name'],
       invalidVariables: [],
     });
-    
+
     mockUseEmailTemplate.mockReturnValue({
       data: mockTemplates[0],
     });
@@ -348,7 +357,7 @@ describe('EmailComposer', () => {
 
   it('shows preview when preview button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailComposer onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -363,7 +372,9 @@ describe('EmailComposer', () => {
     await user.type(contentInput, 'Test content');
 
     // Click preview button
-    const previewButton = screen.getByRole('button', { name: /preview email/i });
+    const previewButton = screen.getByRole('button', {
+      name: /preview email/i,
+    });
     await user.click(previewButton);
 
     await waitFor(() => {
@@ -375,7 +386,7 @@ describe('EmailComposer', () => {
 
   it('calls onCancel when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <TestWrapper>
         <EmailComposer onSent={mockOnSent} onCancel={mockOnCancel} />
@@ -414,8 +425,8 @@ describe('EmailComposer', () => {
 
     render(
       <TestWrapper>
-        <EmailComposer 
-          onSent={mockOnSent} 
+        <EmailComposer
+          onSent={mockOnSent}
           onCancel={mockOnCancel}
           initialData={initialData}
         />

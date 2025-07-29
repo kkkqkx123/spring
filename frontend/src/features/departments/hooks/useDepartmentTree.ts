@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import { queryKeys } from '../../../services/queryKeys';
-import { DepartmentApi, DepartmentCreateRequest, DepartmentUpdateRequest, DepartmentMoveRequest } from '../services/departmentApi';
+import {
+  DepartmentApi,
+  DepartmentCreateRequest,
+  DepartmentUpdateRequest,
+  DepartmentMoveRequest,
+} from '../services/departmentApi';
 import { Department } from '../../../types';
 
 export const useDepartmentTree = () => {
@@ -50,7 +55,9 @@ export const useUpdateDepartment = () => {
   return useMutation({
     mutationFn: DepartmentApi.updateDepartment,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.departments.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.departments.detail(variables.id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.departments.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.departments.tree });
       notifications.show({

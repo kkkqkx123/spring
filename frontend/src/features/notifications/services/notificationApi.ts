@@ -16,8 +16,12 @@ export interface NotificationUpdateRequest {
 export class NotificationApi {
   constructor(private client: ApiClient) {}
 
-  async getNotifications(pageable: Pageable): Promise<PaginatedResponse<Notification>> {
-    const response = await this.client.get('/api/notifications', { params: pageable });
+  async getNotifications(
+    pageable: Pageable
+  ): Promise<PaginatedResponse<Notification>> {
+    const response = await this.client.get('/api/notifications', {
+      params: pageable,
+    });
     return response.data;
   }
 
@@ -26,12 +30,17 @@ export class NotificationApi {
     return response.data;
   }
 
-  async createNotification(notification: NotificationRequest): Promise<Notification> {
+  async createNotification(
+    notification: NotificationRequest
+  ): Promise<Notification> {
     const response = await this.client.post('/api/notifications', notification);
     return response.data;
   }
 
-  async updateNotification(id: number, updates: NotificationUpdateRequest): Promise<Notification> {
+  async updateNotification(
+    id: number,
+    updates: NotificationUpdateRequest
+  ): Promise<Notification> {
     const response = await this.client.put(`/api/notifications/${id}`, updates);
     return response.data;
   }
@@ -63,11 +72,13 @@ export class NotificationApi {
     pageable: Pageable
   ): Promise<PaginatedResponse<Notification>> {
     const response = await this.client.get('/api/notifications/search', {
-      params: { q: query, ...pageable }
+      params: { q: query, ...pageable },
     });
     return response.data;
   }
 }
 
 // Create singleton instance
-export const notificationApi = new NotificationApi(new ApiClient(import.meta.env.VITE_API_BASE_URL || '/api'));
+export const notificationApi = new NotificationApi(
+  new ApiClient(import.meta.env.VITE_API_BASE_URL || '/api')
+);

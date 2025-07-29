@@ -24,13 +24,8 @@ export function NotificationDropdown({
   onViewAll,
   onMarkAllAsRead,
 }: NotificationDropdownProps) {
-  const {
-    notifications,
-    unreadCount,
-    isLoading,
-    markAsRead,
-    markAllAsRead,
-  } = useNotificationStore();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } =
+    useNotificationStore();
 
   const handleNotificationClick = (id: number) => {
     markAsRead(id);
@@ -84,11 +79,7 @@ export function NotificationDropdown({
           <>
             <Divider />
             <Group p="xs" justify="flex-end">
-              <Button
-                variant="subtle"
-                size="xs"
-                onClick={handleMarkAllAsRead}
-              >
+              <Button variant="subtle" size="xs" onClick={handleMarkAllAsRead}>
                 Mark all as read
               </Button>
             </Group>

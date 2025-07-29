@@ -68,9 +68,9 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
   // API hooks
   const { data: templates, isLoading: templatesLoading } = useEmailTemplates();
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
-  const { data: employees, isLoading: employeesLoading } = useEmployees({ 
-    page: 0, 
-    size: 1000 
+  const { data: employees, isLoading: employeesLoading } = useEmployees({
+    page: 0,
+    size: 1000,
   });
   const sendBulkEmailMutation = useSendBulkEmail();
   const validateVariablesMutation = useValidateVariables();
@@ -86,16 +86,19 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
       variables: initialData?.variables || {},
     },
     validate: {
-      templateId: (value) => 
+      templateId: value =>
         value.trim().length === 0 ? 'Template is required' : null,
-      departmentIds: (value, values) => 
-        value.length === 0 && values.employeeIds.length === 0 
-          ? 'At least one department or employee must be selected' : null,
+      departmentIds: (value, values) =>
+        value.length === 0 && values.employeeIds.length === 0
+          ? 'At least one department or employee must be selected'
+          : null,
     },
   });
 
   // Get selected template data
-  const selectedTemplateId = form.values.templateId ? parseInt(form.values.templateId) : 0;
+  const selectedTemplateId = form.values.templateId
+    ? parseInt(form.values.templateId)
+    : 0;
   const { data: selectedTemplate } = useEmailTemplate(selectedTemplateId);
 
   // Progress tracking
@@ -111,10 +114,13 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
         ...form.values,
         subject: selectedTemplate.subject,
         customContent: selectedTemplate.content,
-        variables: selectedTemplate.variables.reduce((acc, variable) => {
-          acc[variable] = form.values.variables[variable] || '';
-          return acc;
-        }, {} as Record<string, string>),
+        variables: selectedTemplate.variables.reduce(
+          (acc, variable) => {
+            acc[variable] = form.values.variables[variable] || '';
+            return acc;
+          },
+          {} as Record<string, string>
+        ),
       });
     }
   }, [selectedTemplate]);
@@ -137,16 +143,16 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
   }));
 
   // Calculate recipient count
-  const selectedDepartments = (departments || []).filter(dept => 
+  const selectedDepartments = (departments || []).filter(dept =>
     form.values.departmentIds.includes(dept.id.toString())
   );
-  const selectedEmployees = (employees?.content || []).filter(emp => 
+  const selectedEmployees = (employees?.content || []).filter(emp =>
     form.values.employeeIds.includes(emp.id.toString())
   );
-  
-  const estimatedRecipientCount = selectedDepartments.reduce((count, dept) => 
-    count + dept.employeeCount, 0
-  ) + selectedEmployees.length;
+
+  const estimatedRecipientCount =
+    selectedDepartments.reduce((count, dept) => count + dept.employeeCount, 0) +
+    selectedEmployees.length;
 
   const handleValidateVariables = async () => {
     if (!selectedTemplateId) return true;
@@ -217,7 +223,10 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
 
   // Handle progress completion
   useEffect(() => {
-    if (progress && (progress.status === 'COMPLETED' || progress.status === 'FAILED')) {
+    if (
+      progress &&
+      (progress.status === 'COMPLETED' || progress.status === 'FAILED')
+    ) {
       if (progress.status === 'COMPLETED') {
         notifications.show({
           title: 'Bulk Email Completed',
@@ -239,18 +248,23 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
     }
   }, [progress, onSent]);
 
-  const isLoading = templatesLoading || departmentsLoading || employeesLoading || 
-                   sendBulkEmailMutation.isPending;
+  const isLoading =
+    templatesLoading ||
+    departmentsLoading ||
+    employeesLoading ||
+    sendBulkEmailMutation.isPending;
 
   return (
     <Paper p="md" withBorder>
       <LoadingOverlay visible={isLoading} />
-      
+
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           {/* Header */}
           <Group justify="space-between">
-            <Text size="lg" fw={600}>Bulk Email Sender</Text>
+            <Text size="lg" fw={600}>
+              Bulk Email Sender
+            </Text>
             <Badge variant="light" size="lg">
               ~{estimatedRecipientCount} recipients
             </Badge>
@@ -261,45 +275,71 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             <Card withBorder>
               <Stack gap="sm">
                 <Group justify="space-between">
-                  <Text size="sm" fw={500}>Bulk Email Progress</Text>
-                  <Badge color={
-                    progress.status === 'COMPLETED' ? 'green' :
-                    progress.status === 'FAILED' ? 'red' :
-                    progress.status === 'SENDING' ? 'blue' : 'gray'
-                  }>
+                  <Text size="sm" fw={500}>
+                    Bulk Email Progress
+                  </Text>
+                  <Badge
+                    color={
+                      progress.status === 'COMPLETED'
+                        ? 'green'
+                        : progress.status === 'FAILED'
+                          ? 'red'
+                          : progress.status === 'SENDING'
+                            ? 'blue'
+                            : 'gray'
+                    }
+                  >
                     {progress.status}
                   </Badge>
                 </Group>
-                
-                <Progress 
-                  value={(progress.sent + progress.failed) / progress.total * 100}
+
+                <Progress
+                  value={
+                    ((progress.sent + progress.failed) / progress.total) * 100
+                  }
                   color={progress.failed > 0 ? 'orange' : 'blue'}
                 />
-                
+
                 <Group gap="md">
                   <div>
-                    <Text size="xs" c="dimmed">Total</Text>
-                    <Text size="sm" fw={500}>{progress.total}</Text>
+                    <Text size="xs" c="dimmed">
+                      Total
+                    </Text>
+                    <Text size="sm" fw={500}>
+                      {progress.total}
+                    </Text>
                   </div>
                   <div>
-                    <Text size="xs" c="dimmed">Sent</Text>
-                    <Text size="sm" fw={500} c="green">{progress.sent}</Text>
+                    <Text size="xs" c="dimmed">
+                      Sent
+                    </Text>
+                    <Text size="sm" fw={500} c="green">
+                      {progress.sent}
+                    </Text>
                   </div>
                   <div>
-                    <Text size="xs" c="dimmed">Failed</Text>
-                    <Text size="sm" fw={500} c="red">{progress.failed}</Text>
+                    <Text size="xs" c="dimmed">
+                      Failed
+                    </Text>
+                    <Text size="sm" fw={500} c="red">
+                      {progress.failed}
+                    </Text>
                   </div>
                 </Group>
 
                 {progress.errors && progress.errors.length > 0 && (
                   <Alert icon={<IconAlertCircle size={16} />} color="red">
-                    <Text size="sm" fw={500}>Errors:</Text>
+                    <Text size="sm" fw={500}>
+                      Errors:
+                    </Text>
                     <List size="sm">
                       {progress.errors.slice(0, 5).map((error, index) => (
                         <List.Item key={index}>{error}</List.Item>
                       ))}
                       {progress.errors.length > 5 && (
-                        <List.Item>... and {progress.errors.length - 5} more</List.Item>
+                        <List.Item>
+                          ... and {progress.errors.length - 5} more
+                        </List.Item>
                       )}
                     </List>
                   </Alert>
@@ -314,7 +354,7 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             placeholder="Select a template"
             data={templateOptions}
             value={form.values.templateId}
-            onChange={(value) => form.setFieldValue('templateId', value || '')}
+            onChange={value => form.setFieldValue('templateId', value || '')}
             searchable
             required
             error={form.errors.templateId}
@@ -326,21 +366,26 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             <Card withBorder>
               <Stack gap="sm">
                 <Group gap="xs">
-                  <Text size="sm" fw={500}>Template Variables</Text>
+                  <Text size="sm" fw={500}>
+                    Template Variables
+                  </Text>
                   <Badge size="xs" variant="light">
                     {selectedTemplate.variables.length} variables
                   </Badge>
                 </Group>
-                
+
                 <Stack gap="xs">
-                  {selectedTemplate.variables.map((variable) => (
+                  {selectedTemplate.variables.map(variable => (
                     <TextInput
                       key={variable}
                       label={variable}
                       placeholder={`Enter value for ${variable}`}
                       value={form.values.variables[variable] || ''}
-                      onChange={(event) =>
-                        form.setFieldValue(`variables.${variable}`, event.currentTarget.value)
+                      onChange={event =>
+                        form.setFieldValue(
+                          `variables.${variable}`,
+                          event.currentTarget.value
+                        )
                       }
                       required
                     />
@@ -365,7 +410,7 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             placeholder="Select departments (all employees in selected departments will receive the email)"
             data={departmentOptions}
             value={form.values.departmentIds}
-            onChange={(value) => form.setFieldValue('departmentIds', value)}
+            onChange={value => form.setFieldValue('departmentIds', value)}
             searchable
             description="Select entire departments to send emails to all employees"
             leftSection={<IconBuilding size={16} />}
@@ -377,7 +422,7 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             placeholder="Select specific employees"
             data={employeeOptions}
             value={form.values.employeeIds}
-            onChange={(value) => form.setFieldValue('employeeIds', value)}
+            onChange={value => form.setFieldValue('employeeIds', value)}
             searchable
             description="Select specific employees in addition to departments"
             leftSection={<IconUsers size={16} />}
@@ -391,12 +436,14 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
                 <Text size="sm" fw={500}>
                   Recipient Summary (~{estimatedRecipientCount} total)
                 </Text>
-                
+
                 {selectedDepartments.length > 0 && (
                   <div>
-                    <Text size="xs" c="dimmed" mb={4}>Departments:</Text>
+                    <Text size="xs" c="dimmed" mb={4}>
+                      Departments:
+                    </Text>
                     <Group gap="xs">
-                      {selectedDepartments.map((dept) => (
+                      {selectedDepartments.map(dept => (
                         <Badge
                           key={dept.id}
                           variant="light"
@@ -412,9 +459,11 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
 
                 {selectedEmployees.length > 0 && (
                   <div>
-                    <Text size="xs" c="dimmed" mb={4}>Individual Employees:</Text>
+                    <Text size="xs" c="dimmed" mb={4}>
+                      Individual Employees:
+                    </Text>
                     <Group gap="xs">
-                      {selectedEmployees.slice(0, 10).map((emp) => (
+                      {selectedEmployees.slice(0, 10).map(emp => (
                         <Badge
                           key={emp.id}
                           variant="light"
@@ -441,7 +490,9 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             label="Subject Override (Optional)"
             placeholder="Override template subject"
             value={form.values.subject}
-            onChange={(event) => form.setFieldValue('subject', event.currentTarget.value)}
+            onChange={event =>
+              form.setFieldValue('subject', event.currentTarget.value)
+            }
             description="Leave empty to use template subject"
           />
 
@@ -450,7 +501,9 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
             label="Content Override (Optional)"
             placeholder="Override template content"
             value={form.values.customContent}
-            onChange={(event) => form.setFieldValue('customContent', event.currentTarget.value)}
+            onChange={event =>
+              form.setFieldValue('customContent', event.currentTarget.value)
+            }
             minRows={4}
             autosize
             description="Leave empty to use template content"
@@ -460,9 +513,9 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
           {estimatedRecipientCount > 100 && (
             <Alert icon={<IconAlertCircle size={16} />} color="orange">
               <Text size="sm">
-                You are about to send emails to {estimatedRecipientCount} recipients. 
-                This operation may take several minutes to complete. Please ensure all 
-                information is correct before proceeding.
+                You are about to send emails to {estimatedRecipientCount}{' '}
+                recipients. This operation may take several minutes to complete.
+                Please ensure all information is correct before proceeding.
               </Text>
             </Alert>
           )}
@@ -470,7 +523,11 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
           {/* Actions */}
           <Group justify="flex-end" gap="sm">
             {onCancel && (
-              <Button variant="light" onClick={onCancel} disabled={showProgress}>
+              <Button
+                variant="light"
+                onClick={onCancel}
+                disabled={showProgress}
+              >
                 Cancel
               </Button>
             )}

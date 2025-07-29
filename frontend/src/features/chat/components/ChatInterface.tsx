@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Grid,
-  Paper,
-  Group,
-  Text,
-  Stack,
-  Center,
-} from '@mantine/core';
+import { Box, Grid, Paper, Group, Text, Stack, Center } from '@mantine/core';
 import { IconWifiOff } from '@tabler/icons-react';
 import { ConversationList } from './ConversationList';
 import { MessageHistory } from './MessageHistory';
@@ -28,7 +20,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     defaultSelectedUserId
   );
   const [selectedUserName, setSelectedUserName] = useState<string>('');
-  
+
   const { onlineUsers, connectionState } = useRealTimeChat();
 
   const isOnline = selectedUserId ? onlineUsers.has(selectedUserId) : false;
@@ -43,7 +35,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <Paper shadow="sm" radius="md" h={height}>
       <Grid h="100%" gutter={0}>
         {/* Conversations sidebar */}
-        <Grid.Col span={4} style={{ borderRight: '1px solid var(--mantine-color-gray-3)' }}>
+        <Grid.Col
+          span={4}
+          style={{ borderRight: '1px solid var(--mantine-color-gray-3)' }}
+        >
           <ConversationList
             selectedUserId={selectedUserId}
             onSelectConversation={handleSelectConversation}
@@ -83,9 +78,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   {/* Connection status */}
                   {connectionState !== 'connected' && (
                     <Group gap="xs">
-                      <IconWifiOff size={16} color="var(--mantine-color-red-6)" />
+                      <IconWifiOff
+                        size={16}
+                        color="var(--mantine-color-red-6)"
+                      />
                       <Text size="xs" c="red">
-                        {connectionState === 'connecting' ? 'Connecting...' : 'Disconnected'}
+                        {connectionState === 'connecting'
+                          ? 'Connecting...'
+                          : 'Disconnected'}
                       </Text>
                     </Group>
                   )}

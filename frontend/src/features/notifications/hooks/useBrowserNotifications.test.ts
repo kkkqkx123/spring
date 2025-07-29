@@ -58,7 +58,7 @@ describe('useBrowserNotifications', () => {
 
   it('returns current permission status', () => {
     window.Notification.permission = 'granted';
-    
+
     const { result } = renderHook(() => useBrowserNotifications());
 
     expect(result.current.permission).toBe('granted');
@@ -80,7 +80,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('handles permission request failure', async () => {
-    (window.Notification.requestPermission as any).mockRejectedValue(new Error('Permission denied'));
+    (window.Notification.requestPermission as any).mockRejectedValue(
+      new Error('Permission denied')
+    );
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -101,14 +103,17 @@ describe('useBrowserNotifications', () => {
       result.current.showBrowserNotification(mockTestNotification);
     });
 
-    expect(mockNotificationConstructor).toHaveBeenCalledWith('Test Notification', {
-      body: 'This is a test notification',
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: 'notification-1',
-      requireInteraction: false,
-      silent: false,
-    });
+    expect(mockNotificationConstructor).toHaveBeenCalledWith(
+      'Test Notification',
+      {
+        body: 'This is a test notification',
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: 'notification-1',
+        requireInteraction: false,
+        silent: false,
+      }
+    );
   });
 
   it('does not show notification when permission is denied', () => {
@@ -125,7 +130,10 @@ describe('useBrowserNotifications', () => {
 
   it('requires interaction for error notifications', () => {
     window.Notification.permission = 'granted';
-    const errorNotification = { ...mockTestNotification, type: 'error' as const };
+    const errorNotification = {
+      ...mockTestNotification,
+      type: 'error' as const,
+    };
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -133,7 +141,8 @@ describe('useBrowserNotifications', () => {
       result.current.showBrowserNotification(errorNotification);
     });
 
-    expect(mockNotificationConstructor).toHaveBeenCalledWith('Test Notification', 
+    expect(mockNotificationConstructor).toHaveBeenCalledWith(
+      'Test Notification',
       expect.objectContaining({
         requireInteraction: true,
       })
@@ -160,7 +169,10 @@ describe('useBrowserNotifications', () => {
 
   it('does not auto-close error notifications', () => {
     window.Notification.permission = 'granted';
-    const errorNotification = { ...mockTestNotification, type: 'error' as const };
+    const errorNotification = {
+      ...mockTestNotification,
+      type: 'error' as const,
+    };
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -177,9 +189,9 @@ describe('useBrowserNotifications', () => {
 
   it('handles notification click events', () => {
     window.Notification.permission = 'granted';
-    const notificationWithUrl = { 
-      ...mockTestNotification, 
-      actionUrl: '/test-url' 
+    const notificationWithUrl = {
+      ...mockTestNotification,
+      actionUrl: '/test-url',
     };
 
     // Mock window.focus and location.href

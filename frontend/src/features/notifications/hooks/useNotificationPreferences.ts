@@ -30,7 +30,8 @@ export interface UseNotificationPreferencesReturn {
 }
 
 export function useNotificationPreferences(): UseNotificationPreferencesReturn {
-  const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences);
+  const [preferences, setPreferences] =
+    useState<NotificationPreferences>(defaultPreferences);
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -45,14 +46,17 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     }
   }, []);
 
-  const updatePreferences = useCallback((newPreferences: NotificationPreferences) => {
-    setPreferences(newPreferences);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newPreferences));
-    } catch (error) {
-      console.error('Error saving notification preferences:', error);
-    }
-  }, []);
+  const updatePreferences = useCallback(
+    (newPreferences: NotificationPreferences) => {
+      setPreferences(newPreferences);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newPreferences));
+      } catch (error) {
+        console.error('Error saving notification preferences:', error);
+      }
+    },
+    []
+  );
 
   const resetPreferences = useCallback(() => {
     setPreferences(defaultPreferences);
@@ -70,10 +74,14 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
 
     const now = new Date();
     const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    const [startHour, startMinute] = preferences.quietHours.start.split(':').map(Number);
-    const [endHour, endMinute] = preferences.quietHours.end.split(':').map(Number);
-    
+
+    const [startHour, startMinute] = preferences.quietHours.start
+      .split(':')
+      .map(Number);
+    const [endHour, endMinute] = preferences.quietHours.end
+      .split(':')
+      .map(Number);
+
     const startTime = startHour * 60 + startMinute;
     const endTime = endHour * 60 + endMinute;
 
@@ -81,20 +89,25 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     if (startTime > endTime) {
       return currentTime >= startTime || currentTime <= endTime;
     }
-    
+
     // Handle same-day quiet hours (e.g., 12:00 to 14:00)
     return currentTime >= startTime && currentTime <= endTime;
   }, [preferences.quietHours]);
 
-  const shouldShowNotification = useCallback((type: string): boolean => {
-    // Check if notification type is enabled
-    if (type in preferences.notificationTypes) {
-      return preferences.notificationTypes[type as keyof typeof preferences.notificationTypes];
-    }
-    
-    // Default to showing if type is not in preferences
-    return true;
-  }, [preferences.notificationTypes]);
+  const shouldShowNotification = useCallback(
+    (type: string): boolean => {
+      // Check if notification type is enabled
+      if (type in preferences.notificationTypes) {
+        return preferences.notificationTypes[
+          type as keyof typeof preferences.notificationTypes
+        ];
+      }
+
+      // Default to showing if type is not in preferences
+      return true;
+    },
+    [preferences.notificationTypes]
+  );
 
   return {
     preferences,

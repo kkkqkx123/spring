@@ -58,7 +58,8 @@ export function NotificationSettings({
   onSave,
   loading = false,
 }: NotificationSettingsProps) {
-  const [settings, setSettings] = useState<NotificationPreferences>(preferences);
+  const [settings, setSettings] =
+    useState<NotificationPreferences>(preferences);
   const [hasChanges, setHasChanges] = useState(false);
 
   const updateSetting = <K extends keyof NotificationPreferences>(
@@ -80,7 +81,10 @@ export function NotificationSettings({
     setHasChanges(true);
   };
 
-  const updateQuietHours = (key: keyof NotificationPreferences['quietHours'], value: any) => {
+  const updateQuietHours = (
+    key: keyof NotificationPreferences['quietHours'],
+    value: any
+  ) => {
     setSettings(prev => ({
       ...prev,
       quietHours: {
@@ -117,7 +121,7 @@ export function NotificationSettings({
         <Title order={4} mb="md">
           General Settings
         </Title>
-        
+
         <Stack gap="md">
           <Group justify="space-between">
             <div>
@@ -130,7 +134,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.emailNotifications}
-              onChange={event => updateSetting('emailNotifications', event.currentTarget.checked)}
+              onChange={event =>
+                updateSetting('emailNotifications', event.currentTarget.checked)
+              }
             />
           </Group>
 
@@ -145,7 +151,12 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.browserNotifications}
-              onChange={event => updateSetting('browserNotifications', event.currentTarget.checked)}
+              onChange={event =>
+                updateSetting(
+                  'browserNotifications',
+                  event.currentTarget.checked
+                )
+              }
             />
           </Group>
 
@@ -160,7 +171,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.soundEnabled}
-              onChange={event => updateSetting('soundEnabled', event.currentTarget.checked)}
+              onChange={event =>
+                updateSetting('soundEnabled', event.currentTarget.checked)
+              }
             />
           </Group>
 
@@ -175,7 +188,12 @@ export function NotificationSettings({
             </div>
             <Select
               value={settings.frequency}
-              onChange={value => updateSetting('frequency', value as NotificationPreferences['frequency'])}
+              onChange={value =>
+                updateSetting(
+                  'frequency',
+                  value as NotificationPreferences['frequency']
+                )
+              }
               data={[
                 { value: 'immediate', label: 'Immediate' },
                 { value: 'hourly', label: 'Hourly digest' },
@@ -192,7 +210,7 @@ export function NotificationSettings({
         <Title order={4} mb="md">
           Notification Types
         </Title>
-        
+
         <Stack gap="md">
           <Group justify="space-between">
             <div>
@@ -205,7 +223,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.notificationTypes.info}
-              onChange={event => updateNotificationType('info', event.currentTarget.checked)}
+              onChange={event =>
+                updateNotificationType('info', event.currentTarget.checked)
+              }
             />
           </Group>
 
@@ -220,7 +240,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.notificationTypes.success}
-              onChange={event => updateNotificationType('success', event.currentTarget.checked)}
+              onChange={event =>
+                updateNotificationType('success', event.currentTarget.checked)
+              }
             />
           </Group>
 
@@ -235,7 +257,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.notificationTypes.warning}
-              onChange={event => updateNotificationType('warning', event.currentTarget.checked)}
+              onChange={event =>
+                updateNotificationType('warning', event.currentTarget.checked)
+              }
             />
           </Group>
 
@@ -250,7 +274,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.notificationTypes.error}
-              onChange={event => updateNotificationType('error', event.currentTarget.checked)}
+              onChange={event =>
+                updateNotificationType('error', event.currentTarget.checked)
+              }
             />
           </Group>
         </Stack>
@@ -261,7 +287,7 @@ export function NotificationSettings({
         <Title order={4} mb="md">
           Quiet Hours
         </Title>
-        
+
         <Stack gap="md">
           <Group justify="space-between">
             <div>
@@ -274,7 +300,9 @@ export function NotificationSettings({
             </div>
             <Switch
               checked={settings.quietHours.enabled}
-              onChange={event => updateQuietHours('enabled', event.currentTarget.checked)}
+              onChange={event =>
+                updateQuietHours('enabled', event.currentTarget.checked)
+              }
             />
           </Group>
 
@@ -303,8 +331,13 @@ export function NotificationSettings({
                 />
               </Group>
 
-              <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
-                Quiet hours will suppress browser and sound notifications, but email notifications will still be sent.
+              <Alert
+                icon={<IconInfoCircle size={16} />}
+                color="blue"
+                variant="light"
+              >
+                Quiet hours will suppress browser and sound notifications, but
+                email notifications will still be sent.
               </Alert>
             </>
           )}
@@ -320,11 +353,7 @@ export function NotificationSettings({
         >
           Reset
         </Button>
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges}
-          loading={loading}
-        >
+        <Button onClick={handleSave} disabled={!hasChanges} loading={loading}>
           Save Settings
         </Button>
       </Group>

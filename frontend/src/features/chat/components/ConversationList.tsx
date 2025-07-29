@@ -35,9 +35,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const { onlineUsers } = useRealTimeChat();
 
   // Filter conversations based on search query
-  const filteredConversations = conversations?.filter(conversation =>
-    conversation.userName.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredConversations =
+    conversations?.filter(conversation =>
+      conversation.userName.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
   const handleConversationClick = (conversation: Conversation) => {
     onSelectConversation(conversation.userId, conversation.userName);
@@ -68,11 +69,14 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   return (
     <Box h={height}>
       {/* Search bar */}
-      <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+      <Box
+        p="md"
+        style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}
+      >
         <TextInput
           placeholder="Search conversations..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
+          onChange={e => setSearchQuery(e.currentTarget.value)}
           leftSection={<IconSearch size={16} />}
           rightSection={
             searchQuery && (
@@ -99,7 +103,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           </Center>
         ) : (
           <Stack gap={0}>
-            {filteredConversations.map((conversation) => (
+            {filteredConversations.map(conversation => (
               <ConversationItem
                 key={conversation.userId}
                 conversation={conversation}
@@ -133,18 +137,16 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   return (
     <Paper
       p="md"
-      style={(theme) => ({
+      style={theme => ({
         cursor: 'pointer',
-        backgroundColor: isSelected 
-          ? theme.colors.blue[0] 
-          : 'transparent',
+        backgroundColor: isSelected ? theme.colors.blue[0] : 'transparent',
         borderRadius: 0,
-        borderLeft: isSelected 
-          ? `3px solid ${theme.colors.blue[6]}` 
+        borderLeft: isSelected
+          ? `3px solid ${theme.colors.blue[6]}`
           : '3px solid transparent',
         '&:hover': {
-          backgroundColor: isSelected 
-            ? theme.colors.blue[0] 
+          backgroundColor: isSelected
+            ? theme.colors.blue[0]
             : theme.colors.gray[0],
         },
       })}

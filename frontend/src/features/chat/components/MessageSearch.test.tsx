@@ -10,7 +10,7 @@ import type { ChatMessage, PaginatedResponse } from '../../../types';
 vi.mock('../hooks/useChat');
 vi.mock('../../../utils', () => ({
   formatDate: vi.fn(() => 'Jan 1, 2024 10:30 AM'),
-  debounce: vi.fn((fn) => fn),
+  debounce: vi.fn(fn => fn),
 }));
 
 const mockUseSearchMessages = useSearchMessages as any;
@@ -58,9 +58,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {component}
-      </MantineProvider>
+      <MantineProvider>{component}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -81,15 +79,21 @@ describe('MessageSearch', () => {
   });
 
   it('renders search input correctly', () => {
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
-    expect(screen.getByPlaceholderText('Search messages...')).toBeInTheDocument();
-    expect(screen.getByText('Enter a search term to find messages')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Search messages...')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Enter a search term to find messages')
+    ).toBeInTheDocument();
   });
 
   it('shows search results when query is provided', async () => {
     // Set up the mock to return results for any query
-    mockUseSearchMessages.mockImplementation((query) => {
+    mockUseSearchMessages.mockImplementation(query => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -104,7 +108,9 @@ describe('MessageSearch', () => {
       };
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     await userEvent.type(searchInput, 'test');
@@ -124,7 +130,9 @@ describe('MessageSearch', () => {
       error: null,
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     fireEvent.change(searchInput, { target: { value: 'test' } });
@@ -139,7 +147,9 @@ describe('MessageSearch', () => {
       error: new Error('Search failed'),
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     fireEvent.change(searchInput, { target: { value: 'test' } });
@@ -154,16 +164,20 @@ describe('MessageSearch', () => {
       error: null,
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
 
-    expect(screen.getByText('No messages found for "nonexistent"')).toBeInTheDocument();
+    expect(
+      screen.getByText('No messages found for "nonexistent"')
+    ).toBeInTheDocument();
   });
 
   it('handles message selection', async () => {
-    mockUseSearchMessages.mockImplementation((query) => {
+    mockUseSearchMessages.mockImplementation(query => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -178,7 +192,9 @@ describe('MessageSearch', () => {
       };
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     await userEvent.type(searchInput, 'test');
@@ -198,7 +214,9 @@ describe('MessageSearch', () => {
   });
 
   it('clears search when clear button is clicked', async () => {
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     await userEvent.type(searchInput, 'test');
@@ -207,11 +225,13 @@ describe('MessageSearch', () => {
     await userEvent.click(clearButton);
 
     expect(searchInput).toHaveValue('');
-    expect(screen.getByText('Enter a search term to find messages')).toBeInTheDocument();
+    expect(
+      screen.getByText('Enter a search term to find messages')
+    ).toBeInTheDocument();
   });
 
   it('highlights search terms in results', async () => {
-    mockUseSearchMessages.mockImplementation((query) => {
+    mockUseSearchMessages.mockImplementation(query => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -226,7 +246,9 @@ describe('MessageSearch', () => {
       };
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     await userEvent.type(searchInput, 'test');
@@ -238,7 +260,7 @@ describe('MessageSearch', () => {
   });
 
   it('shows sender and recipient information', async () => {
-    mockUseSearchMessages.mockImplementation((query) => {
+    mockUseSearchMessages.mockImplementation(query => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -253,7 +275,9 @@ describe('MessageSearch', () => {
       };
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     await userEvent.type(searchInput, 'test');
@@ -267,7 +291,7 @@ describe('MessageSearch', () => {
   });
 
   it('shows read status badges', async () => {
-    mockUseSearchMessages.mockImplementation((query) => {
+    mockUseSearchMessages.mockImplementation(query => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -282,7 +306,9 @@ describe('MessageSearch', () => {
       };
     });
 
-    renderWithProviders(<MessageSearch onMessageSelect={mockOnMessageSelect} />);
+    renderWithProviders(
+      <MessageSearch onMessageSelect={mockOnMessageSelect} />
+    );
 
     const searchInput = screen.getByPlaceholderText('Search messages...');
     await userEvent.type(searchInput, 'test');

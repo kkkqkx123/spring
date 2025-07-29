@@ -33,7 +33,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           size="sm"
           radius="xl"
           color="blue"
-          style={{ 
+          style={{
             visibility: isConsecutive ? 'hidden' : 'visible',
             minWidth: 32,
           }}
@@ -59,16 +59,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         {/* Message bubble */}
         <Box
           p="xs"
-          style={(theme) => ({
-            backgroundColor: isOwnMessage 
-              ? theme.colors.blue[6] 
+          style={theme => ({
+            backgroundColor: isOwnMessage
+              ? theme.colors.blue[6]
               : theme.colors.gray[1],
-            color: isOwnMessage 
-              ? theme.white 
-              : theme.colors.dark[7],
+            color: isOwnMessage ? theme.white : theme.colors.dark[7],
             borderRadius: theme.radius.md,
-            borderTopLeftRadius: !isOwnMessage && isConsecutive ? 4 : theme.radius.md,
-            borderTopRightRadius: isOwnMessage && isConsecutive ? 4 : theme.radius.md,
+            borderTopLeftRadius:
+              !isOwnMessage && isConsecutive ? 4 : theme.radius.md,
+            borderTopRightRadius:
+              isOwnMessage && isConsecutive ? 4 : theme.radius.md,
             wordBreak: 'break-word',
             position: 'relative',
           })}
@@ -104,9 +104,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       </Box>
 
       {/* Spacer for sent messages to maintain alignment */}
-      {isOwnMessage && showAvatar && (
-        <Box style={{ minWidth: 32 }} />
-      )}
+      {isOwnMessage && showAvatar && <Box style={{ minWidth: 32 }} />}
     </Group>
   );
 };

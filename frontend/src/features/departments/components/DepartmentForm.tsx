@@ -12,12 +12,21 @@ import {
 import { IconBuilding, IconAlertCircle } from '@tabler/icons-react';
 import { z } from 'zod';
 import { DepartmentSelect } from './DepartmentSelect';
-import { useCreateDepartment, useUpdateDepartment } from '../hooks/useDepartmentTree';
+import {
+  useCreateDepartment,
+  useUpdateDepartment,
+} from '../hooks/useDepartmentTree';
 import { Department } from '../../../types';
 
 const departmentSchema = z.object({
-  name: z.string().min(1, 'Department name is required').max(100, 'Name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+  name: z
+    .string()
+    .min(1, 'Department name is required')
+    .max(100, 'Name must be less than 100 characters'),
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional(),
   parentId: z.string().optional(),
 });
 
@@ -79,11 +88,16 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <LoadingOverlay visible={isLoading} />
-      
+
       <Stack gap="md">
         {error && (
-          <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
-            {error.response?.data?.message || 'An error occurred while saving the department'}
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            color="red"
+            variant="light"
+          >
+            {error.response?.data?.message ||
+              'An error occurred while saving the department'}
           </Alert>
         )}
 

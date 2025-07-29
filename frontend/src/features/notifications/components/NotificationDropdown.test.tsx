@@ -50,11 +50,7 @@ const mockStore = {
 };
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('NotificationDropdown', () => {
@@ -65,10 +61,10 @@ describe('NotificationDropdown', () => {
 
   it('renders notification badge with correct unread count', () => {
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     expect(badge).toBeInTheDocument();
-    
+
     // Check for unread indicator
     expect(screen.getByText('1')).toBeInTheDocument();
   });
@@ -80,14 +76,14 @@ describe('NotificationDropdown', () => {
     });
 
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     expect(badge).toHaveAttribute('data-loading', 'true');
   });
 
   it('opens dropdown when clicked', async () => {
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -99,7 +95,7 @@ describe('NotificationDropdown', () => {
 
   it('displays notifications in dropdown', async () => {
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -111,7 +107,7 @@ describe('NotificationDropdown', () => {
 
   it('shows "Mark all as read" button when there are unread notifications', async () => {
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -122,7 +118,7 @@ describe('NotificationDropdown', () => {
 
   it('calls markAsRead when notification is clicked', async () => {
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -135,7 +131,7 @@ describe('NotificationDropdown', () => {
 
   it('calls markAllAsRead when "Mark all as read" is clicked', async () => {
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -154,7 +150,7 @@ describe('NotificationDropdown', () => {
     });
 
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -166,7 +162,7 @@ describe('NotificationDropdown', () => {
   it('calls onViewAll when "View all notifications" is clicked', async () => {
     const onViewAll = vi.fn();
     renderWithProvider(<NotificationDropdown onViewAll={onViewAll} />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 
@@ -195,7 +191,7 @@ describe('NotificationDropdown', () => {
     });
 
     renderWithProvider(<NotificationDropdown />);
-    
+
     const badge = screen.getByLabelText('Notifications');
     fireEvent.click(badge);
 

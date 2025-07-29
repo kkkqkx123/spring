@@ -25,13 +25,15 @@ const flattenDepartments = (
 ): DepartmentOption[] => {
   const options: DepartmentOption[] = [];
 
-  departments.forEach((dept) => {
+  departments.forEach(dept => {
     if (excludeId && dept.id === excludeId) {
       return; // Skip excluded department
     }
 
     const indent = '  '.repeat(level);
-    const employeeCountText = showEmployeeCount ? ` (${dept.employeeCount})` : '';
+    const employeeCountText = showEmployeeCount
+      ? ` (${dept.employeeCount})`
+      : '';
     const label = `${indent}${dept.name}${employeeCountText}`;
 
     options.push({
@@ -42,7 +44,12 @@ const flattenDepartments = (
 
     if (dept.children && dept.children.length > 0) {
       options.push(
-        ...flattenDepartments(dept.children, level + 1, excludeId, showEmployeeCount)
+        ...flattenDepartments(
+          dept.children,
+          level + 1,
+          excludeId,
+          showEmployeeCount
+        )
       );
     }
   });
@@ -71,10 +78,7 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
     );
 
     if (includeRoot) {
-      return [
-        { value: '', label: rootLabel },
-        ...departmentOptions,
-      ];
+      return [{ value: '', label: rootLabel }, ...departmentOptions];
     }
 
     return departmentOptions;
@@ -119,7 +123,9 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
 };
 
 // Simplified version for basic use cases
-export const SimpleDepartmentSelect: React.FC<Omit<SelectProps, 'data'>> = (props) => {
+export const SimpleDepartmentSelect: React.FC<
+  Omit<SelectProps, 'data'>
+> = props => {
   const { data: departments, isLoading, error } = useDepartmentTree();
 
   const options = useMemo(() => {

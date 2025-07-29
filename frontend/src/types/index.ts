@@ -188,7 +188,12 @@ export interface EmailHistory {
   errorMessage?: string;
 }
 
-export type EmailStatus = 'PENDING' | 'SENDING' | 'SENT' | 'FAILED' | 'CANCELLED';
+export type EmailStatus =
+  | 'PENDING'
+  | 'SENDING'
+  | 'SENT'
+  | 'FAILED'
+  | 'CANCELLED';
 
 // Form types
 export interface FormFieldProps {

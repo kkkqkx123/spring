@@ -1,7 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
-import { NotificationSettings, NotificationPreferences } from './NotificationSettings';
+import {
+  NotificationSettings,
+  NotificationPreferences,
+} from './NotificationSettings';
 import { vi } from 'vitest';
 
 const mockPreferences: NotificationPreferences = {
@@ -23,11 +26,7 @@ const mockPreferences: NotificationPreferences = {
 };
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('NotificationSettings', () => {
@@ -59,7 +58,9 @@ describe('NotificationSettings', () => {
 
     expect(screen.getByLabelText('Start Time')).toBeInTheDocument();
     expect(screen.getByLabelText('End Time')).toBeInTheDocument();
-    expect(screen.getByText(/quiet hours will suppress browser/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/quiet hours will suppress browser/i)
+    ).toBeInTheDocument();
   });
 
   it('hides quiet hours controls when disabled', () => {
@@ -68,7 +69,9 @@ describe('NotificationSettings', () => {
       quietHours: { ...mockPreferences.quietHours, enabled: false },
     };
 
-    renderWithProvider(<NotificationSettings preferences={preferencesWithoutQuietHours} />);
+    renderWithProvider(
+      <NotificationSettings preferences={preferencesWithoutQuietHours} />
+    );
 
     expect(screen.queryByLabelText('Start Time')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('End Time')).not.toBeInTheDocument();
@@ -123,7 +126,9 @@ describe('NotificationSettings', () => {
     fireEvent.click(resetButton);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /save settings/i })).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: /save settings/i })
+      ).toBeDisabled();
     });
   });
 
@@ -136,7 +141,7 @@ describe('NotificationSettings', () => {
     // Change frequency
     const frequencySelect = screen.getByDisplayValue('Immediate');
     fireEvent.click(frequencySelect);
-    
+
     const hourlyOption = screen.getByText('Hourly digest');
     fireEvent.click(hourlyOption);
 
@@ -161,7 +166,7 @@ describe('NotificationSettings', () => {
     // Change start time
     const startTimeSelect = screen.getByDisplayValue('22:00');
     fireEvent.click(startTimeSelect);
-    
+
     const newStartTime = screen.getByText('23:00');
     fireEvent.click(newStartTime);
 
@@ -194,7 +199,9 @@ describe('NotificationSettings', () => {
       <NotificationSettings preferences={mockPreferences} loading />
     );
 
-    expect(screen.getByRole('button', { name: /save settings/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /save settings/i })
+    ).toBeDisabled();
     expect(screen.getByRole('button', { name: /reset/i })).toBeDisabled();
   });
 });

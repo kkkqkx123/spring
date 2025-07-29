@@ -28,11 +28,7 @@ const mockStore = {
 };
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('NotificationBadge', () => {
@@ -43,10 +39,10 @@ describe('NotificationBadge', () => {
 
   it('renders with correct unread count', () => {
     renderWithProvider(<NotificationBadge />);
-    
+
     const badge = screen.getByTestId('notification-badge');
     expect(badge).toBeInTheDocument();
-    
+
     const indicator = screen.getByTestId('notification-indicator');
     expect(indicator).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
@@ -59,7 +55,7 @@ describe('NotificationBadge', () => {
     });
 
     renderWithProvider(<NotificationBadge />);
-    
+
     expect(screen.getByText('99+')).toBeInTheDocument();
   });
 
@@ -70,58 +66,60 @@ describe('NotificationBadge', () => {
     });
 
     renderWithProvider(<NotificationBadge />);
-    
+
     // When disabled, the indicator should not show the count
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
 
   it('calls onClick when clicked', () => {
     const onClick = vi.fn();
-    
+
     renderWithProvider(<NotificationBadge onClick={onClick} />);
-    
+
     const badge = screen.getByTestId('notification-badge');
     fireEvent.click(badge);
-    
+
     expect(onClick).toHaveBeenCalled();
   });
 
   it('shows loading state', () => {
     renderWithProvider(<NotificationBadge loading />);
-    
+
     const badge = screen.getByTestId('notification-badge');
     expect(badge).toHaveAttribute('data-loading', 'true');
   });
 
   it('applies correct size variants', () => {
     const sizes = ['sm', 'md', 'lg'] as const;
-    
+
     sizes.forEach(size => {
       const { unmount } = renderWithProvider(<NotificationBadge size={size} />);
-      
+
       const badge = screen.getByTestId('notification-badge');
       expect(badge).toHaveAttribute('data-size', size);
-      
+
       unmount();
     });
   });
 
   it('applies correct variant styles', () => {
     const variants = ['subtle', 'filled', 'outline'] as const;
-    
+
     variants.forEach(variant => {
-      const { unmount } = renderWithProvider(<NotificationBadge variant={variant} />);
-      
+      const { unmount } = renderWithProvider(
+        <NotificationBadge variant={variant} />
+      );
+
       const badge = screen.getByTestId('notification-badge');
       expect(badge).toHaveAttribute('data-variant', variant);
-      
+
       unmount();
     });
   });
 
   it('has correct aria-label', () => {
     renderWithProvider(<NotificationBadge />);
-    
+
     const badge = screen.getByTestId('notification-badge');
     expect(badge).toHaveAttribute('aria-label', 'Notifications (5 unread)');
   });
@@ -133,7 +131,7 @@ describe('NotificationBadge', () => {
     });
 
     renderWithProvider(<NotificationBadge />);
-    
+
     const badge = screen.getByTestId('notification-badge');
     expect(badge).toHaveAttribute('aria-label', 'Notifications');
   });

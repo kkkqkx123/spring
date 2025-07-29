@@ -12,11 +12,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-  IconPlus,
-  IconRefresh,
-  IconBuilding,
-} from '@tabler/icons-react';
+import { IconPlus, IconRefresh, IconBuilding } from '@tabler/icons-react';
 import { DepartmentTree } from '../components/DepartmentTree';
 import { DepartmentDetail } from '../components/DepartmentDetail';
 import { DepartmentForm } from '../components/DepartmentForm';
@@ -24,12 +20,19 @@ import { DepartmentMoveDialog } from '../components/DepartmentMoveDialog';
 import { Department } from '../../../types';
 
 export const DepartmentsPage: React.FC = () => {
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(null);
   const [parentIdForNew, setParentIdForNew] = useState<number | undefined>();
-  const [departmentToMove, setDepartmentToMove] = useState<Department | null>(null);
-  
-  const [createModalOpened, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false);
-  const [moveDialogOpened, { open: openMoveDialog, close: closeMoveDialog }] = useDisclosure(false);
+  const [departmentToMove, setDepartmentToMove] = useState<Department | null>(
+    null
+  );
+
+  const [
+    createModalOpened,
+    { open: openCreateModal, close: closeCreateModal },
+  ] = useDisclosure(false);
+  const [moveDialogOpened, { open: openMoveDialog, close: closeMoveDialog }] =
+    useDisclosure(false);
 
   const handleSelectDepartment = (department: Department) => {
     setSelectedDepartment(department);
@@ -115,7 +118,12 @@ export const DepartmentsPage: React.FC = () => {
         <Grid>
           {/* Department Tree */}
           <Grid.Col span={{ base: 12, md: selectedDepartment ? 6 : 12 }}>
-            <Paper withBorder p="md" h="calc(100vh - 200px)" style={{ overflow: 'auto' }}>
+            <Paper
+              withBorder
+              p="md"
+              h="calc(100vh - 200px)"
+              style={{ overflow: 'auto' }}
+            >
               <DepartmentTree
                 onSelectDepartment={handleSelectDepartment}
                 onEditDepartment={handleEditDepartment}
@@ -130,10 +138,17 @@ export const DepartmentsPage: React.FC = () => {
           {/* Department Detail */}
           {selectedDepartment && (
             <Grid.Col span={{ base: 12, md: 6 }}>
-              <Paper withBorder p="md" h="calc(100vh - 200px)" style={{ overflow: 'auto' }}>
+              <Paper
+                withBorder
+                p="md"
+                h="calc(100vh - 200px)"
+                style={{ overflow: 'auto' }}
+              >
                 <DepartmentDetail
                   departmentId={selectedDepartment.id}
-                  onCreateChild={() => handleCreateDepartment(selectedDepartment.id)}
+                  onCreateChild={() =>
+                    handleCreateDepartment(selectedDepartment.id)
+                  }
                   onDelete={handleDeleteDepartment}
                   onClose={() => setSelectedDepartment(null)}
                 />

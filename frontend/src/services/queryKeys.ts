@@ -33,9 +33,10 @@ export const queryKeys = {
   // Chat
   chat: {
     conversations: ['chat', 'conversations'] as const,
-    conversation: (userId: number, params?: any) => 
-      params ? ['chat', 'conversation', userId, params] as const 
-             : ['chat', 'conversation', userId] as const,
+    conversation: (userId: number, params?: any) =>
+      params
+        ? (['chat', 'conversation', userId, params] as const)
+        : (['chat', 'conversation', userId] as const),
     messages: (userId: number, params: any) =>
       ['chat', 'messages', userId, params] as const,
     unreadCount: ['chat', 'unreadCount'] as const,
@@ -50,7 +51,7 @@ export const queryKeys = {
     template: (id: number) => ['email', 'template', id] as const,
     history: (params: any) => ['email', 'history', params] as const,
     recipients: ['email', 'recipients'] as const,
-    departmentRecipients: (departmentId: number) => 
+    departmentRecipients: (departmentId: number) =>
       ['email', 'recipients', 'department', departmentId] as const,
     preview: (templateId: number, variables: Record<string, string>) =>
       ['email', 'preview', templateId, variables] as const,

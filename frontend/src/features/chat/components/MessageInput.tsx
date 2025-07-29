@@ -31,27 +31,174 @@ interface MessageInputProps {
 
 // Common emoji list for the picker
 const COMMON_EMOJIS = [
-  '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
-  '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰',
-  '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜',
-  '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏',
-  '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
-  '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠',
-  '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨',
-  '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥',
-  '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧',
-  '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
-  '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑',
-  '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻',
-  '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸',
-  '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '👋',
-  '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️',
-  '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕',
-  '👇', '☝️', '👍', '👎', '👊', '✊', '🤛', '🤜',
-  '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💅',
-  '🤳', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻',
-  '👃', '🧠', '🫀', '🫁', '🦷', '🦴', '👀', '👁️',
-  '👅', '👄', '💋', '🩸', '👶', '🧒', '👦', '👧',
+  '😀',
+  '😃',
+  '😄',
+  '😁',
+  '😆',
+  '😅',
+  '😂',
+  '🤣',
+  '😊',
+  '😇',
+  '🙂',
+  '🙃',
+  '😉',
+  '😌',
+  '😍',
+  '🥰',
+  '😘',
+  '😗',
+  '😙',
+  '😚',
+  '😋',
+  '😛',
+  '😝',
+  '😜',
+  '🤪',
+  '🤨',
+  '🧐',
+  '🤓',
+  '😎',
+  '🤩',
+  '🥳',
+  '😏',
+  '😒',
+  '😞',
+  '😔',
+  '😟',
+  '😕',
+  '🙁',
+  '☹️',
+  '😣',
+  '😖',
+  '😫',
+  '😩',
+  '🥺',
+  '😢',
+  '😭',
+  '😤',
+  '😠',
+  '😡',
+  '🤬',
+  '🤯',
+  '😳',
+  '🥵',
+  '🥶',
+  '😱',
+  '😨',
+  '😰',
+  '😥',
+  '😓',
+  '🤗',
+  '🤔',
+  '🤭',
+  '🤫',
+  '🤥',
+  '😶',
+  '😐',
+  '😑',
+  '😬',
+  '🙄',
+  '😯',
+  '😦',
+  '😧',
+  '😮',
+  '😲',
+  '🥱',
+  '😴',
+  '🤤',
+  '😪',
+  '😵',
+  '🤐',
+  '🥴',
+  '🤢',
+  '🤮',
+  '🤧',
+  '😷',
+  '🤒',
+  '🤕',
+  '🤑',
+  '🤠',
+  '😈',
+  '👿',
+  '👹',
+  '👺',
+  '🤡',
+  '💩',
+  '👻',
+  '💀',
+  '☠️',
+  '👽',
+  '👾',
+  '🤖',
+  '🎃',
+  '😺',
+  '😸',
+  '😹',
+  '😻',
+  '😼',
+  '😽',
+  '🙀',
+  '😿',
+  '😾',
+  '👋',
+  '🤚',
+  '🖐️',
+  '✋',
+  '🖖',
+  '👌',
+  '🤌',
+  '🤏',
+  '✌️',
+  '🤞',
+  '🤟',
+  '🤘',
+  '🤙',
+  '👈',
+  '👉',
+  '👆',
+  '🖕',
+  '👇',
+  '☝️',
+  '👍',
+  '👎',
+  '👊',
+  '✊',
+  '🤛',
+  '🤜',
+  '👏',
+  '🙌',
+  '👐',
+  '🤲',
+  '🤝',
+  '🙏',
+  '✍️',
+  '💅',
+  '🤳',
+  '💪',
+  '🦾',
+  '🦿',
+  '🦵',
+  '🦶',
+  '👂',
+  '🦻',
+  '👃',
+  '🧠',
+  '🫀',
+  '🫁',
+  '🦷',
+  '🦴',
+  '👀',
+  '👁️',
+  '👅',
+  '👄',
+  '💋',
+  '🩸',
+  '👶',
+  '🧒',
+  '👦',
+  '👧',
 ];
 
 export const MessageInput: React.FC<MessageInputProps> = ({
@@ -64,7 +211,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [emojiPopoverOpen, setEmojiPopoverOpen] = useState(false);
-  
+
   const textInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,7 +245,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleSendMessage = () => {
     const trimmedMessage = message.trim();
-    
+
     if (!trimmedMessage && !attachedFile) {
       return;
     }
@@ -121,13 +268,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             setAttachedFile(null);
             setFileError(null);
             stopTyping();
-            
+
             // Focus back to input
             if (textInputRef.current) {
               textInputRef.current.focus();
             }
           },
-          onError: (error) => {
+          onError: error => {
             console.error('Failed to send message:', error);
             // Error handling is managed by the global error handler
           },
@@ -142,10 +289,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       const start = input.selectionStart || 0;
       const end = input.selectionEnd || 0;
       const newMessage = message.slice(0, start) + emoji + message.slice(end);
-      
+
       setMessage(newMessage);
       setEmojiPopoverOpen(false);
-      
+
       // Focus back to input and set cursor position
       setTimeout(() => {
         input.focus();
@@ -156,7 +303,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleFileSelect = (file: File | null) => {
     setFileError(null);
-    
+
     if (!file) {
       setAttachedFile(null);
       return;
@@ -164,13 +311,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
     // Validate file type
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      setFileError('File type not supported. Please select an image or document.');
+      setFileError(
+        'File type not supported. Please select an image or document.'
+      );
       return;
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      setFileError(`File size too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+      setFileError(
+        `File size too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`
+      );
       return;
     }
 
@@ -194,7 +345,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         <Box
           p="xs"
           mb="xs"
-          style={(theme) => ({
+          style={theme => ({
             backgroundColor: theme.colors.blue[0],
             borderRadius: theme.radius.sm,
             border: `1px solid ${theme.colors.blue[2]}`,

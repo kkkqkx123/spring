@@ -21,10 +21,11 @@ export {
   useOnlineUsers,
 } from './hooks/useChat';
 
-export {
-  useRealTimeChat,
-  useTypingIndicator,
-} from './hooks/useRealTimeChat';
+export { useRealTimeChat, useTypingIndicator } from './hooks/useRealTimeChat';
 
 // Services
-export { chatApi, type ChatMessageRequest, type ChatMessageResponse } from './services/chatApi';
+export {
+  chatApi,
+  type ChatMessageRequest,
+  type ChatMessageResponse,
+} from './services/chatApi';

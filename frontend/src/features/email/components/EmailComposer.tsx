@@ -64,7 +64,8 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
 
   // API hooks
   const { data: templates, isLoading: templatesLoading } = useEmailTemplates();
-  const { data: recipients, isLoading: recipientsLoading } = useEmailRecipients();
+  const { data: recipients, isLoading: recipientsLoading } =
+    useEmailRecipients();
   const { data: departments } = useDepartments();
   const sendEmailMutation = useSendEmail();
   const validateVariablesMutation = useValidateVariables();
@@ -79,17 +80,19 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
       variables: initialData?.variables || {},
     },
     validate: {
-      recipients: (value) => 
+      recipients: value =>
         value.length === 0 ? 'At least one recipient is required' : null,
-      subject: (value) => 
+      subject: value =>
         value.trim().length === 0 ? 'Subject is required' : null,
-      content: (value) => 
+      content: value =>
         value.trim().length === 0 ? 'Content is required' : null,
     },
   });
 
   // Get selected template data
-  const selectedTemplateId = form.values.templateId ? parseInt(form.values.templateId) : 0;
+  const selectedTemplateId = form.values.templateId
+    ? parseInt(form.values.templateId)
+    : 0;
   const { data: selectedTemplate } = useEmailTemplate(selectedTemplateId);
 
   // Template preview
@@ -106,10 +109,13 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
         ...form.values,
         subject: selectedTemplate.subject,
         content: selectedTemplate.content,
-        variables: selectedTemplate.variables.reduce((acc, variable) => {
-          acc[variable] = form.values.variables[variable] || '';
-          return acc;
-        }, {} as Record<string, string>),
+        variables: selectedTemplate.variables.reduce(
+          (acc, variable) => {
+            acc[variable] = form.values.variables[variable] || '';
+            return acc;
+          },
+          {} as Record<string, string>
+        ),
       });
     }
   }, [selectedTemplate]);
@@ -128,7 +134,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
   }));
 
   // Get selected recipients data
-  const selectedRecipients = (recipients || []).filter(r => 
+  const selectedRecipients = (recipients || []).filter(r =>
     form.values.recipients.includes(r.id.toString())
   );
 
@@ -220,17 +226,20 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
     }
   };
 
-  const isLoading = templatesLoading || recipientsLoading || sendEmailMutation.isPending;
+  const isLoading =
+    templatesLoading || recipientsLoading || sendEmailMutation.isPending;
 
   return (
     <Paper p="md" withBorder>
       <LoadingOverlay visible={isLoading} />
-      
+
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           {/* Header */}
           <Group justify="space-between">
-            <Text size="lg" fw={600}>Compose Email</Text>
+            <Text size="lg" fw={600}>
+              Compose Email
+            </Text>
             <Group gap="xs">
               <Tooltip label="Preview email">
                 <ActionIcon
@@ -261,21 +270,26 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
             <Card withBorder>
               <Stack gap="sm">
                 <Group gap="xs">
-                  <Text size="sm" fw={500}>Template Variables</Text>
+                  <Text size="sm" fw={500}>
+                    Template Variables
+                  </Text>
                   <Badge size="xs" variant="light">
                     {selectedTemplate.variables.length} variables
                   </Badge>
                 </Group>
-                
+
                 <Stack gap="xs">
-                  {selectedTemplate.variables.map((variable) => (
+                  {selectedTemplate.variables.map(variable => (
                     <TextInput
                       key={variable}
                       label={variable}
                       placeholder={`Enter value for ${variable}`}
                       value={form.values.variables[variable] || ''}
-                      onChange={(event) =>
-                        form.setFieldValue(`variables.${variable}`, event.currentTarget.value)
+                      onChange={event =>
+                        form.setFieldValue(
+                          `variables.${variable}`,
+                          event.currentTarget.value
+                        )
                       }
                       required
                     />
@@ -300,7 +314,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
             placeholder="Select recipients"
             data={recipientOptions}
             value={form.values.recipients}
-            onChange={(value) => form.setFieldValue('recipients', value)}
+            onChange={value => form.setFieldValue('recipients', value)}
             searchable
             required
             error={form.errors.recipients}
@@ -311,16 +325,20 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
           {selectedRecipients.length > 0 && (
             <Card withBorder>
               <Stack gap="xs">
-                <Text size="sm" fw={500}>Selected Recipients ({selectedRecipients.length})</Text>
+                <Text size="sm" fw={500}>
+                  Selected Recipients ({selectedRecipients.length})
+                </Text>
                 <Group gap="xs">
-                  {selectedRecipients.map((recipient) => (
+                  {selectedRecipients.map(recipient => (
                     <Badge
                       key={recipient.id}
                       variant="light"
                       leftSection={
-                        recipient.type === 'department' ? 
-                          <IconBuilding size={12} /> : 
+                        recipient.type === 'department' ? (
+                          <IconBuilding size={12} />
+                        ) : (
                           <IconUser size={12} />
+                        )
                       }
                     >
                       {recipient.name}
@@ -336,7 +354,9 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
             label="Subject"
             placeholder="Enter email subject"
             value={form.values.subject}
-            onChange={(event) => form.setFieldValue('subject', event.currentTarget.value)}
+            onChange={event =>
+              form.setFieldValue('subject', event.currentTarget.value)
+            }
             required
             error={form.errors.subject}
           />
@@ -346,7 +366,9 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
             label="Content"
             placeholder="Enter email content"
             value={form.values.content}
-            onChange={(event) => form.setFieldValue('content', event.currentTarget.value)}
+            onChange={event =>
+              form.setFieldValue('content', event.currentTarget.value)
+            }
             required
             error={form.errors.content}
             minRows={6}
@@ -357,19 +379,29 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
           {showPreview && (
             <Card withBorder>
               <Stack gap="sm">
-                <Text size="sm" fw={500}>Email Preview</Text>
+                <Text size="sm" fw={500}>
+                  Email Preview
+                </Text>
                 <Divider />
-                
+
                 {previewLoading ? (
-                  <Text size="sm" c="dimmed">Loading preview...</Text>
+                  <Text size="sm" c="dimmed">
+                    Loading preview...
+                  </Text>
                 ) : preview ? (
                   <Stack gap="xs">
                     <div>
-                      <Text size="xs" c="dimmed">Subject:</Text>
-                      <Text size="sm" fw={500}>{preview.subject}</Text>
+                      <Text size="xs" c="dimmed">
+                        Subject:
+                      </Text>
+                      <Text size="sm" fw={500}>
+                        {preview.subject}
+                      </Text>
                     </div>
                     <div>
-                      <Text size="xs" c="dimmed">Content:</Text>
+                      <Text size="xs" c="dimmed">
+                        Content:
+                      </Text>
                       <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
                         {preview.content}
                       </Text>
@@ -378,11 +410,17 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
                 ) : (
                   <Stack gap="xs">
                     <div>
-                      <Text size="xs" c="dimmed">Subject:</Text>
-                      <Text size="sm" fw={500}>{form.values.subject}</Text>
+                      <Text size="xs" c="dimmed">
+                        Subject:
+                      </Text>
+                      <Text size="sm" fw={500}>
+                        {form.values.subject}
+                      </Text>
                     </div>
                     <div>
-                      <Text size="xs" c="dimmed">Content:</Text>
+                      <Text size="xs" c="dimmed">
+                        Content:
+                      </Text>
                       <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
                         {form.values.content}
                       </Text>

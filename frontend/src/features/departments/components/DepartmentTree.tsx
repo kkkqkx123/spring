@@ -27,7 +27,11 @@ import {
 } from '@tabler/icons-react';
 import { useDragAndDrop } from '@mantine/dnd';
 import { notifications } from '@mantine/notifications';
-import { useDepartmentTree, useDeleteDepartment, useMoveDepartment } from '../hooks/useDepartmentTree';
+import {
+  useDepartmentTree,
+  useDeleteDepartment,
+  useMoveDepartment,
+} from '../hooks/useDepartmentTree';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Department } from '../../../types';
 
@@ -121,7 +125,7 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
           <ActionIcon
             variant="subtle"
             size={compact ? 'sm' : 'md'}
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleToggleExpand();
             }}
@@ -129,10 +133,17 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
               visibility: hasChildren ? 'visible' : 'hidden',
             }}
           >
-            {isExpanded ? <IconChevronDown size={16} /> : <IconChevronRight size={16} />}
+            {isExpanded ? (
+              <IconChevronDown size={16} />
+            ) : (
+              <IconChevronRight size={16} />
+            )}
           </ActionIcon>
 
-          <IconBuilding size={compact ? 16 : 20} color="var(--mantine-color-blue-6)" />
+          <IconBuilding
+            size={compact ? 16 : 20}
+            color="var(--mantine-color-blue-6)"
+          />
 
           <Box>
             <Text size={compact ? 'sm' : 'md'} fw={500}>
@@ -161,16 +172,22 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
             <ActionIcon
               variant="subtle"
               size={compact ? 'sm' : 'md'}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <IconDots size={16} />
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item leftSection={<IconEdit size={16} />} onClick={handleEdit}>
+            <Menu.Item
+              leftSection={<IconEdit size={16} />}
+              onClick={handleEdit}
+            >
               Edit Department
             </Menu.Item>
-            <Menu.Item leftSection={<IconPlus size={16} />} onClick={handleCreateChild}>
+            <Menu.Item
+              leftSection={<IconPlus size={16} />}
+              onClick={handleCreateChild}
+            >
               Add Subdepartment
             </Menu.Item>
             <Menu.Divider />
@@ -193,13 +210,13 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
       {allowDragDrop ? (
         <div
           draggable
-          onDragStart={(e) => {
+          onDragStart={e => {
             e.dataTransfer.setData('text/plain', department.id.toString());
           }}
-          onDragOver={(e) => {
+          onDragOver={e => {
             e.preventDefault();
           }}
-          onDrop={(e) => {
+          onDrop={e => {
             e.preventDefault();
             const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
             if (draggedId !== department.id) {
@@ -216,7 +233,7 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
       <Collapse in={isExpanded}>
         {hasChildren && (
           <Stack gap={compact ? 'xs' : 'sm'} mt={compact ? 'xs' : 'sm'}>
-            {department.children!.map((child) => (
+            {department.children!.map(child => (
               <DepartmentNode
                 key={child.id}
                 department={child}
@@ -266,7 +283,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
 
   const handleToggleExpand = useCallback((id: number) => {
-    setExpandedNodes((prev) => {
+    setExpandedNodes(prev => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -294,7 +311,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
   const expandAll = useCallback(() => {
     const getAllIds = (depts: Department[]): number[] => {
       const ids: number[] = [];
-      depts.forEach((dept) => {
+      depts.forEach(dept => {
         ids.push(dept.id);
         if (dept.children) {
           ids.push(...getAllIds(dept.children));
@@ -370,7 +387,10 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
             </Tooltip>
             {onCreateDepartment && (
               <Tooltip label="Add Department">
-                <ActionIcon variant="light" onClick={() => onCreateDepartment()}>
+                <ActionIcon
+                  variant="light"
+                  onClick={() => onCreateDepartment()}
+                >
                   <IconPlus size={16} />
                 </ActionIcon>
               </Tooltip>
@@ -380,7 +400,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
       )}
 
       <Stack gap={compact ? 'xs' : 'sm'}>
-        {departments.map((department) => (
+        {departments.map(department => (
           <DepartmentNode
             key={department.id}
             department={department}

@@ -48,18 +48,15 @@ interface OnlineDotProps {
   size?: number;
 }
 
-export const OnlineDot: React.FC<OnlineDotProps> = ({
-  isOnline,
-  size = 8,
-}) => {
+export const OnlineDot: React.FC<OnlineDotProps> = ({ isOnline, size = 8 }) => {
   return (
     <Box
-      style={(theme) => ({
+      style={theme => ({
         width: size,
         height: size,
         borderRadius: '50%',
-        backgroundColor: isOnline 
-          ? theme.colors.green[6] 
+        backgroundColor: isOnline
+          ? theme.colors.green[6]
           : theme.colors.gray[4],
         border: `2px solid ${theme.white}`,
         boxShadow: theme.shadows.sm,

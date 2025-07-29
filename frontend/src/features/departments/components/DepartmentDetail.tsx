@@ -27,7 +27,11 @@ import {
   IconCalendar,
   IconHierarchy,
 } from '@tabler/icons-react';
-import { useDepartment, useDeleteDepartment, useDepartmentEmployees } from '../hooks/useDepartmentTree';
+import {
+  useDepartment,
+  useDeleteDepartment,
+  useDepartmentEmployees,
+} from '../hooks/useDepartmentTree';
 import { DepartmentForm } from './DepartmentForm';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { Department } from '../../../types';
@@ -74,12 +78,14 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
   onCreateChild,
   onClose,
 }) => {
-  const [editModalOpened, { open: openEditModal, close: closeEditModal }] = useDisclosure(false);
+  const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
+    useDisclosure(false);
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('overview');
 
   const { data: department, isLoading, error } = useDepartment(departmentId);
-  const { data: employees, isLoading: employeesLoading } = useDepartmentEmployees(departmentId);
+  const { data: employees, isLoading: employeesLoading } =
+    useDepartmentEmployees(departmentId);
   const deleteDepartment = useDeleteDepartment();
 
   const handleEdit = () => {
@@ -126,7 +132,9 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
     );
   }
 
-  const canDelete = department.employeeCount === 0 && (!department.children || department.children.length === 0);
+  const canDelete =
+    department.employeeCount === 0 &&
+    (!department.children || department.children.length === 0);
 
   return (
     <>
@@ -275,7 +283,7 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
               </Center>
             ) : employees && employees.length > 0 ? (
               <SimpleGrid cols={2} spacing="md">
-                {employees.map((employee) => (
+                {employees.map(employee => (
                   <EmployeeCard key={employee.id} employee={employee} />
                 ))}
               </SimpleGrid>
@@ -294,7 +302,7 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
           {department.children && department.children.length > 0 && (
             <Tabs.Panel value="subdepartments" pt="md">
               <SimpleGrid cols={2} spacing="md">
-                {department.children.map((child) => (
+                {department.children.map(child => (
                   <Card key={child.id} withBorder p="md">
                     <Group justify="space-between" wrap="nowrap">
                       <div>
@@ -323,11 +331,18 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
               Close
             </Button>
           )}
-          <Button variant="light" leftSection={<IconEdit size={16} />} onClick={handleEdit}>
+          <Button
+            variant="light"
+            leftSection={<IconEdit size={16} />}
+            onClick={handleEdit}
+          >
             Edit Department
           </Button>
           {onCreateChild && (
-            <Button leftSection={<IconPlus size={16} />} onClick={onCreateChild}>
+            <Button
+              leftSection={<IconPlus size={16} />}
+              onClick={onCreateChild}
+            >
               Add Subdepartment
             </Button>
           )}

@@ -52,19 +52,22 @@ export function NotificationList({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<NotificationType | 'all'>('all');
-  const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
+  const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>(
+    'all'
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
   // Filter notifications
   const filteredNotifications = notifications.filter(notification => {
-    const matchesSearch = 
+    const matchesSearch =
       notification.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       notification.message.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesType = typeFilter === 'all' || notification.type === typeFilter;
-    
-    const matchesRead = 
+
+    const matchesType =
+      typeFilter === 'all' || notification.type === typeFilter;
+
+    const matchesRead =
       readFilter === 'all' ||
       (readFilter === 'read' && notification.read) ||
       (readFilter === 'unread' && !notification.read);
@@ -144,7 +147,7 @@ export function NotificationList({
               Mark all as read
             </Button>
           )}
-          
+
           <Menu shadow="md" width={200}>
             <Menu.Target>
               <ActionIcon variant="subtle" size="lg">
@@ -175,7 +178,7 @@ export function NotificationList({
             onChange={event => setSearchQuery(event.currentTarget.value)}
             style={{ flex: 1 }}
           />
-          
+
           <Select
             placeholder="Type"
             leftSection={<IconFilter size={16} />}
@@ -184,11 +187,13 @@ export function NotificationList({
             data={typeOptions}
             w={150}
           />
-          
+
           <Select
             placeholder="Status"
             value={readFilter}
-            onChange={value => setReadFilter(value as 'all' | 'read' | 'unread')}
+            onChange={value =>
+              setReadFilter(value as 'all' | 'read' | 'unread')
+            }
             data={readOptions}
             w={120}
           />
@@ -221,7 +226,7 @@ export function NotificationList({
                       onClick={() => handleNotificationClick(notification)}
                     />
                   </div>
-                  
+
                   <Group gap="xs">
                     {!notification.read && (
                       <ActionIcon
@@ -233,7 +238,7 @@ export function NotificationList({
                         <IconCheck size={14} />
                       </ActionIcon>
                     )}
-                    
+
                     <ActionIcon
                       variant="subtle"
                       size="sm"
@@ -245,9 +250,13 @@ export function NotificationList({
                     </ActionIcon>
                   </Group>
                 </Group>
-                
+
                 {index < paginatedNotifications.length - 1 && (
-                  <div style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }} />
+                  <div
+                    style={{
+                      borderBottom: '1px solid var(--mantine-color-gray-2)',
+                    }}
+                  />
                 )}
               </div>
             ))}
