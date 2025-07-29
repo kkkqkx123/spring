@@ -49,6 +49,12 @@ export const queryKeys = {
     templates: ['email', 'templates'] as const,
     template: (id: number) => ['email', 'template', id] as const,
     history: (params: any) => ['email', 'history', params] as const,
+    recipients: ['email', 'recipients'] as const,
+    departmentRecipients: (departmentId: number) => 
+      ['email', 'recipients', 'department', departmentId] as const,
+    preview: (templateId: number, variables: Record<string, string>) =>
+      ['email', 'preview', templateId, variables] as const,
+    bulkProgress: (jobId: string) => ['email', 'bulk-progress', jobId] as const,
   },
 
   // Notifications

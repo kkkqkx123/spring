@@ -149,13 +149,46 @@ export interface EmailTemplate {
   subject: string;
   content: string;
   variables: string[];
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface EmailRequest {
   templateId: number;
   recipients: number[];
   variables: Record<string, string>;
+  subject?: string;
+  customContent?: string;
 }
+
+export interface EmailRecipient {
+  id: number;
+  name: string;
+  email: string;
+  type: 'individual' | 'department';
+}
+
+export interface EmailComposition {
+  templateId?: number;
+  recipients: EmailRecipient[];
+  subject: string;
+  content: string;
+  variables: Record<string, string>;
+  scheduledAt?: string;
+}
+
+export interface EmailHistory {
+  id: number;
+  subject: string;
+  recipientCount: number;
+  status: EmailStatus;
+  sentAt: string;
+  templateName?: string;
+  errorMessage?: string;
+}
+
+export type EmailStatus = 'PENDING' | 'SENDING' | 'SENT' | 'FAILED' | 'CANCELLED';
 
 // Form types
 export interface FormFieldProps {

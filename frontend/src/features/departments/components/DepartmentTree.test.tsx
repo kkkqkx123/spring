@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { DepartmentTree } from './DepartmentTree';
-import { Department } from '../../../types';
+import { type Department } from '../../../types';
 
 // Mock the hooks
 vi.mock('../hooks/useDepartmentTree');
