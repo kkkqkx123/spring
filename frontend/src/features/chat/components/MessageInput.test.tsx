@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
@@ -13,8 +14,8 @@ vi.mock('../../../utils', () => ({
   debounce: vi.fn(fn => fn),
 }));
 
-const mockUseTypingIndicator = useTypingIndicator as any;
-const mockUseSendMessage = useSendMessage as any;
+const mockUseTypingIndicator = vi.mocked(useTypingIndicator);
+const mockUseSendMessage = vi.mocked(useSendMessage);
 
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = new QueryClient({
@@ -36,6 +37,25 @@ describe('MessageInput', () => {
   const mockStopTyping = vi.fn();
   const mockSendMessage = vi.fn();
 
+  // Helper for default mutation result
+  const mockSendMessageResult: any = {
+    mutate: mockSendMessage,
+    isPending: false,
+    isSuccess: false,
+    isError: false,
+    error: null,
+    data: undefined,
+    reset: vi.fn(),
+    mutateAsync: vi.fn(),
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    isPaused: false,
+    status: 'idle',
+    submittedAt: 0,
+    variables: undefined,
+  };
+
   beforeEach(() => {
     mockUseTypingIndicator.mockReturnValue({
       isTyping: false,
@@ -43,10 +63,7 @@ describe('MessageInput', () => {
       stopTyping: mockStopTyping,
     });
 
-    mockUseSendMessage.mockReturnValue({
-      mutate: mockSendMessage,
-      isPending: false,
-    });
+    mockUseSendMessage.mockReturnValue(mockSendMessageResult);
   });
 
   afterEach(() => {
@@ -176,7 +193,7 @@ describe('MessageInput', () => {
 
   it('shows loading state when sending', () => {
     mockUseSendMessage.mockReturnValue({
-      mutate: mockSendMessage,
+      ...mockSendMessageResult,
       isPending: true,
     });
 
@@ -190,13 +207,13 @@ describe('MessageInput', () => {
 
   it('clears input after successful send', async () => {
     const user = userEvent.setup();
-    let onSuccessCallback: any;
+    let onSuccessCallback: (() => void) | undefined;
 
     mockUseSendMessage.mockReturnValue({
+      ...mockSendMessageResult,
       mutate: vi.fn((data, options) => {
         onSuccessCallback = options.onSuccess;
       }),
-      isPending: false,
     });
 
     renderWithProviders(

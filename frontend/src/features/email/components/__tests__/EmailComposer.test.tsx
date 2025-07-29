@@ -6,12 +6,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { EmailComposer } from '../EmailComposer';
-import { emailApi } from '../../services/emailApi';
 import type { EmailTemplate, EmailRecipient } from '../../../../types';
 
 // Mock the API
 vi.mock('../../services/emailApi');
-const mockEmailApi = emailApi as any;
 
 // Mock the hooks
 vi.mock('../../hooks/useEmail');

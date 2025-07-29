@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   useDepartmentTree,
@@ -11,7 +11,7 @@ import {
   useDepartmentEmployees,
 } from './useDepartmentTree';
 import { DepartmentApi } from '../services/departmentApi';
-import { Department } from '../../../types';
+import type { Department } from '../../../types';
 
 // Mock the API
 vi.mock('../services/departmentApi');
@@ -43,9 +43,7 @@ const createWrapper = () => {
   });
 
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
@@ -134,7 +132,9 @@ describe('useCreateDepartment', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockDepartmentApi.createDepartment).toHaveBeenCalledWith(newDepartment);
+    expect(mockDepartmentApi.createDepartment).toHaveBeenCalledWith(
+      newDepartment
+    );
   });
 
   it('handles error when creating department', async () => {
@@ -165,7 +165,11 @@ describe('useUpdateDepartment', () => {
   });
 
   it('updates department successfully', async () => {
-    const updateData = { id: 1, name: 'Updated Department', description: 'Updated' };
+    const updateData = {
+      id: 1,
+      name: 'Updated Department',
+      description: 'Updated',
+    };
     mockDepartmentApi.updateDepartment.mockResolvedValue(mockDepartment);
 
     const { result } = renderHook(() => useUpdateDepartment(), {
