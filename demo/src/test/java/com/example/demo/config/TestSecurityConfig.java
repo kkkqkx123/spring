@@ -7,6 +7,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+
+import java.util.Collection;
+import java.util.function.Supplier;
+
 /**
  * Security configuration for tests
  */
@@ -34,8 +43,35 @@ public class TestSecurityConfig {
                         // Position endpoints
                         .requestMatchers("/api/positions/**").hasAnyRole("ADMIN", "HR_MANAGER")
                         // Payroll endpoints
-                        .requestMatchers("/api/payroll/**").hasAnyRole("ADMIN", "PAYROLL_MANAGER", "HR_MANAGER")
-                        .requestMatchers("/api/payroll/**").hasAnyAuthority("PAYROLL_READ", "PAYROLL_CREATE", "PAYROLL_UPDATE", "PAYROLL_DELETE")
+                        .requestMatchers("/api/payroll/**").access(new AuthorizationManager<RequestAuthorizationContext>() {
+                            @Override
+                            public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
+                                Authentication auth = authentication.get();
+                                if (auth == null || !auth.isAuthenticated()) {
+                                    return new AuthorizationDecision(false);
+                                }
+                                
+                                // Check roles
+                                Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+                                boolean hasRole = authorities.stream()
+                                    .map(GrantedAuthority::getAuthority)
+                                    .anyMatch(role -> 
+                                        "ROLE_ADMIN".equals(role) || 
+                                        "ROLE_PAYROLL_MANAGER".equals(role) || 
+                                        "ROLE_HR_MANAGER".equals(role));
+                                
+                                // Check authorities
+                                boolean hasAuthority = authorities.stream()
+                                    .map(GrantedAuthority::getAuthority)
+                                    .anyMatch(authority -> 
+                                        "PAYROLL_READ".equals(authority) || 
+                                        "PAYROLL_CREATE".equals(authority) || 
+                                        "PAYROLL_UPDATE".equals(authority) || 
+                                        "PAYROLL_DELETE".equals(authority));
+                                
+                                return new AuthorizationDecision(hasRole || hasAuthority);
+                            }
+                        })
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
                 );
