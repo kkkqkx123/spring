@@ -135,12 +135,11 @@ public abstract class BaseIntegrationTest {
     protected void setupTestData() {
         // Clean existing data
         employeeRepository.deleteAll();
-        departmentRepository.deleteAll();
         userRepository.deleteAll();
+        positionRepository.deleteAll();
+        departmentRepository.deleteAll();
         roleRepository.deleteAll();
         resourceRepository.deleteAll();
-        departmentRepository.deleteAll();
-        positionRepository.deleteAll();
 
         // Create resources with proper authority names
         Resource employeeReadResource = createResource("EMPLOYEE_READ", "/api/employees", "GET");
