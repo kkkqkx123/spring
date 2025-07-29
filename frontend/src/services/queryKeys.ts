@@ -33,10 +33,15 @@ export const queryKeys = {
   // Chat
   chat: {
     conversations: ['chat', 'conversations'] as const,
-    conversation: (userId: number) => ['chat', 'conversation', userId] as const,
+    conversation: (userId: number, params?: any) => 
+      params ? ['chat', 'conversation', userId, params] as const 
+             : ['chat', 'conversation', userId] as const,
     messages: (userId: number, params: any) =>
       ['chat', 'messages', userId, params] as const,
     unreadCount: ['chat', 'unreadCount'] as const,
+    search: (query: string, params: any) =>
+      ['chat', 'search', query, params] as const,
+    onlineUsers: ['chat', 'onlineUsers'] as const,
   },
 
   // Email
