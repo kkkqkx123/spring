@@ -27,9 +27,9 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$[?(@.name=='ADMIN')]").exists())
-                .andExpect(jsonPath("$[?(@.name=='HR_MANAGER')]").exists())
-                .andExpect(jsonPath("$[?(@.name=='USER')]").exists());
+                .andExpect(jsonPath("$[?(@.name=='ROLE_ADMIN')]").exists())
+                .andExpect(jsonPath("$[?(@.name=='ROLE_HR_MANAGER')]").exists())
+                .andExpect(jsonPath("$[?(@.name=='ROLE_USER')]").exists());
     }
 
     @Test
@@ -51,7 +51,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .with(user(adminUser.getUsername()).roles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(adminRole.getId()))
-                .andExpect(jsonPath("$.name").value("ADMIN"))
+                .andExpect(jsonPath("$.name").value("ROLE_ADMIN"))
                 .andExpect(jsonPath("$.description").value("System Administrator"))
                 .andExpect(jsonPath("$.resources").isArray());
     }
@@ -66,7 +66,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testCreateRole_AsAdmin_ShouldCreateRole() throws Exception {
         Role newRole = new Role();
-        newRole.setName("MANAGER");
+        newRole.setName("ROLE_MANAGER");
         newRole.setDescription("Department Manager");
 
         mockMvc.perform(post("/api/permissions/roles")
@@ -75,14 +75,14 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newRole)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("MANAGER"))
+                .andExpect(jsonPath("$.name").value("ROLE_MANAGER"))
                 .andExpect(jsonPath("$.description").value("Department Manager"));
     }
 
     @Test
     void testCreateRole_AsRegularUser_ShouldReturn403() throws Exception {
         Role newRole = new Role();
-        newRole.setName("UNAUTHORIZED_ROLE");
+        newRole.setName("ROLE_UNAUTHORIZED_ROLE");
         newRole.setDescription("Unauthorized Role");
 
         mockMvc.perform(post("/api/permissions/roles")
@@ -109,7 +109,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testDeleteRole_AsAdmin_ShouldDeleteRole() throws Exception {
         // Create a role that can be safely deleted
-        Role deletableRole = createRole("TEMP_ROLE", "Temporary Role", Set.of());
+        Role deletableRole = createRole("ROLE_TEMP_ROLE", "Temporary Role", Set.of());
 
         mockMvc.perform(delete("/api/permissions/roles/{id}", deletableRole.getId())
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
@@ -171,7 +171,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/permissions/users/{userId}/roles", regularUser.getId())
                 .with(user(adminUser.getUsername()).roles("ADMIN")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.name=='HR_MANAGER')]").exists());
+                .andExpect(jsonPath("$[?(@.name=='ROLE_HR_MANAGER')]").exists());
     }
 
     @Test
@@ -190,7 +190,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .with(user(adminUser.getUsername()).roles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].name").value("ADMIN"));
+                .andExpect(jsonPath("$[0].name").value("ROLE_ADMIN"));
     }
 
     @Test
@@ -199,7 +199,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .with(user(regularUser.getUsername()).roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].name").value("USER"));
+                .andExpect(jsonPath("$[0].name").value("ROLE_USER"));
     }
 
     @Test
@@ -224,7 +224,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("USER"))
+                .andExpect(jsonPath("$.name").value("ROLE_USER"))
                 .andExpect(jsonPath("$.resources[?(@.id==" + testResource.getId() + ")]").exists());
     }
 
@@ -272,7 +272,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void testCreateRole_DuplicateName_ShouldReturn400() throws Exception {
         Role duplicateRole = new Role();
-        duplicateRole.setName("ADMIN"); // Already exists
+        duplicateRole.setName("ROLE_ADMIN"); // Already exists
         duplicateRole.setDescription("Duplicate Admin Role");
 
         mockMvc.perform(post("/api/permissions/roles")

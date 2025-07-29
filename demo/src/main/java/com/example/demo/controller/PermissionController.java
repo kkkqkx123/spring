@@ -1,107 +1,161 @@
 package com.example.demo.controller;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.demo.model.entity.Resource;
 import com.example.demo.model.entity.Role;
 import com.example.demo.model.entity.User;
+import com.example.demo.repository.ResourceRepository;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.PermissionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller for permission management
- */
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/permissions")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class PermissionController {
 
     @Autowired
     private PermissionService permissionService;
 
-    /**
-     * Get all resources accessible by a user
-     */
-    @GetMapping("/users/{username}/resources")
-    public ResponseEntity<List<Resource>> getUserResources(@PathVariable String username) {
-        List<Resource> resources = permissionService.getUserResources(username);
-        return ResponseEntity.ok(resources);
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private ResourceRepository resourceRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @GetMapping("/roles")
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
     }
 
-    /**
-     * Get all roles assigned to a user
-     */
-    @GetMapping("/users/{username}/roles")
-    public ResponseEntity<List<String>> getUserRoles(@PathVariable String username) {
-        Set<Role> roles = permissionService.getUserRoles(username);
-        List<String> roleNames = roles.stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(roleNames);
+    @GetMapping("/roles/{id}")
+    public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
+        return roleRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Assign a role to a user
-     */
-    @PostMapping("/users/{username}/roles/{roleName}")
-    public ResponseEntity<User> assignRoleToUser(@PathVariable String username, @PathVariable String roleName) {
-        User user = permissionService.assignRoleToUser(username, roleName);
-        return ResponseEntity.ok(user);
+    @PostMapping("/roles")
+    public ResponseEntity<Role> createRole(@RequestBody Role role) {
+        if (roleRepository.findByName(role.getName()).isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Role savedRole = roleRepository.save(role);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedRole);
     }
 
-    /**
-     * Remove a role from a user
-     */
-    @DeleteMapping("/users/{username}/roles/{roleName}")
-    public ResponseEntity<User> removeRoleFromUser(@PathVariable String username, @PathVariable String roleName) {
-        User user = permissionService.removeRoleFromUser(username, roleName);
-        return ResponseEntity.ok(user);
+    @PutMapping("/roles/{id}")
+    public ResponseEntity<Role> updateRole(@PathVariable Long id, @RequestBody Role roleDetails) {
+        return roleRepository.findById(id)
+                .map(role -> {
+                    role.setName(roleDetails.getName());
+                    role.setDescription(roleDetails.getDescription());
+                    return ResponseEntity.ok(roleRepository.save(role));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Assign a resource to a role
-     */
+    @DeleteMapping("/roles/{id}")
+    public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
+        if (!roleRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        roleRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/resources")
+    public List<Resource> getAllResources() {
+        return resourceRepository.findAll();
+    }
+
+    @PostMapping("/resources")
+    public ResponseEntity<Resource> createResource(@RequestBody Resource resource) {
+        Resource savedResource = resourceRepository.save(resource);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedResource);
+    }
+
+    @PostMapping("/users/{userId}/roles/{roleId}")
+    public ResponseEntity<?> assignRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Role role = roleRepository.findById(roleId).orElse(null);
+
+        if (user == null || role == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        user.getRoles().add(role);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Role assigned successfully"));
+    }
+
+    @DeleteMapping("/users/{userId}/roles/{roleId}")
+    public ResponseEntity<?> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Role role = roleRepository.findById(roleId).orElse(null);
+
+        if (user == null || role == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        user.getRoles().remove(role);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Role removed successfully"));
+    }
+
+    @GetMapping("/users/{userId}/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == authentication.principal.id")
+    public ResponseEntity<Set<Role>> getUserRoles(@PathVariable Long userId) {
+        return userRepository.findById(userId)
+                .map(user -> ResponseEntity.ok(user.getRoles()))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/roles/{roleName}/resources/{resourceId}")
     public ResponseEntity<Role> assignResourceToRole(@PathVariable String roleName, @PathVariable Long resourceId) {
         Role role = permissionService.assignResourceToRole(roleName, resourceId);
         return ResponseEntity.ok(role);
     }
 
-    /**
-     * Remove a resource from a role
-     */
-    @DeleteMapping("/roles/{roleName}/resources/{resourceId}")
-    public ResponseEntity<Role> removeResourceFromRole(@PathVariable String roleName, @PathVariable Long resourceId) {
-        Role role = permissionService.removeResourceFromRole(roleName, resourceId);
-        return ResponseEntity.ok(role);
+    @DeleteMapping("/roles/{roleId}/resources/{resourceId}")
+    public ResponseEntity<?> removeResourceFromRole(@PathVariable Long roleId, @PathVariable Long resourceId) {
+        Role role = roleRepository.findById(roleId).orElse(null);
+        if (role == null) {
+            return ResponseEntity.notFound().build();
+        }
+        role.getResources().removeIf(resource -> resource.getId().equals(resourceId));
+        roleRepository.save(role);
+        return ResponseEntity.ok(Map.of("message", "Resource removed from role successfully"));
     }
 
-    /**
-     * Check if a user has a specific role
-     */
-    @GetMapping("/users/{username}/roles/{roleName}/check")
-    public ResponseEntity<Boolean> hasRole(@PathVariable String username, @PathVariable String roleName) {
-        boolean hasRole = permissionService.hasRole(username, roleName);
-        return ResponseEntity.ok(hasRole);
+    @GetMapping("/roles/{roleId}/resources")
+    public ResponseEntity<Set<Resource>> getRoleResources(@PathVariable Long roleId) {
+        return roleRepository.findById(roleId)
+                .map(role -> ResponseEntity.ok(role.getResources()))
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Check if a user has permission to access a resource
-     */
-    @GetMapping("/users/{username}/resources/check")
-    public ResponseEntity<Boolean> hasPermission(@PathVariable String username, String resourceUrl, String method) {
-        boolean hasPermission = permissionService.hasPermission(username, resourceUrl, method);
-        return ResponseEntity.ok(hasPermission);
+    @GetMapping("/users/{userId}/check")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == authentication.principal.id")
+    public ResponseEntity<?> checkUserPermission(@PathVariable Long userId, @RequestParam String resource) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        boolean hasPermission = user.getRoles().stream()
+                .flatMap(role -> role.getResources().stream())
+                .anyMatch(r -> r.getName().equals(resource));
+        return ResponseEntity.ok(Map.of("hasPermission", hasPermission, "resource", resource));
     }
 }

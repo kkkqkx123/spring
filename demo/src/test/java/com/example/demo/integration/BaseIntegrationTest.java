@@ -11,6 +11,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.CacheManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -106,6 +107,9 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected com.example.demo.service.EmployeeService employeeService;
 
+    @Autowired
+    protected CacheManager cacheManager;
+
     // Test data
     protected User adminUser;
     protected User hrManagerUser;
@@ -128,6 +132,12 @@ public abstract class BaseIntegrationTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
+        
+        // Clear all caches before each test
+        cacheManager.getCacheNames().stream()
+                .map(cacheManager::getCache)
+                .filter(cache -> cache != null)
+                .forEach(cache -> cache.clear());
 
         setupTestData();
     }
@@ -174,7 +184,7 @@ public abstract class BaseIntegrationTest {
                 notificationReadResource, notificationCreateResource,
                 emailSendResource
         ));
-        adminRole = createRole("ADMIN", "System Administrator", adminResources);
+        adminRole = createRole("ROLE_ADMIN", "System Administrator", adminResources);
 
         Set<Resource> hrManagerResources = new HashSet<>();
         hrManagerResources.addAll(Set.of(
@@ -184,7 +194,7 @@ public abstract class BaseIntegrationTest {
                 payrollReadResource, payrollCreateResource, payrollUpdateResource,
                 emailSendResource
         ));
-        hrManagerRole = createRole("HR_MANAGER", "HR Manager", hrManagerResources);
+        hrManagerRole = createRole("ROLE_HR_MANAGER", "HR Manager", hrManagerResources);
 
         Set<Resource> userResources = new HashSet<>();
         userResources.addAll(Set.of(
@@ -192,13 +202,13 @@ public abstract class BaseIntegrationTest {
                 chatReadResource, chatCreateResource, chatUpdateResource,
                 notificationReadResource
         ));
-        userRole = createRole("USER", "Regular User", userResources);
+        userRole = createRole("ROLE_USER", "Regular User", userResources);
 
         Set<Resource> newUserResources = new HashSet<>();
-        userResources.addAll(Set.of(
+        newUserResources.addAll(Set.of(
                 registerResource
         ));
-        newUserRole = createRole("NEW_USER", "newUser", newUserResources);
+        newUserRole = createRole("ROLE_NEW_USER", "newUser", newUserResources);
 
         // Create users
         Set<Role> adminRoles = new HashSet<>();
@@ -214,7 +224,7 @@ public abstract class BaseIntegrationTest {
         regularUser = createUser("user", "user@example.com", "password", userRoles);
 
         Set<Role> newUserRoles = new HashSet<>();
-        userRoles.add(newUserRole);
+        newUserRoles.add(newUserRole);
         newUser = createUser("newUser", "existinguser@example.com", "password", newUserRoles);
 
         // Load permissions for users
@@ -252,15 +262,7 @@ public abstract class BaseIntegrationTest {
         role.setName(name);
         role.setDescription(description);
         role.setResources(resources);
-        Role savedRole = roleRepository.save(role);
-        
-        // Ensure the role-resource relationships are persisted
-        if (resources != null && !resources.isEmpty()) {
-            savedRole.setResources(resources);
-            roleRepository.save(savedRole);
-        }
-        
-        return savedRole;
+        return roleRepository.save(role);
     }
 
     protected User createUser(String username, String email, String password, Set<Role> roles) {
@@ -273,15 +275,7 @@ public abstract class BaseIntegrationTest {
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         user.setRoles(roles);
-        User savedUser = userRepository.save(user);
-        
-        // Ensure the user-role relationships are persisted
-        if (roles != null && !roles.isEmpty()) {
-            savedUser.setRoles(roles);
-            userRepository.save(savedUser);
-        }
-        
-        return savedUser;
+        return userRepository.save(user);
     }
 
     protected Department createDepartment(String name, Long parentId, String depPath, boolean isParent) {
