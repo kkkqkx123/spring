@@ -8,9 +8,13 @@ const positionApi = {
     const response = await apiClient.get('/api/positions');
     return response.data;
   },
-  
-  getPositionsByDepartment: async (departmentId: number): Promise<Position[]> => {
-    const response = await apiClient.get(`/api/positions/department/${departmentId}`);
+
+  getPositionsByDepartment: async (
+    departmentId: number
+  ): Promise<Position[]> => {
+    const response = await apiClient.get(
+      `/api/positions/department/${departmentId}`
+    );
     return response.data;
   },
 };

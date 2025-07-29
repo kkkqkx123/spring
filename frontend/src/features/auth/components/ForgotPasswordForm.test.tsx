@@ -7,10 +7,22 @@ import { beforeEach } from 'node:test';
 
 // Mock the FormField component since it's imported from a relative path
 vi.mock('../../../components/ui', () => ({
-  FormField: ({ children, label, error }: { children: React.ReactNode; label: string; error?: string }) => (
+  FormField: ({
+    children,
+    label,
+    error,
+  }: {
+    children: React.ReactNode;
+    label: string;
+    error?: string;
+  }) => (
     <div>
       <label htmlFor="email-input">{label}</label>
-      {React.isValidElement(children) ? React.cloneElement(children, { id: 'email-input' } as React.Attributes) : children}
+      {React.isValidElement(children)
+        ? React.cloneElement(children, {
+            id: 'email-input',
+          } as React.Attributes)
+        : children}
       {error && <span>{error}</span>}
     </div>
   ),
@@ -36,7 +48,11 @@ describe('ForgotPasswordForm', () => {
     );
 
     expect(screen.getByText('Forgot Password?')).toBeInTheDocument();
-    expect(screen.getByText('Enter your email address and we\'ll send you a link to reset your password.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Enter your email address and we'll send you a link to reset your password."
+      )
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Email Address')).toBeInTheDocument();
     expect(screen.getByTestId('send-reset-link-button')).toBeInTheDocument();
     expect(screen.getByTestId('back-to-login-link')).toBeInTheDocument();
@@ -83,7 +99,7 @@ describe('ForgotPasswordForm', () => {
 
     // Wait for validation to occur
     await screen.findByText('Email is required');
-    
+
     expect(screen.getByText('Email is required')).toBeInTheDocument();
   });
 
@@ -100,7 +116,11 @@ describe('ForgotPasswordForm', () => {
 
     expect(screen.getByText('Check Your Email')).toBeInTheDocument();
     expect(screen.getByText('Reset Link Sent')).toBeInTheDocument();
-    expect(screen.getByText('We\'ve sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password."
+      )
+    ).toBeInTheDocument();
   });
 
   it('shows error message when error prop is provided', () => {

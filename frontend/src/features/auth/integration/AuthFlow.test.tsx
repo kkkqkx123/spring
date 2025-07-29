@@ -38,10 +38,10 @@ vi.mock('@mantine/notifications', async () => {
   };
 });
 
-const TestWrapper = ({ 
-  children, 
-  initialEntries = ['/'] 
-}: { 
+const TestWrapper = ({
+  children,
+  initialEntries = ['/'],
+}: {
   children: React.ReactNode;
   initialEntries?: string[];
 }) => {
@@ -56,9 +56,7 @@ const TestWrapper = ({
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
         <Notifications />
-        <MemoryRouter initialEntries={initialEntries}>
-          {children}
-        </MemoryRouter>
+        <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
       </MantineProvider>
     </QueryClientProvider>
   );
@@ -150,7 +148,9 @@ describe('Authentication Flow Integration', () => {
 
       // Should redirect to dashboard after successful login
       await waitFor(() => {
-        expect(screen.getByText('Dashboard Page - To be implemented')).toBeInTheDocument();
+        expect(
+          screen.getByText('Dashboard Page - To be implemented')
+        ).toBeInTheDocument();
       });
     });
 
@@ -181,7 +181,7 @@ describe('Authentication Flow Integration', () => {
 
       // Should stay on login page and show error
       expect(screen.getByText('Welcome back!')).toBeInTheDocument();
-      
+
       const { notifications } = await import('@mantine/notifications');
       expect(notifications.show).toHaveBeenCalledWith({
         title: 'Login Failed',
@@ -308,7 +308,9 @@ describe('Authentication Flow Integration', () => {
       );
 
       // Should redirect to dashboard
-      expect(screen.getByText('Dashboard Page - To be implemented')).toBeInTheDocument();
+      expect(
+        screen.getByText('Dashboard Page - To be implemented')
+      ).toBeInTheDocument();
     });
 
     it('allows access to protected routes with sufficient permissions', () => {
@@ -318,7 +320,9 @@ describe('Authentication Flow Integration', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText('Employees Page - To be implemented')).toBeInTheDocument();
+      expect(
+        screen.getByText('Employees Page - To be implemented')
+      ).toBeInTheDocument();
     });
 
     it('denies access to protected routes without sufficient permissions', () => {

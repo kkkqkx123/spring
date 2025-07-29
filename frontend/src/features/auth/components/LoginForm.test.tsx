@@ -48,7 +48,9 @@ describe('LoginForm', () => {
       renderWithProvider(defaultProps);
 
       expect(screen.getByText('Welcome back!')).toBeInTheDocument();
-      expect(screen.getByText('Sign in to your account to continue')).toBeInTheDocument();
+      expect(
+        screen.getByText('Sign in to your account to continue')
+      ).toBeInTheDocument();
       expect(screen.getByTestId('username-input')).toBeInTheDocument();
       expect(screen.getByTestId('password-input')).toBeInTheDocument();
       expect(screen.getByTestId('remember-me-checkbox')).toBeInTheDocument();
@@ -66,7 +68,9 @@ describe('LoginForm', () => {
       const props = { ...defaultProps, onForgotPassword: undefined };
       renderWithProvider(props);
 
-      expect(screen.queryByTestId('forgot-password-link')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('forgot-password-link')
+      ).not.toBeInTheDocument();
     });
 
     it('should render register link when onRegister is provided', () => {
@@ -133,7 +137,9 @@ describe('LoginForm', () => {
       await user.click(loginButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Username must be at least 3 characters')).toBeInTheDocument();
+        expect(
+          screen.getByText('Username must be at least 3 characters')
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -170,7 +176,9 @@ describe('LoginForm', () => {
       await user.click(loginButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument();
+        expect(
+          screen.getByText('Password must be at least 6 characters')
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -196,8 +204,12 @@ describe('LoginForm', () => {
         });
       });
 
-      expect(screen.queryByText('Username is required')).not.toBeInTheDocument();
-      expect(screen.queryByText('Password is required')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Username is required')
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Password is required')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -228,8 +240,12 @@ describe('LoginForm', () => {
       mockOnSubmit.mockResolvedValueOnce(undefined);
       renderWithProvider(defaultProps);
 
-      const usernameInput = screen.getByTestId('username-input') as HTMLInputElement;
-      const passwordInput = screen.getByTestId('password-input') as HTMLInputElement;
+      const usernameInput = screen.getByTestId(
+        'username-input'
+      ) as HTMLInputElement;
+      const passwordInput = screen.getByTestId(
+        'password-input'
+      ) as HTMLInputElement;
 
       await user.type(usernameInput, 'testuser');
       await user.type(passwordInput, 'password123');
@@ -250,7 +266,9 @@ describe('LoginForm', () => {
 
     it('should handle submission errors gracefully', async () => {
       const user = userEvent.setup();
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       mockOnSubmit.mockRejectedValueOnce(new Error('Network error'));
 
       renderWithProvider(defaultProps);
@@ -279,7 +297,7 @@ describe('LoginForm', () => {
     it('should disable form during submission', async () => {
       const user = userEvent.setup();
       let resolveSubmit: () => void;
-      const submitPromise = new Promise<void>((resolve) => {
+      const submitPromise = new Promise<void>(resolve => {
         resolveSubmit = resolve;
       });
       mockOnSubmit.mockReturnValueOnce(submitPromise);
@@ -314,7 +332,7 @@ describe('LoginForm', () => {
       renderWithProvider(defaultProps);
 
       const rememberMeCheckbox = screen.getByTestId('remember-me-checkbox');
-      
+
       // Initially unchecked
       expect(rememberMeCheckbox).not.toBeChecked();
 
@@ -361,7 +379,9 @@ describe('LoginForm', () => {
     it('should have proper button text', () => {
       renderWithProvider(defaultProps);
 
-      expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Sign in' })
+      ).toBeInTheDocument();
     });
 
     it('should have proper error announcements', async () => {
@@ -380,8 +400,12 @@ describe('LoginForm', () => {
     it('should have proper input placeholders', () => {
       renderWithProvider(defaultProps);
 
-      expect(screen.getByPlaceholderText('Enter your username')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('Enter your username')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('Enter your password')
+      ).toBeInTheDocument();
     });
   });
 

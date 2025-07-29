@@ -1,7 +1,12 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
-import { useEmployees, useEmployee, useEmployeeSearch, useEmployeeListState } from './useEmployees';
+import {
+  useEmployees,
+  useEmployee,
+  useEmployeeSearch,
+  useEmployeeListState,
+} from './useEmployees';
 import { employeeApi } from '../services/employeeApi';
 import { type Employee } from '../../../types';
 
@@ -25,9 +30,7 @@ const createWrapper = () => {
   });
 
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
@@ -74,27 +77,28 @@ describe('useEmployees', () => {
 
     vi.mocked(employeeApi.getEmployees).mockResolvedValue(mockResponse);
 
-    const { result } = renderHook(
-      () => useEmployees({ page: 0, size: 10 }),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useEmployees({ page: 0, size: 10 }), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
 
     expect(result.current.data).toEqual(mockResponse);
-    expect(employeeApi.getEmployees).toHaveBeenCalledWith({ page: 0, size: 10 });
+    expect(employeeApi.getEmployees).toHaveBeenCalledWith({
+      page: 0,
+      size: 10,
+    });
   });
 
   it('handles error when fetching employees fails', async () => {
     const mockError = new Error('Failed to fetch employees');
     vi.mocked(employeeApi.getEmployees).mockRejectedValue(mockError);
 
-    const { result } = renderHook(
-      () => useEmployees({ page: 0, size: 10 }),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useEmployees({ page: 0, size: 10 }), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -133,10 +137,9 @@ describe('useEmployee', () => {
 
     vi.mocked(employeeApi.getEmployee).mockResolvedValue(mockEmployee);
 
-    const { result } = renderHook(
-      () => useEmployee(1),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useEmployee(1), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -148,11 +151,10 @@ describe('useEmployee', () => {
 
   it('does not fetch when id is not provided', () => {
     vi.clearAllMocks(); // Clear previous test mocks
-    
-    const { result } = renderHook(
-      () => useEmployee(0),
-      { wrapper: createWrapper() }
-    );
+
+    const { result } = renderHook(() => useEmployee(0), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.fetchStatus).toBe('idle');
     expect(employeeApi.getEmployee).not.toHaveBeenCalled();
@@ -201,22 +203,24 @@ describe('useEmployeeSearch', () => {
     const criteria = { name: 'John' };
     const pageable = { page: 0, size: 10 };
 
-    const { result } = renderHook(
-      () => useEmployeeSearch(criteria, pageable),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useEmployeeSearch(criteria, pageable), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
 
     expect(result.current.data).toEqual(mockResponse);
-    expect(employeeApi.searchEmployees).toHaveBeenCalledWith(criteria, pageable);
+    expect(employeeApi.searchEmployees).toHaveBeenCalledWith(
+      criteria,
+      pageable
+    );
   });
 
   it('is enabled only when criteria has values', () => {
     vi.clearAllMocks(); // Clear previous test mocks
-    
+
     const emptyCriteria = {};
     const pageable = { page: 0, size: 10 };
 

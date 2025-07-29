@@ -19,7 +19,9 @@ vi.mock('./Header', () => ({
   Header: ({ user, navbarOpened, toggleNavbar, isMobile }: any) => (
     <div data-testid="header">
       Header for {user.username}
-      <button onClick={toggleNavbar}>Toggle: {navbarOpened ? 'Open' : 'Closed'}</button>
+      <button onClick={toggleNavbar}>
+        Toggle: {navbarOpened ? 'Open' : 'Closed'}
+      </button>
       {isMobile && <span>Mobile</span>}
     </div>
   ),
@@ -40,9 +42,7 @@ const mockUser: User = {
 const renderWithProviders = (component: React.ReactElement) => {
   return render(
     <MantineProvider>
-      <BrowserRouter>
-        {component}
-      </BrowserRouter>
+      <BrowserRouter>{component}</BrowserRouter>
     </MantineProvider>
   );
 };

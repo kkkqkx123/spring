@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { MantineProvider } from '@mantine/core';
 import { EmployeeSearch } from './EmployeeSearch';
-import { Department, Position } from '../../../types';
+import type { Department, Position } from '../../../types';
 
 const mockDepartments: Department[] = [
   {
@@ -42,6 +42,7 @@ const defaultProps = {
   departments: mockDepartments,
   positions: mockPositions,
   loading: false,
+  initialValues: {},
 };
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -63,20 +64,22 @@ describe('EmployeeSearch', () => {
 
   it('renders basic search input', () => {
     renderWithWrapper();
-    
-    expect(screen.getByPlaceholderText('Search by name...')).toBeInTheDocument();
+
+    expect(
+      screen.getByPlaceholderText('Search by name...')
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
   });
 
   it('calls onSearch with name criteria when form is submitted', async () => {
     renderWithWrapper();
-    
+
     const nameInput = screen.getByPlaceholderText('Search by name...');
     const searchButton = screen.getByRole('button', { name: 'Search' });
-    
+
     fireEvent.change(nameInput, { target: { value: 'John Doe' } });
     fireEvent.click(searchButton);
-    
+
     await waitFor(() => {
       expect(defaultProps.onSearch).toHaveBeenCalledWith({
         name: 'John Doe',
@@ -86,53 +89,59 @@ describe('EmployeeSearch', () => {
 
   it('shows advanced search when toggle is clicked', async () => {
     renderWithWrapper();
-    
+
     const toggleButton = screen.getByLabelText('Toggle advanced search');
     fireEvent.click(toggleButton);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Advanced Filters')).toBeInTheDocument();
-      expect(screen.getByLabelText('Email')).toBeInTheDocument();
-      expect(screen.getByLabelText('Department')).toBeInTheDocument();
-      expect(screen.getByLabelText('Position')).toBeInTheDocument();
-      expect(screen.getByLabelText('Status')).toBeInTheDocument();
-    });
+
+    await screen.findByText('Advanced Filters');
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('combobox', { name: /department/i })
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('combobox', { name: /position/i })
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('combobox', { name: /status/i })
+    ).toBeInTheDocument();
   });
 
   it('includes advanced criteria in search', async () => {
     renderWithWrapper();
-    
+
     // Open advanced search
     const toggleButton = screen.getByLabelText('Toggle advanced search');
     fireEvent.click(toggleButton);
-    
+
     await waitFor(() => {
       expect(screen.getByLabelText('Email')).toBeInTheDocument();
     });
-    
+
     // Fill in advanced fields
     const emailInput = screen.getByLabelText('Email');
-    const departmentSelect = screen.getByLabelText('Department');
-    const statusSelect = screen.getByLabelText('Status');
-    
+    const departmentSelect = screen.getByRole('combobox', {
+      name: /department/i,
+    });
+    const statusSelect = screen.getByRole('combobox', { name: /status/i });
+
     fireEvent.change(emailInput, { target: { value: 'john@example.com' } });
     fireEvent.click(departmentSelect);
-    
+
     await waitFor(() => {
       const engineeringOption = screen.getByText('Engineering');
       fireEvent.click(engineeringOption);
     });
-    
+
     fireEvent.click(statusSelect);
     await waitFor(() => {
       const activeOption = screen.getByText('Active');
       fireEvent.click(activeOption);
     });
-    
+
     // Submit search
     const searchButton = screen.getByRole('button', { name: 'Search' });
     fireEvent.click(searchButton);
-    
+
     await waitFor(() => {
       expect(defaultProps.onSearch).toHaveBeenCalledWith({
         email: 'john@example.com',
@@ -144,10 +153,10 @@ describe('EmployeeSearch', () => {
 
   it('shows clear button when there are active filters', async () => {
     renderWithWrapper();
-    
+
     const nameInput = screen.getByPlaceholderText('Search by name...');
     fireEvent.change(nameInput, { target: { value: 'John' } });
-    
+
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
     });
@@ -155,27 +164,31 @@ describe('EmployeeSearch', () => {
 
   it('calls onClear when clear button is clicked', async () => {
     renderWithWrapper();
-    
+
     const nameInput = screen.getByPlaceholderText('Search by name...');
     fireEvent.change(nameInput, { target: { value: 'John' } });
-    
+
+    let clearButton;
     await waitFor(() => {
-      const clearButton = screen.getByRole('button', { name: 'Clear' });
-      fireEvent.click(clearButton);
+      clearButton = screen.getByRole('button', { name: 'Clear' });
+      expect(clearButton).toBeInTheDocument();
     });
-    
-    expect(defaultProps.onClear).toHaveBeenCalled();
+
+    fireEvent.click(clearButton!);
+
+    await waitFor(() => {
+      expect(defaultProps.onClear).toHaveBeenCalled();
+    });
   });
 
   it('filters out empty values from search criteria', async () => {
     renderWithWrapper();
-    
-    const nameInput = screen.getByPlaceholderText('Search by name...');
+
     const searchButton = screen.getByRole('button', { name: 'Search' });
-    
+
     // Leave name empty but submit
     fireEvent.click(searchButton);
-    
+
     await waitFor(() => {
       expect(defaultProps.onSearch).toHaveBeenCalledWith({});
     });
@@ -183,7 +196,7 @@ describe('EmployeeSearch', () => {
 
   it('shows loading state on search button', () => {
     renderWithWrapper({ ...defaultProps, loading: true });
-    
+
     const searchButton = screen.getByRole('button', { name: 'Search' });
     expect(searchButton).toBeDisabled();
   });
@@ -194,9 +207,9 @@ describe('EmployeeSearch', () => {
       email: 'john@example.com',
       status: 'ACTIVE',
     };
-    
+
     renderWithWrapper({ ...defaultProps, initialValues });
-    
+
     expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
   });
 });

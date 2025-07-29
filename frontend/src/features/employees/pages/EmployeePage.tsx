@@ -20,10 +20,12 @@ import {
 } from '../hooks/useEmployees';
 import { EmployeeForm } from '../components/EmployeeForm';
 import { EmployeeDetail } from '../components/EmployeeDetail';
-import { ConfirmDialog } from '../../../components/ui';
 import { LoadingSpinner } from '../../../components/ui';
 import { useAuth } from '../../../hooks/useAuth';
-import { EmployeeCreateRequest, EmployeeUpdateRequest } from '../services/employeeApi';
+import {
+  type EmployeeCreateRequest,
+  type EmployeeUpdateRequest,
+} from '../services/employeeApi';
 
 type PageMode = 'view' | 'edit' | 'create';
 
@@ -31,14 +33,16 @@ export const EmployeePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [mode, setMode] = useState<PageMode>(id ? 'view' : 'create');
-  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
+  const [
+    deleteModalOpened,
+    { open: openDeleteModal, close: closeDeleteModal },
+  ] = useDisclosure(false);
 
   const employeeId = id ? parseInt(id) : 0;
   const isEditing = mode === 'edit';
   const isCreating = mode === 'create';
-  const isViewing = mode === 'view';
 
   // Queries and mutations
   const {
@@ -52,45 +56,50 @@ export const EmployeePage: React.FC = () => {
   const deleteEmployee = useDeleteEmployee();
 
   // Permission checks (simplified - in real app, check against user permissions)
-  const canEdit = user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ?? false;
-  const canDelete = user?.roles.some(role => ['ADMIN'].includes(role.name)) ?? false;
+  const canEdit =
+    user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ??
+    false;
+  const canDelete =
+    user?.roles.some(role => ['ADMIN'].includes(role.name)) ?? false;
 
-  const handleCreate = async (data: EmployeeCreateRequest) => {
+  const handleSubmit = async (
+    data: EmployeeCreateRequest | EmployeeUpdateRequest
+  ) => {
     try {
-      const newEmployee = await createEmployee.mutateAsync(data);
-      notifications.show({
-        title: 'Success',
-        message: 'Employee created successfully',
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      });
-      navigate(`/employees/${newEmployee.id}`);
-    } catch (error) {
+      if (isCreating) {
+        // For creating, data should be EmployeeCreateRequest (without id)
+        const createData = data as EmployeeCreateRequest;
+        const newEmployee = await createEmployee.mutateAsync(createData);
+        notifications.show({
+          title: 'Success',
+          message: 'Employee created successfully',
+          color: 'green',
+          icon: <IconCheck size={16} />,
+        });
+        navigate(`/employees/${newEmployee.id}`);
+      } else {
+        // For updating, data should be EmployeeUpdateRequest (with id)
+        const updateData = data as EmployeeUpdateRequest;
+        if (!employee) return;
+
+        await updateEmployee.mutateAsync({
+          id: employee.id,
+          employee: updateData,
+        });
+        notifications.show({
+          title: 'Success',
+          message: 'Employee updated successfully',
+          color: 'green',
+          icon: <IconCheck size={16} />,
+        });
+        setMode('view');
+      }
+    } catch {
       notifications.show({
         title: 'Error',
-        message: 'Failed to create employee',
-        color: 'red',
-        icon: <IconAlertCircle size={16} />,
-      });
-    }
-  };
-
-  const handleUpdate = async (data: EmployeeUpdateRequest) => {
-    if (!employee) return;
-    
-    try {
-      await updateEmployee.mutateAsync({ id: employee.id, employee: data });
-      notifications.show({
-        title: 'Success',
-        message: 'Employee updated successfully',
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      });
-      setMode('view');
-    } catch (error) {
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to update employee',
+        message: isCreating
+          ? 'Failed to create employee'
+          : 'Failed to update employee',
         color: 'red',
         icon: <IconAlertCircle size={16} />,
       });
@@ -99,7 +108,7 @@ export const EmployeePage: React.FC = () => {
 
   const handleDelete = async () => {
     if (!employee) return;
-    
+
     try {
       await deleteEmployee.mutateAsync(employee.id);
       notifications.show({
@@ -109,7 +118,7 @@ export const EmployeePage: React.FC = () => {
         icon: <IconCheck size={16} />,
       });
       navigate('/employees');
-    } catch (error) {
+    } catch {
       notifications.show({
         title: 'Error',
         message: 'Failed to delete employee',
@@ -181,46 +190,22 @@ export const EmployeePage: React.FC = () => {
             >
               Back to Employees
             </Button>
-            
-            <Text size="xl" fw={700}>
+
+            <Text size="xl" fw={700} component="h1">
               {isCreating
                 ? 'Create New Employee'
                 : isEditing
-                ? 'Edit Employee'
-                : 'Employee Details'}
+                  ? 'Edit Employee'
+                  : 'Employee Details'}
             </Text>
           </Group>
-
-          {/* Action buttons for view mode */}
-          {isViewing && employee && (
-            <Group gap="md">
-              {canEdit && (
-                <Button
-                  variant="light"
-                  onClick={() => setMode('edit')}
-                >
-                  Edit Employee
-                </Button>
-              )}
-              
-              {canDelete && (
-                <Button
-                  variant="light"
-                  color="red"
-                  onClick={openDeleteModal}
-                >
-                  Delete Employee
-                </Button>
-              )}
-            </Group>
-          )}
         </Group>
 
         {/* Content */}
-        {(isCreating || isEditing) ? (
+        {isCreating || isEditing ? (
           <EmployeeForm
             employee={employee}
-            onSubmit={isCreating ? handleCreate : handleUpdate}
+            onSubmit={handleSubmit}
             onCancel={handleCancel}
             loading={createEmployee.isPending || updateEmployee.isPending}
           />
@@ -251,12 +236,13 @@ export const EmployeePage: React.FC = () => {
               </strong>
               ? This action cannot be undone.
             </Text>
-            
+
             <Group justify="flex-end" gap="md">
               <Button
                 variant="outline"
                 onClick={closeDeleteModal}
                 disabled={deleteEmployee.isPending}
+                data-testid="cancel-delete-button"
               >
                 Cancel
               </Button>
@@ -264,6 +250,7 @@ export const EmployeePage: React.FC = () => {
                 color="red"
                 onClick={handleDelete}
                 loading={deleteEmployee.isPending}
+                data-testid="confirm-delete-button"
               >
                 Delete Employee
               </Button>

@@ -1,7 +1,11 @@
 // Auth feature public API
 // Components
 export { LoginForm, RegisterForm, ForgotPasswordForm } from './components';
-export type { LoginFormProps, RegisterFormProps, ForgotPasswordFormProps } from './components';
+export type {
+  LoginFormProps,
+  RegisterFormProps,
+  ForgotPasswordFormProps,
+} from './components';
 
 // Pages
 export { LoginPage, RegisterPage } from './pages';

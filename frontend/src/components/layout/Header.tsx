@@ -62,7 +62,12 @@ const mockNotifications: Notification[] = [
   },
 ];
 
-export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderProps) {
+export function Header({
+  user,
+  navbarOpened,
+  toggleNavbar,
+  isMobile,
+}: HeaderProps) {
   const [searchValue, setSearchValue] = useState('');
   const [notifications] = useState(mockNotifications);
 
@@ -91,10 +96,14 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
 
   const getNotificationColor = (type: Notification['type']) => {
     switch (type) {
-      case 'success': return 'green';
-      case 'warning': return 'yellow';
-      case 'error': return 'red';
-      default: return 'blue';
+      case 'success':
+        return 'green';
+      case 'warning':
+        return 'yellow';
+      case 'error':
+        return 'red';
+      default:
+        return 'blue';
     }
   };
 
@@ -110,7 +119,7 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
             aria-label="Toggle navigation"
           />
         )}
-        
+
         <Text size="lg" fw={700} c="blue">
           Employee Management
         </Text>
@@ -123,7 +132,7 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
             placeholder="Search employees, departments..."
             leftSection={<IconSearch size={16} />}
             value={searchValue}
-            onChange={(event) => setSearchValue(event.currentTarget.value)}
+            onChange={event => setSearchValue(event.currentTarget.value)}
             style={{ width: '100%' }}
             size="sm"
           />
@@ -136,9 +145,9 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
         <Menu shadow="md" width={320} position="bottom-end">
           <Menu.Target>
             <ActionIcon variant="subtle" size="lg" aria-label="Notifications">
-              <Indicator 
-                color="red" 
-                size={16} 
+              <Indicator
+                color="red"
+                size={16}
                 disabled={unreadCount === 0}
                 label={unreadCount > 9 ? '9+' : unreadCount}
               >
@@ -158,9 +167,9 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
                 )}
               </Group>
             </Menu.Label>
-            
+
             <Divider />
-            
+
             <ScrollArea.Autosize mah={300}>
               <Stack gap="xs" p="xs">
                 {notifications.length === 0 ? (
@@ -168,23 +177,23 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
                     No notifications
                   </Text>
                 ) : (
-                  notifications.map((notification) => (
+                  notifications.map(notification => (
                     <UnstyledButton
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
                       p="xs"
                       style={{
                         borderRadius: 'var(--mantine-radius-sm)',
-                        backgroundColor: notification.read 
-                          ? 'transparent' 
+                        backgroundColor: notification.read
+                          ? 'transparent'
                           : 'var(--mantine-color-blue-0)',
                         border: '1px solid var(--mantine-color-gray-2)',
                         width: '100%',
                       }}
                     >
                       <Group gap="sm" align="flex-start">
-                        <Badge 
-                          size="xs" 
+                        <Badge
+                          size="xs"
                           color={getNotificationColor(notification.type)}
                           variant="dot"
                         />
@@ -196,7 +205,9 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
                             {notification.message}
                           </Text>
                           <Text size="xs" c="dimmed" mt="xs">
-                            {new Date(notification.createdAt).toLocaleTimeString()}
+                            {new Date(
+                              notification.createdAt
+                            ).toLocaleTimeString()}
                           </Text>
                         </div>
                       </Group>
@@ -205,7 +216,7 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
                 )}
               </Stack>
             </ScrollArea.Autosize>
-            
+
             {notifications.length > 0 && (
               <>
                 <Divider />
@@ -231,10 +242,9 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
                   <>
                     <div>
                       <Text size="sm" fw={500}>
-                        {user.firstName && user.lastName 
+                        {user.firstName && user.lastName
                           ? `${user.firstName} ${user.lastName}`
-                          : user.username
-                        }
+                          : user.username}
                       </Text>
                       <Text size="xs" c="dimmed">
                         {user.email}
@@ -249,22 +259,22 @@ export function Header({ user, navbarOpened, toggleNavbar, isMobile }: HeaderPro
 
           <Menu.Dropdown>
             <Menu.Label>Account</Menu.Label>
-            <Menu.Item 
+            <Menu.Item
               leftSection={<IconUser size={16} />}
               onClick={handleProfileClick}
             >
               Profile
             </Menu.Item>
-            <Menu.Item 
+            <Menu.Item
               leftSection={<IconSettings size={16} />}
               onClick={handleSettingsClick}
             >
               Settings
             </Menu.Item>
-            
+
             <Menu.Divider />
-            
-            <Menu.Item 
+
+            <Menu.Item
               leftSection={<IconLogout size={16} />}
               color="red"
               onClick={handleLogout}

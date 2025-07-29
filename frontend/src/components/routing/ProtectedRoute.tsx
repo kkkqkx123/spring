@@ -38,13 +38,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return (
-      <Navigate 
-        to={ROUTES.LOGIN} 
-        state={{ from: location }} 
-        replace 
-      />
-    );
+    return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
   // Combine single and array requirements
@@ -60,7 +54,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Check role requirements
   const hasRequiredRoles = (() => {
     if (allRequiredRoles.length === 0) return true;
-    
+
     if (requireAll) {
       return allRequiredRoles.every(role => hasRole(role));
     } else {
@@ -71,11 +65,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Check permission requirements
   const hasRequiredPermissions = (() => {
     if (allRequiredPermissions.length === 0) return true;
-    
+
     if (requireAll) {
-      return allRequiredPermissions.every(permission => hasPermission(permission));
+      return allRequiredPermissions.every(permission =>
+        hasPermission(permission)
+      );
     } else {
-      return allRequiredPermissions.some(permission => hasPermission(permission));
+      return allRequiredPermissions.some(permission =>
+        hasPermission(permission)
+      );
     }
   })();
 
@@ -100,19 +98,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
               <Text size="sm">
                 You don't have the required permissions to access this page.
               </Text>
-              
+
               {allRequiredRoles.length > 0 && (
                 <Text size="xs" c="dimmed">
-                  Required roles: {allRequiredRoles.join(requireAll ? ' AND ' : ' OR ')}
+                  Required roles:{' '}
+                  {allRequiredRoles.join(requireAll ? ' AND ' : ' OR ')}
                 </Text>
               )}
-              
+
               {allRequiredPermissions.length > 0 && (
                 <Text size="xs" c="dimmed">
-                  Required permissions: {allRequiredPermissions.join(requireAll ? ' AND ' : ' OR ')}
+                  Required permissions:{' '}
+                  {allRequiredPermissions.join(requireAll ? ' AND ' : ' OR ')}
                 </Text>
               )}
-              
+
               <Button
                 variant="light"
                 size="sm"

@@ -68,9 +68,9 @@ const registerSchema = z
     confirmPassword: z.string().min(1, 'Please confirm your password'),
     acceptTerms: z
       .boolean()
-      .refine((val) => val === true, 'You must accept the terms and conditions'),
+      .refine(val => val === true, 'You must accept the terms and conditions'),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
@@ -91,12 +91,12 @@ interface PasswordStrengthProps {
 
 const PasswordStrength: React.FC<PasswordStrengthProps> = ({ password }) => {
   const strength = useMemo(() => {
-    const requirements = passwordRequirements.map((requirement) => ({
+    const requirements = passwordRequirements.map(requirement => ({
       ...requirement,
       met: requirement.re.test(password),
     }));
 
-    const score = requirements.filter((req) => req.met).length;
+    const score = requirements.filter(req => req.met).length;
     return { requirements, score };
   }, [password]);
 
@@ -163,8 +163,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   error,
   onLogin,
 }) => {
-
-
   const {
     register,
     handleSubmit,
@@ -210,7 +208,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <Title ta="center" mb="md">
         Create Account
       </Title>
-      
+
       <Text c="dimmed" size="sm" ta="center" mb="xl">
         Join us today and get started
       </Text>
@@ -258,11 +256,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             </FormField>
           </Group>
 
-          <FormField
-            label="Username"
-            error={errors.username?.message}
-            required
-          >
+          <FormField label="Username" error={errors.username?.message} required>
             <TextInput
               {...register('username')}
               placeholder="Choose a username"
@@ -272,11 +266,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             />
           </FormField>
 
-          <FormField
-            label="Email"
-            error={errors.email?.message}
-            required
-          >
+          <FormField label="Email" error={errors.email?.message} required>
             <TextInput
               {...register('email')}
               type="email"
@@ -287,11 +277,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             />
           </FormField>
 
-          <FormField
-            label="Password"
-            error={errors.password?.message}
-            required
-          >
+          <FormField label="Password" error={errors.password?.message} required>
             <PasswordInput
               {...register('password')}
               placeholder="Create a strong password"
@@ -301,9 +287,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             />
           </FormField>
 
-          {watchedPassword && (
-            <PasswordStrength password={watchedPassword} />
-          )}
+          {watchedPassword && <PasswordStrength password={watchedPassword} />}
 
           <FormField
             label="Confirm Password"

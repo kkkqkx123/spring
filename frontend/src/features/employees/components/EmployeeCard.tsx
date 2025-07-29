@@ -74,17 +74,13 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
             {selectable && (
               <Checkbox
                 checked={selected}
-                onChange={(event) => onSelect?.(event.currentTarget.checked)}
+                onChange={event => onSelect?.(event.currentTarget.checked)}
                 aria-label={`Select ${fullName}`}
               />
             )}
-            <Avatar
-              src={avatarSrc}
-              alt={fullName}
-              size="lg"
-              radius="md"
-            >
-              {employee.firstName[0]}{employee.lastName[0]}
+            <Avatar src={avatarSrc} alt={fullName} size="lg" radius="md">
+              {employee.firstName[0]}
+              {employee.lastName[0]}
             </Avatar>
             <Stack gap={4}>
               <Text fw={600} size="lg" lineClamp={1}>
@@ -141,19 +137,25 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
         {/* Employee Details */}
         <Stack gap="xs">
           <Group gap="xs">
-            <Text size="sm" fw={500}>Position:</Text>
+            <Text size="sm" fw={500}>
+              Position:
+            </Text>
             <Text size="sm">{employee.position.title}</Text>
           </Group>
-          
+
           <Group gap="xs">
-            <Text size="sm" fw={500}>Department:</Text>
+            <Text size="sm" fw={500}>
+              Department:
+            </Text>
             <Text size="sm">{employee.department.name}</Text>
           </Group>
 
           {employee.email && (
             <Group gap="xs">
               <IconMail size={14} />
-              <Text size="sm" lineClamp={1}>{employee.email}</Text>
+              <Text size="sm" lineClamp={1}>
+                {employee.email}
+              </Text>
             </Group>
           )}
 
@@ -181,7 +183,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({
           >
             {employee.status}
           </Badge>
-          
+
           {employee.salary && (
             <Text size="sm" fw={500} c="blue">
               ${employee.salary.toLocaleString()}

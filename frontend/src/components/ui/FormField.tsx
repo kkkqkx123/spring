@@ -3,16 +3,16 @@ import { Box, Text, Group, Tooltip } from '@mantine/core';
 import { IconInfoCircle, IconAsterisk } from '@tabler/icons-react';
 import { FormFieldProps } from '../../types';
 
-export function FormField({ 
-  label, 
-  error, 
-  required = false, 
+export function FormField({
+  label,
+  error,
+  required = false,
   children,
   helpText,
-  ...props 
+  ...props
 }: FormFieldProps & { helpText?: string }) {
   const fieldId = React.useId();
-  
+
   return (
     <Box {...props}>
       {/* Label */}
@@ -26,19 +26,19 @@ export function FormField({
         >
           {label}
         </Text>
-        
+
         {required && (
-          <IconAsterisk 
-            size={8} 
-            color="var(--mantine-color-red-6)" 
+          <IconAsterisk
+            size={8}
+            color="var(--mantine-color-red-6)"
             aria-label="Required field"
           />
         )}
-        
+
         {helpText && (
           <Tooltip label={helpText} position="top" withArrow>
-            <IconInfoCircle 
-              size={14} 
+            <IconInfoCircle
+              size={14}
               color="var(--mantine-color-gray-6)"
               style={{ cursor: 'help' }}
               aria-label="Field information"
@@ -135,15 +135,9 @@ export function CheckboxFormField({
         'aria-invalid': !!error,
         'aria-describedby': error ? `${React.useId()}-error` : undefined,
       })}
-      
+
       {error && (
-        <Text
-          size="sm"
-          c="red"
-          mt="xs"
-          role="alert"
-          aria-live="polite"
-        >
+        <Text size="sm" c="red" mt="xs" role="alert" aria-live="polite">
           {error}
         </Text>
       )}

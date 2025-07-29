@@ -38,9 +38,7 @@ const mockEmployee: Employee = {
 
 const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
-    <MantineProvider>
-      {children}
-    </MantineProvider>
+    <MantineProvider>{children}</MantineProvider>
   );
 };
 
@@ -164,7 +162,9 @@ describe('EmployeeDetail', () => {
     );
 
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /delete/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows delete button when canDelete is true', () => {
@@ -179,7 +179,9 @@ describe('EmployeeDetail', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /edit/i })
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
@@ -195,8 +197,12 @@ describe('EmployeeDetail', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /edit/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /delete/i })
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('Quick Actions')).not.toBeInTheDocument();
   });
 
@@ -274,7 +280,9 @@ describe('EmployeeDetail', () => {
       { wrapper: createWrapper() }
     );
 
-    const deleteButton = screen.getByRole('button', { name: /delete employee/i });
+    const deleteButton = screen.getByRole('button', {
+      name: /delete employee/i,
+    });
     await user.click(deleteButton);
 
     expect(mockOnDelete).toHaveBeenCalledTimes(1);
@@ -306,7 +314,9 @@ describe('EmployeeDetail', () => {
     );
 
     expect(screen.getByText('Employee not found')).toBeInTheDocument();
-    expect(screen.getByText('The requested employee could not be found.')).toBeInTheDocument();
+    expect(
+      screen.getByText('The requested employee could not be found.')
+    ).toBeInTheDocument();
   });
 
   it('formats currency correctly', () => {

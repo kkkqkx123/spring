@@ -133,13 +133,13 @@ export const AppRouter = () => {
         <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 
         {/* 404 page */}
-        <Route 
-          path="*" 
+        <Route
+          path="*"
           element={
             <Center h="100vh">
               <div>404 - Page Not Found</div>
             </Center>
-          } 
+          }
         />
       </Routes>
     </Suspense>

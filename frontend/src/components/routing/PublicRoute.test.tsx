@@ -26,15 +26,15 @@ vi.mock('react-router-dom', async () => {
 
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <MantineProvider>
-    <BrowserRouter>
-      {children}
-    </BrowserRouter>
+    <BrowserRouter>{children}</BrowserRouter>
   </MantineProvider>
 );
 
 describe('PublicRoute', () => {
   const mockUseAuth = useAuth as any;
-  const TestComponent = () => <div data-testid="public-content">Public Content</div>;
+  const TestComponent = () => (
+    <div data-testid="public-content">Public Content</div>
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -91,7 +91,10 @@ describe('PublicRoute', () => {
     );
 
     expect(screen.getByTestId('navigate')).toBeInTheDocument();
-    expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', ROUTES.DASHBOARD);
+    expect(screen.getByTestId('navigate')).toHaveAttribute(
+      'data-to',
+      ROUTES.DASHBOARD
+    );
     expect(screen.queryByTestId('public-content')).not.toBeInTheDocument();
   });
 
@@ -112,7 +115,10 @@ describe('PublicRoute', () => {
     );
 
     expect(screen.getByTestId('navigate')).toBeInTheDocument();
-    expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', customRedirect);
+    expect(screen.getByTestId('navigate')).toHaveAttribute(
+      'data-to',
+      customRedirect
+    );
     expect(screen.queryByTestId('public-content')).not.toBeInTheDocument();
   });
 });

@@ -60,11 +60,7 @@ const mockUser: User = {
 };
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('Header', () => {
@@ -88,7 +84,9 @@ describe('Header', () => {
   it('renders search input', () => {
     renderWithProvider(<Header {...defaultProps} />);
 
-    expect(screen.getByPlaceholderText('Search employees, departments...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Search employees, departments...')
+    ).toBeInTheDocument();
   });
 
   it('renders user information in desktop mode', () => {
@@ -107,7 +105,9 @@ describe('Header', () => {
   it('does not show burger menu in desktop mode', () => {
     renderWithProvider(<Header {...defaultProps} isMobile={false} />);
 
-    expect(screen.queryByLabelText('Toggle navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Toggle navigation')
+    ).not.toBeInTheDocument();
   });
 
   it('calls toggleNavbar when burger is clicked', async () => {
@@ -128,7 +128,9 @@ describe('Header', () => {
 
     renderWithProvider(<Header {...defaultProps} />);
 
-    const searchInput = screen.getByPlaceholderText('Search employees, departments...');
+    const searchInput = screen.getByPlaceholderText(
+      'Search employees, departments...'
+    );
     await user.type(searchInput, 'test search');
     await user.keyboard('{Enter}');
 
@@ -141,7 +143,7 @@ describe('Header', () => {
 
     const notificationButton = screen.getByLabelText('Notifications');
     expect(notificationButton).toBeInTheDocument();
-    
+
     // The badge should show unread notifications count
     expect(screen.getByText('2')).toBeInTheDocument(); // Based on mock data
   });
@@ -152,7 +154,7 @@ describe('Header', () => {
 
     const notificationButton = screen.getByLabelText('Notifications');
     await user.click(notificationButton);
-    
+
     // Check that the button is expanded (menu is open)
     expect(notificationButton).toHaveAttribute('aria-expanded', 'true');
   });
@@ -161,7 +163,7 @@ describe('Header', () => {
     // This test would require more complex setup to test portal content
     // For now, we'll just verify the notification button exists
     renderWithProvider(<Header {...defaultProps} />);
-    
+
     expect(screen.getByLabelText('Notifications')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument(); // Badge count
   });
@@ -173,7 +175,7 @@ describe('Header', () => {
     // Click on the user avatar/name area
     const userButton = screen.getByText('Test User').closest('button');
     await user.click(userButton!);
-    
+
     // Check that the button is expanded (menu is open)
     expect(userButton).toHaveAttribute('aria-expanded', 'true');
   });
@@ -186,7 +188,7 @@ describe('Header', () => {
 
     const userButton = screen.getByText('Test User').closest('button');
     expect(userButton).toBeInTheDocument();
-    
+
     await user.click(userButton!);
     expect(userButton).toHaveAttribute('aria-expanded', 'true');
   });
@@ -198,7 +200,11 @@ describe('Header', () => {
   });
 
   it('uses username initial when no firstName', () => {
-    const userWithoutName = { ...mockUser, firstName: undefined, lastName: undefined };
+    const userWithoutName = {
+      ...mockUser,
+      firstName: undefined,
+      lastName: undefined,
+    };
     renderWithProvider(<Header {...defaultProps} user={userWithoutName} />);
 
     expect(screen.getByText('t')).toBeInTheDocument(); // First letter of username
@@ -210,7 +216,7 @@ describe('Header', () => {
     // User name and email should not be visible in mobile
     expect(screen.queryByText('Test User')).not.toBeInTheDocument();
     expect(screen.queryByText('test@example.com')).not.toBeInTheDocument();
-    
+
     // But avatar should still be there
     expect(screen.getByText('T')).toBeInTheDocument();
   });

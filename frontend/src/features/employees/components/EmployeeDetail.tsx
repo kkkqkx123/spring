@@ -26,7 +26,7 @@ import {
   IconUser,
   IconAlertCircle,
 } from '@tabler/icons-react';
-import { Employee } from '../../../types';
+import { type Employee } from '../../../types';
 import { LoadingSpinner } from '../../../components/ui';
 
 interface EmployeeDetailProps {
@@ -105,7 +105,7 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
             >
               <IconUser size={50} />
             </Avatar>
-            
+
             <Stack gap="xs">
               <Group align="center" gap="sm">
                 <Text size="xl" fw={700}>
@@ -119,17 +119,17 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
                   {employee.status}
                 </Badge>
               </Group>
-              
+
               <Text size="md" c="dimmed">
                 Employee #{employee.employeeNumber}
               </Text>
-              
+
               <Group gap="md">
                 <Group gap="xs">
                   <IconMail size={16} />
                   <Text size="sm">{employee.email}</Text>
                 </Group>
-                
+
                 {employee.phone && (
                   <Group gap="xs">
                     <IconPhone size={16} />
@@ -149,12 +149,13 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
                   color="blue"
                   size="lg"
                   onClick={onEdit}
+                  data-testid="edit-employee-icon"
                 >
                   <IconEdit size={18} />
                 </ActionIcon>
               </Tooltip>
             )}
-            
+
             {canDelete && (
               <Tooltip label="Delete Employee">
                 <ActionIcon
@@ -162,6 +163,7 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
                   color="red"
                   size="lg"
                   onClick={onDelete}
+                  data-testid="delete-employee-icon"
                 >
                   <IconTrash size={18} />
                 </ActionIcon>
@@ -179,14 +181,18 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
             <Stack gap="md">
               <Group align="center" gap="xs">
                 <IconBriefcase size={20} />
-                <Text size="lg" fw={600}>Work Information</Text>
+                <Text size="lg" fw={600}>
+                  Work Information
+                </Text>
               </Group>
-              
+
               <Divider />
-              
+
               <Stack gap="sm">
                 <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Department:</Text>
+                  <Text size="sm" c="dimmed">
+                    Department:
+                  </Text>
                   <Group gap="xs">
                     <IconBuilding size={16} />
                     <Text size="sm" fw={500}>
@@ -194,16 +200,20 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
                     </Text>
                   </Group>
                 </Group>
-                
+
                 <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Position:</Text>
+                  <Text size="sm" c="dimmed">
+                    Position:
+                  </Text>
                   <Text size="sm" fw={500}>
                     {employee.position.title}
                   </Text>
                 </Group>
-                
+
                 <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Hire Date:</Text>
+                  <Text size="sm" c="dimmed">
+                    Hire Date:
+                  </Text>
                   <Group gap="xs">
                     <IconCalendar size={16} />
                     <Text size="sm" fw={500}>
@@ -211,10 +221,12 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
                     </Text>
                   </Group>
                 </Group>
-                
+
                 {employee.salary && (
                   <Group justify="space-between">
-                    <Text size="sm" c="dimmed">Salary:</Text>
+                    <Text size="sm" c="dimmed">
+                      Salary:
+                    </Text>
                     <Group gap="xs">
                       <IconCurrencyDollar size={16} />
                       <Text size="sm" fw={500}>
@@ -234,37 +246,45 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
             <Stack gap="md">
               <Group align="center" gap="xs">
                 <IconBuilding size={20} />
-                <Text size="lg" fw={600}>Department Details</Text>
+                <Text size="lg" fw={600}>
+                  Department Details
+                </Text>
               </Group>
-              
+
               <Divider />
-              
+
               <Stack gap="sm">
                 <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Department Name:</Text>
+                  <Text size="sm" c="dimmed">
+                    Department Name:
+                  </Text>
                   <Text size="sm" fw={500}>
                     {employee.department.name}
                   </Text>
                 </Group>
-                
+
                 {employee.department.description && (
                   <Box>
-                    <Text size="sm" c="dimmed" mb="xs">Description:</Text>
-                    <Text size="sm">
-                      {employee.department.description}
+                    <Text size="sm" c="dimmed" mb="xs">
+                      Description:
                     </Text>
+                    <Text size="sm">{employee.department.description}</Text>
                   </Box>
                 )}
-                
+
                 <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Total Employees:</Text>
+                  <Text size="sm" c="dimmed">
+                    Total Employees:
+                  </Text>
                   <Text size="sm" fw={500}>
                     {employee.department.employeeCount}
                   </Text>
                 </Group>
-                
+
                 <Group justify="space-between">
-                  <Text size="sm" c="dimmed">Created:</Text>
+                  <Text size="sm" c="dimmed">
+                    Created:
+                  </Text>
                   <Text size="sm" fw={500}>
                     {formatDate(employee.department.createdAt)}
                   </Text>
@@ -279,8 +299,10 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
       {(canEdit || canDelete) && (
         <Card shadow="sm" padding="lg" radius="md">
           <Group justify="space-between" align="center">
-            <Text size="lg" fw={600}>Quick Actions</Text>
-            
+            <Text size="lg" fw={600}>
+              Quick Actions
+            </Text>
+
             <Group gap="md">
               {canEdit && (
                 <Button
@@ -288,17 +310,19 @@ export const EmployeeDetail: React.FC<EmployeeDetailProps> = ({
                   variant="light"
                   color="blue"
                   onClick={onEdit}
+                  data-testid="edit-employee-button"
                 >
                   Edit Employee
                 </Button>
               )}
-              
+
               {canDelete && (
                 <Button
                   leftSection={<IconTrash size={16} />}
                   variant="light"
                   color="red"
                   onClick={onDelete}
+                  data-testid="delete-employee-button"
                 >
                   Delete Employee
                 </Button>

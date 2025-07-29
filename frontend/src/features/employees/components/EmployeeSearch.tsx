@@ -61,12 +61,15 @@ export const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
 
   const handleSubmit = (values: EmployeeSearchCriteria) => {
     // Filter out empty values
-    const filteredCriteria = Object.entries(values).reduce((acc, [key, value]) => {
-      if (value !== '' && value !== undefined && value !== null) {
-        acc[key as keyof EmployeeSearchCriteria] = value;
-      }
-      return acc;
-    }, {} as EmployeeSearchCriteria);
+    const filteredCriteria = Object.entries(values).reduce(
+      (acc, [key, value]) => {
+        if (value !== '' && value !== undefined && value !== null) {
+          acc[key as keyof EmployeeSearchCriteria] = value;
+        }
+        return acc;
+      },
+      {} as EmployeeSearchCriteria
+    );
 
     onSearch(filteredCriteria);
   };
@@ -108,7 +111,7 @@ export const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
               flex={1}
               {...form.getInputProps('name')}
             />
-            
+
             <Button
               type="submit"
               loading={loading}
@@ -116,7 +119,7 @@ export const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
             >
               Search
             </Button>
-            
+
             {hasActiveFilters && (
               <Button
                 variant="light"
@@ -127,13 +130,17 @@ export const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
                 Clear
               </Button>
             )}
-            
+
             <ActionIcon
               variant="light"
               onClick={toggleAdvanced}
               aria-label="Toggle advanced search"
             >
-              {advancedOpen ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+              {advancedOpen ? (
+                <IconChevronUp size={16} />
+              ) : (
+                <IconChevronDown size={16} />
+              )}
             </ActionIcon>
           </Group>
 
@@ -142,38 +149,46 @@ export const EmployeeSearch: React.FC<EmployeeSearchProps> = ({
             <Stack gap="md">
               <Group gap="md" align="center">
                 <IconFilter size={16} />
-                <Text size="sm" fw={500}>Advanced Filters</Text>
+                <Text size="sm" fw={500}>
+                  Advanced Filters
+                </Text>
               </Group>
-              
+
               <Group gap="md" grow>
                 <TextInput
                   label="Email"
                   placeholder="Search by email..."
                   {...form.getInputProps('email')}
                 />
-                
+
                 <Select
                   label="Department"
                   placeholder="Select department"
                   data={departmentOptions}
                   value={form.values.departmentId?.toString() || ''}
-                  onChange={(value) => 
-                    form.setFieldValue('departmentId', value ? parseInt(value) : undefined)
+                  onChange={value =>
+                    form.setFieldValue(
+                      'departmentId',
+                      value ? parseInt(value) : undefined
+                    )
                   }
                   clearable
                 />
-                
+
                 <Select
                   label="Position"
                   placeholder="Select position"
                   data={positionOptions}
                   value={form.values.positionId?.toString() || ''}
-                  onChange={(value) => 
-                    form.setFieldValue('positionId', value ? parseInt(value) : undefined)
+                  onChange={value =>
+                    form.setFieldValue(
+                      'positionId',
+                      value ? parseInt(value) : undefined
+                    )
                   }
                   clearable
                 />
-                
+
                 <Select
                   label="Status"
                   placeholder="Select status"

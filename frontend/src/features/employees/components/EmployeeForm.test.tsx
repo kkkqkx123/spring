@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
@@ -59,7 +59,7 @@ const mockEmployee: Employee = {
   hireDate: '2023-01-15',
   salary: 75000,
   status: 'ACTIVE',
-  profilePicture: null,
+  profilePicture: '',
 };
 
 const createWrapper = () => {
@@ -72,9 +72,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -107,17 +105,15 @@ describe('EmployeeForm', () => {
     });
 
     // Mock upload profile picture hook
-    (employeeHooks.useUploadProfilePicture as any).mockReturnValue(mockUploadProfilePicture);
+    (employeeHooks.useUploadProfilePicture as any).mockReturnValue(
+      mockUploadProfilePicture
+    );
   });
 
   it('renders create form correctly', () => {
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
     expect(screen.getByText('Add New Employee')).toBeInTheDocument();
     expect(screen.getByLabelText(/employee number/i)).toBeInTheDocument();
@@ -126,10 +122,12 @@ describe('EmployeeForm', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/department/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/position/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create employee/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create employee/i })
+    ).toBeInTheDocument();
   });
 
-  it('renders edit form with employee data', () => {
+  it('renders edit form with employee data', async () => {
     render(
       <EmployeeForm
         employee={mockEmployee}
@@ -139,30 +137,36 @@ describe('EmployeeForm', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('Edit Employee')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('EMP001')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('John')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Doe')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('john.doe@example.com')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /update employee/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Edit Employee')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('EMP001')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('John')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Doe')).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue('john.doe@example.com')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /update employee/i })
+      ).toBeInTheDocument();
+    });
   });
 
   it('validates required fields', async () => {
     const user = userEvent.setup();
-    
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
 
-    const submitButton = screen.getByRole('button', { name: /create employee/i });
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
+
+    const submitButton = screen.getByRole('button', {
+      name: /create employee/i,
+    });
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/employee number is required/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/employee number is required/i)
+      ).toBeInTheDocument();
       expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
       expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
       expect(screen.getByText(/department is required/i)).toBeInTheDocument();
@@ -174,19 +178,17 @@ describe('EmployeeForm', () => {
 
   it('validates email format', async () => {
     const user = userEvent.setup();
-    
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
+
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
     const emailInput = screen.getByLabelText(/email/i);
     await user.type(emailInput, 'invalid-email');
 
-    const submitButton = screen.getByRole('button', { name: /create employee/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create employee/i,
+    });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -196,32 +198,28 @@ describe('EmployeeForm', () => {
 
   it('submits form with valid data', async () => {
     const user = userEvent.setup();
-    
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
+
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
     // Fill in required fields
     await user.type(screen.getByLabelText(/employee number/i), 'EMP002');
     await user.type(screen.getByLabelText(/first name/i), 'Jane');
     await user.type(screen.getByLabelText(/last name/i), 'Smith');
     await user.type(screen.getByLabelText(/email/i), 'jane.smith@example.com');
-    
+
     // Select department
-    const departmentSelect = screen.getByLabelText(/department/i);
-    await user.click(departmentSelect);
+    await user.click(screen.getByRole('combobox', { name: /department/i }));
     await user.click(screen.getByText('Engineering'));
-    
+
     // Select position
-    const positionSelect = screen.getByLabelText(/position/i);
-    await user.click(positionSelect);
+    await user.click(screen.getByRole('combobox', { name: /position/i }));
     await user.click(screen.getByText('Software Engineer'));
 
-    const submitButton = screen.getByRole('button', { name: /create employee/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create employee/i,
+    });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -241,14 +239,10 @@ describe('EmployeeForm', () => {
 
   it('calls onCancel when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
+
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
@@ -257,43 +251,34 @@ describe('EmployeeForm', () => {
   });
 
   it('disables position select when no department is selected', () => {
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
-    const positionSelect = screen.getByLabelText(/position/i);
+    const positionSelect = screen.getByTestId('position-select');
     expect(positionSelect).toBeDisabled();
   });
 
   it('filters positions by selected department', async () => {
     const user = userEvent.setup();
-    
+
     // Mock positions for specific department
     (positionHooks.usePositionsByDepartment as any).mockReturnValue({
       data: [mockPositions[0]], // Only engineering position
     });
 
-    render(
-      <EmployeeForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />,
-      { wrapper: createWrapper() }
-    );
+    render(<EmployeeForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />, {
+      wrapper: createWrapper(),
+    });
 
     // Select engineering department
-    const departmentSelect = screen.getByLabelText(/department/i);
-    await user.click(departmentSelect);
+    await user.click(screen.getByRole('combobox', { name: /department/i }));
     await user.click(screen.getByText('Engineering'));
 
     // Check that position select is enabled and has correct options
-    const positionSelect = screen.getByLabelText(/position/i);
+    const positionSelect = screen.getByRole('combobox', { name: /position/i });
     expect(positionSelect).not.toBeDisabled();
-    
+
     await user.click(positionSelect);
     expect(screen.getByText('Software Engineer')).toBeInTheDocument();
     expect(screen.queryByText('Marketing Manager')).not.toBeInTheDocument();
@@ -309,9 +294,11 @@ describe('EmployeeForm', () => {
       { wrapper: createWrapper() }
     );
 
-    const submitButton = screen.getByRole('button', { name: /create employee/i });
+    const submitButton = screen.getByRole('button', {
+      name: /create employee/i,
+    });
     expect(submitButton).toBeDisabled();
-    
+
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     expect(cancelButton).toBeDisabled();
   });

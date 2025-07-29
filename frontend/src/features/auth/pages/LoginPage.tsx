@@ -18,7 +18,7 @@ export const LoginPage: React.FC = () => {
   const handleLogin = async (credentials: LoginRequest) => {
     try {
       await loginMutation.mutateAsync(credentials);
-      
+
       notifications.show({
         title: 'Login Successful',
         message: 'Welcome back!',

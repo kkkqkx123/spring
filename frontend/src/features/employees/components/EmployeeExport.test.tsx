@@ -12,44 +12,6 @@ import { vi } from 'vitest';
 vi.mock('../hooks/useEmployees');
 const mockUseEmployeeExport = useEmployeeExport as any;
 
-// Mock URL.createObjectURL and revokeObjectURL
-Object.defineProperty(global.URL, 'createObjectURL', {
-  writable: true,
-  value: vi.fn(() => 'mock-url'),
-});
-
-Object.defineProperty(global.URL, 'revokeObjectURL', {
-  writable: true,
-  value: vi.fn(),
-});
-
-// Mock document.createElement and appendChild/removeChild
-const mockLink = {
-  href: '',
-  download: '',
-  click: vi.fn(),
-};
-
-Object.defineProperty(document, 'createElement', {
-  writable: true,
-  value: vi.fn((tagName) => {
-    if (tagName === 'a') {
-      return mockLink;
-    }
-    return {};
-  }),
-});
-
-Object.defineProperty(document.body, 'appendChild', {
-  writable: true,
-  value: vi.fn(),
-});
-
-Object.defineProperty(document.body, 'removeChild', {
-  writable: true,
-  value: vi.fn(),
-});
-
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -128,7 +90,7 @@ describe('EmployeeExport', () => {
 
   it('renders export modal when opened', () => {
     renderComponent();
-    
+
     expect(screen.getByText('Export Employees')).toBeInTheDocument();
     expect(screen.getByText('Export Summary')).toBeInTheDocument();
     expect(screen.getByText('Select Fields to Export')).toBeInTheDocument();
@@ -136,25 +98,25 @@ describe('EmployeeExport', () => {
 
   it('does not render when closed', () => {
     renderComponent({ opened: false });
-    
+
     expect(screen.queryByText('Export Employees')).not.toBeInTheDocument();
   });
 
   it('shows correct summary for all employees', () => {
     renderComponent();
-    
+
     expect(screen.getByText('All employees (2)')).toBeInTheDocument();
   });
 
   it('shows correct summary for selected employees', () => {
     renderComponent({ selectedEmployees: [1] });
-    
+
     expect(screen.getByText('1 selected employees')).toBeInTheDocument();
   });
 
   it('displays all export fields with correct default selections', () => {
     renderComponent();
-    
+
     // Check that default selected fields are checked
     expect(screen.getByLabelText('Employee Number')).toBeChecked();
     expect(screen.getByLabelText('First Name')).toBeChecked();
@@ -165,7 +127,7 @@ describe('EmployeeExport', () => {
     expect(screen.getByLabelText('Position')).toBeChecked();
     expect(screen.getByLabelText('Hire Date')).toBeChecked();
     expect(screen.getByLabelText('Status')).toBeChecked();
-    
+
     // Check that sensitive fields are not selected by default
     expect(screen.getByLabelText('Salary')).not.toBeChecked();
     expect(screen.getByLabelText('Profile Picture URL')).not.toBeChecked();
@@ -173,33 +135,33 @@ describe('EmployeeExport', () => {
 
   it('toggles field selection when checkbox is clicked', () => {
     renderComponent();
-    
+
     const salaryCheckbox = screen.getByLabelText('Salary');
     expect(salaryCheckbox).not.toBeChecked();
-    
+
     fireEvent.click(salaryCheckbox);
     expect(salaryCheckbox).toBeChecked();
-    
+
     fireEvent.click(salaryCheckbox);
     expect(salaryCheckbox).not.toBeChecked();
   });
 
   it('selects/deselects all fields when Select All button is clicked', () => {
     renderComponent();
-    
+
     const selectAllButton = screen.getByText('Select All');
     fireEvent.click(selectAllButton);
-    
+
     // All fields should be selected
     expect(screen.getByLabelText('Salary')).toBeChecked();
     expect(screen.getByLabelText('Profile Picture URL')).toBeChecked();
-    
+
     // Button text should change
     expect(screen.getByText('Deselect All')).toBeInTheDocument();
-    
+
     // Click again to deselect all
     fireEvent.click(screen.getByText('Deselect All'));
-    
+
     // All fields should be deselected
     expect(screen.getByLabelText('Employee Number')).not.toBeChecked();
     expect(screen.getByLabelText('First Name')).not.toBeChecked();
@@ -207,48 +169,52 @@ describe('EmployeeExport', () => {
 
   it('shows warning when salary field is selected', () => {
     renderComponent();
-    
+
     const salaryCheckbox = screen.getByLabelText('Salary');
     fireEvent.click(salaryCheckbox);
-    
+
     expect(screen.getByText('Sensitive Data Warning')).toBeInTheDocument();
-    expect(screen.getByText(/You have selected to export salary information/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/You have selected to export salary information/)
+    ).toBeInTheDocument();
   });
 
   it('prevents export when no fields are selected', () => {
     renderComponent();
-    
+
     // Deselect all fields
     const deselectAllButton = screen.getByText('Deselect All');
     fireEvent.click(deselectAllButton);
-    
+
     const exportButton = screen.getByText('Export to Excel');
     expect(exportButton).toBeDisabled();
   });
 
   it('shows error notification when no fields are selected and export is attempted', () => {
     renderComponent();
-    
+
     // Deselect all fields
     const deselectAllButton = screen.getByText('Deselect All');
     fireEvent.click(deselectAllButton);
-    
+
     const exportButton = screen.getByText('Export to Excel');
     fireEvent.click(exportButton);
-    
+
     // Should show error notification (mocked)
     expect(mockMutateAsync).not.toHaveBeenCalled();
   });
 
   it('handles successful export', async () => {
-    const mockBlob = new Blob(['test data'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const mockBlob = new Blob(['test data'], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
     mockMutateAsync.mockResolvedValue(mockBlob);
-    
+
     renderComponent({ selectedEmployees: [1, 2] });
-    
+
     const exportButton = screen.getByText('Export to Excel');
     fireEvent.click(exportButton);
-    
+
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith([1, 2]);
       expect(mockLink.click).toHaveBeenCalled();
@@ -258,12 +224,12 @@ describe('EmployeeExport', () => {
 
   it('handles export failure', async () => {
     mockMutateAsync.mockRejectedValue(new Error('Export failed'));
-    
+
     renderComponent();
-    
+
     const exportButton = screen.getByText('Export to Excel');
     fireEvent.click(exportButton);
-    
+
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalled();
       // Should show error notification (mocked)
@@ -271,14 +237,16 @@ describe('EmployeeExport', () => {
   });
 
   it('exports all employees when no selection is provided', async () => {
-    const mockBlob = new Blob(['test data'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const mockBlob = new Blob(['test data'], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
     mockMutateAsync.mockResolvedValue(mockBlob);
-    
+
     renderComponent({ selectedEmployees: [] });
-    
+
     const exportButton = screen.getByText('Export to Excel');
     fireEvent.click(exportButton);
-    
+
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith(undefined);
     });
@@ -291,9 +259,9 @@ describe('EmployeeExport', () => {
       isError: false,
       error: null,
     } as any);
-    
+
     renderComponent();
-    
+
     expect(screen.getByText('Exporting employees...')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
@@ -305,32 +273,32 @@ describe('EmployeeExport', () => {
       isError: false,
       error: null,
     } as any);
-    
+
     renderComponent();
-    
+
     expect(screen.getByText('Cancel')).toBeDisabled();
     expect(screen.getByText('Export to Excel')).toBeDisabled();
   });
 
   it('closes modal and resets state when cancel is clicked', () => {
     renderComponent();
-    
+
     const cancelButton = screen.getByText('Cancel');
     fireEvent.click(cancelButton);
-    
+
     expect(mockOnClose).toHaveBeenCalled();
   });
 
   it('displays correct field count', () => {
     renderComponent();
-    
+
     // Default selected fields count
     expect(screen.getByText('9 of 10 fields selected')).toBeInTheDocument();
-    
+
     // Select salary field
     const salaryCheckbox = screen.getByLabelText('Salary');
     fireEvent.click(salaryCheckbox);
-    
+
     expect(screen.getByText('10 of 10 fields selected')).toBeInTheDocument();
   });
 });

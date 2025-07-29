@@ -20,8 +20,11 @@ vi.mock('../hooks/useEmployees', () => ({
 
 // Mock Mantine components
 vi.mock('@mantine/core', () => ({
-  Modal: ({ children, opened }: any) => opened ? <div data-testid="modal">{children}</div> : null,
-  Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
+  Modal: ({ children, opened }: any) =>
+    opened ? <div data-testid="modal">{children}</div> : null,
+  Button: ({ children, onClick }: any) => (
+    <button onClick={onClick}>{children}</button>
+  ),
   Text: ({ children }: any) => <span>{children}</span>,
   Group: ({ children }: any) => <div>{children}</div>,
   Stack: ({ children }: any) => <div>{children}</div>,
@@ -29,7 +32,9 @@ vi.mock('@mantine/core', () => ({
   Progress: () => <div data-testid="progress" />,
   Table: ({ children }: any) => <table>{children}</table>,
   ScrollArea: ({ children }: any) => <div>{children}</div>,
-  ActionIcon: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
+  ActionIcon: ({ children, onClick }: any) => (
+    <button onClick={onClick}>{children}</button>
+  ),
   Tooltip: ({ children }: any) => <div>{children}</div>,
   Paper: ({ children }: any) => <div>{children}</div>,
   Center: ({ children }: any) => <div>{children}</div>,
@@ -98,7 +103,7 @@ describe('Employee Import/Export Components', () => {
     it('should export both components from the module', async () => {
       const importModule = await import('./EmployeeImport');
       const exportModule = await import('./EmployeeExport');
-      
+
       expect(importModule.EmployeeImport).toBeDefined();
       expect(exportModule.EmployeeExport).toBeDefined();
     });

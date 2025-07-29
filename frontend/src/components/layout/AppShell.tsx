@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { AppShell as MantineAppShell, Burger, Group, Text, UnstyledButton } from '@mantine/core';
+import {
+  AppShell as MantineAppShell,
+  Burger,
+  Group,
+  Text,
+  UnstyledButton,
+} from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Navigation } from './Navigation';
 import { Header } from './Header';
@@ -25,8 +31,8 @@ export function AppShell({ user, children }: AppShellProps) {
       padding="md"
     >
       <MantineAppShell.Header>
-        <Header 
-          user={user} 
+        <Header
+          user={user}
           navbarOpened={opened}
           toggleNavbar={toggle}
           isMobile={isMobile}
@@ -34,15 +40,10 @@ export function AppShell({ user, children }: AppShellProps) {
       </MantineAppShell.Header>
 
       <MantineAppShell.Navbar p="md">
-        <Navigation 
-          user={user} 
-          onNavigate={isMobile ? close : undefined}
-        />
+        <Navigation user={user} onNavigate={isMobile ? close : undefined} />
       </MantineAppShell.Navbar>
 
-      <MantineAppShell.Main>
-        {children}
-      </MantineAppShell.Main>
+      <MantineAppShell.Main>{children}</MantineAppShell.Main>
     </MantineAppShell>
   );
 }

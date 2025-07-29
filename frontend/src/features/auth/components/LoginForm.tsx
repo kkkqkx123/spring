@@ -82,7 +82,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <Title ta="center" mb="md">
         Welcome back!
       </Title>
-      
+
       <Text c="dimmed" size="sm" ta="center" mb="xl">
         Sign in to your account to continue
       </Text>
@@ -100,11 +100,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack>
-          <FormField
-            label="Username"
-            error={errors.username?.message}
-            required
-          >
+          <FormField label="Username" error={errors.username?.message} required>
             <TextInput
               {...register('username')}
               placeholder="Enter your username"
@@ -114,11 +110,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             />
           </FormField>
 
-          <FormField
-            label="Password"
-            error={errors.password?.message}
-            required
-          >
+          <FormField label="Password" error={errors.password?.message} required>
             <PasswordInput
               {...register('password')}
               placeholder="Enter your password"

@@ -4,12 +4,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { EmployeeList } from './EmployeeList';
-import { Employee, PaginatedResponse } from '../../../types';
+import type { Employee, PaginatedResponse } from '../../../types';
 
 // Mock the hooks
 vi.mock('../hooks/useEmployees');
 vi.mock('../../departments/hooks/useDepartments');
 vi.mock('../../positions/hooks/usePositions');
+
+import * as employeeHooks from '../hooks/useEmployees';
+import * as departmentHooks from '../../departments/hooks/useDepartments';
+import * as positionHooks from '../../positions/hooks/usePositions';
 
 const mockEmployees: Employee[] = [
   {
@@ -114,15 +118,10 @@ const defaultProps = {
   onImportEmployees: vi.fn(),
 };
 
-// Import the mocked modules
-import * as employeeHooks from '../hooks/useEmployees';
-import * as departmentHooks from '../../departments/hooks/useDepartments';
-import * as positionHooks from '../../positions/hooks/usePositions';
-
 describe('EmployeeList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Setup default mock implementations
     vi.mocked(employeeHooks.useEmployeeListState).mockReturnValue({
       pageable: { page: 0, size: 10 },
@@ -133,36 +132,100 @@ describe('EmployeeList', () => {
       updateSearchCriteria: vi.fn(),
       clearSearch: vi.fn(),
     });
-    
+
     vi.mocked(employeeHooks.useEmployees).mockReturnValue({
       data: mockPaginatedResponse,
       isLoading: false,
       error: null,
-    });
-    
+      isError: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+      dataUpdatedAt: 0,
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isFetching: false,
+      isInitialLoading: false,
+      isPaused: false,
+      isPlaceholderData: false,
+      isRefetching: false,
+      isStale: false,
+      refetch: vi.fn(),
+      fetchStatus: 'idle',
+    } as any);
+
     vi.mocked(employeeHooks.useEmployeeSearch).mockReturnValue({
-      data: null,
+      data: undefined,
       isLoading: false,
       error: null,
-    });
-    
+      isError: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+      dataUpdatedAt: 0,
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isFetching: false,
+      isInitialLoading: false,
+      isPaused: false,
+      isPlaceholderData: false,
+      isRefetching: false,
+      isStale: false,
+      refetch: vi.fn(),
+      fetchStatus: 'idle',
+    } as any);
+
     vi.mocked(employeeHooks.useDeleteEmployees).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
-    });
-    
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+    } as any);
+
     vi.mocked(employeeHooks.useEmployeeExport).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
-    });
-    
+      isError: false,
+      isSuccess: true,
+      status: 'success',
+    } as any);
+
     vi.mocked(departmentHooks.useDepartments).mockReturnValue({
       data: mockDepartments,
-    });
-    
+      isLoading: false,
+      error: null,
+      isError: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+    } as any);
+
     vi.mocked(positionHooks.usePositions).mockReturnValue({
       data: mockPositions,
-    });
+      isLoading: false,
+      error: null,
+      isError: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+    } as any);
   });
 
   it('renders employee list in table view by default', () => {
@@ -171,7 +234,7 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     expect(screen.getByText('EMP001')).toBeInTheDocument();
@@ -180,34 +243,48 @@ describe('EmployeeList', () => {
 
   it('shows loading state when data is loading', () => {
     vi.mocked(employeeHooks.useEmployees).mockReturnValue({
-      data: null,
+      data: undefined,
       isLoading: true,
       error: null,
-    });
-    
+      isError: false,
+      isPending: true,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: false,
+      status: 'pending',
+    } as any);
+
     render(
       <TestWrapper>
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText('Loading employees...')).toBeInTheDocument();
   });
 
   it('shows error state when there is an error', () => {
     vi.mocked(employeeHooks.useEmployees).mockReturnValue({
-      data: null,
+      data: undefined,
       isLoading: false,
       error: new Error('Failed to load'),
-    });
-    
+      isError: true,
+      isPending: false,
+      isLoadingError: true,
+      isRefetchError: false,
+      isSuccess: false,
+      status: 'error',
+    } as any);
+
     render(
       <TestWrapper>
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
-    expect(screen.getByText('Failed to load employees. Please try again.')).toBeInTheDocument();
+
+    expect(
+      screen.getByText('Failed to load employees. Please try again.')
+    ).toBeInTheDocument();
   });
 
   it('shows Add Employee button when onCreateEmployee is provided', () => {
@@ -216,8 +293,10 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
-    expect(screen.getByRole('button', { name: 'Add Employee' })).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Add Employee' })
+    ).toBeInTheDocument();
   });
 
   it('calls onCreateEmployee when Add Employee button is clicked', () => {
@@ -226,10 +305,10 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     const addButton = screen.getByRole('button', { name: 'Add Employee' });
     fireEvent.click(addButton);
-    
+
     expect(defaultProps.onCreateEmployee).toHaveBeenCalled();
   });
 
@@ -239,14 +318,14 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     // Should be in table view by default
     expect(screen.getByRole('table')).toBeInTheDocument();
-    
+
     // Switch to grid view
     const gridViewButton = screen.getByRole('radio', { name: '' }); // Grid icon button
     fireEvent.click(gridViewButton);
-    
+
     await waitFor(() => {
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
       // Should show employee cards instead
@@ -260,7 +339,7 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText('2 employees')).toBeInTheDocument();
   });
 
@@ -273,14 +352,20 @@ describe('EmployeeList', () => {
       },
       isLoading: false,
       error: null,
-    });
-    
+      isError: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+    } as any);
+
     render(
       <TestWrapper>
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText('1 employee')).toBeInTheDocument();
   });
 
@@ -294,15 +379,19 @@ describe('EmployeeList', () => {
       updateSearchCriteria: vi.fn(),
       clearSearch: vi.fn(),
     });
-    
+
     render(
       <TestWrapper>
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
-    expect(screen.getByRole('button', { name: 'Delete (2)' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Export Selected' })).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Delete (2)' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Export Selected' })
+    ).toBeInTheDocument();
   });
 
   it('opens delete confirmation modal when delete button is clicked', async () => {
@@ -315,19 +404,21 @@ describe('EmployeeList', () => {
       updateSearchCriteria: vi.fn(),
       clearSearch: vi.fn(),
     });
-    
+
     render(
       <TestWrapper>
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
+
     const deleteButton = screen.getByRole('button', { name: 'Delete (1)' });
     fireEvent.click(deleteButton);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Delete Employees')).toBeInTheDocument();
-      expect(screen.getByText(/Are you sure you want to delete 1 employee/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Are you sure you want to delete 1 employee/)
+      ).toBeInTheDocument();
     });
   });
 
@@ -337,8 +428,10 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
-    expect(screen.getByPlaceholderText('Search by name...')).toBeInTheDocument();
+
+    expect(
+      screen.getByPlaceholderText('Search by name...')
+    ).toBeInTheDocument();
   });
 
   it('shows More Actions menu', async () => {
@@ -347,10 +440,12 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
-    const moreActionsButton = screen.getByRole('button', { name: 'More Actions' });
+
+    const moreActionsButton = screen.getByRole('button', {
+      name: 'More Actions',
+    });
     fireEvent.click(moreActionsButton);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Import Employees')).toBeInTheDocument();
       expect(screen.getByText('Export All')).toBeInTheDocument();
@@ -363,15 +458,17 @@ describe('EmployeeList', () => {
         <EmployeeList {...defaultProps} />
       </TestWrapper>
     );
-    
-    const moreActionsButton = screen.getByRole('button', { name: 'More Actions' });
+
+    const moreActionsButton = screen.getByRole('button', {
+      name: 'More Actions',
+    });
     fireEvent.click(moreActionsButton);
-    
+
     await waitFor(() => {
       const importButton = screen.getByText('Import Employees');
       fireEvent.click(importButton);
     });
-    
+
     expect(defaultProps.onImportEmployees).toHaveBeenCalled();
   });
 });

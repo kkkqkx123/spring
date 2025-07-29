@@ -10,9 +10,15 @@ import type { Employee } from '../../../types';
 
 export const EmployeesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [importModalOpened, { open: openImportModal, close: closeImportModal }] = useDisclosure(false);
-  const [exportModalOpened, { open: openExportModal, close: closeExportModal }] = useDisclosure(false);
-  
+  const [
+    importModalOpened,
+    { open: openImportModal, close: closeImportModal },
+  ] = useDisclosure(false);
+  const [
+    exportModalOpened,
+    { open: openExportModal, close: closeExportModal },
+  ] = useDisclosure(false);
+
   const { selectedEmployees } = useEmployeeListState();
 
   const handleCreateEmployee = () => {
@@ -36,7 +42,7 @@ export const EmployeesPage: React.FC = () => {
     <Container size="xl" py="xl">
       <Stack gap="lg">
         <Title order={1}>Employees</Title>
-        
+
         <EmployeeList
           onCreateEmployee={handleCreateEmployee}
           onEditEmployee={handleEditEmployee}

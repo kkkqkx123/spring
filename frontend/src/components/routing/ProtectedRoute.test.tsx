@@ -17,7 +17,11 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     Navigate: ({ to, state }: { to: string; state?: any }) => (
-      <div data-testid="navigate" data-to={to} data-state={JSON.stringify(state)}>
+      <div
+        data-testid="navigate"
+        data-to={to}
+        data-state={JSON.stringify(state)}
+      >
         Navigate to {to}
       </div>
     ),
@@ -26,15 +30,15 @@ vi.mock('react-router-dom', async () => {
 
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <MantineProvider>
-    <BrowserRouter>
-      {children}
-    </BrowserRouter>
+    <BrowserRouter>{children}</BrowserRouter>
   </MantineProvider>
 );
 
 describe('ProtectedRoute', () => {
   const mockUseAuth = useAuth as any;
-  const TestComponent = () => <div data-testid="protected-content">Protected Content</div>;
+  const TestComponent = () => (
+    <div data-testid="protected-content">Protected Content</div>
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -77,7 +81,10 @@ describe('ProtectedRoute', () => {
     );
 
     expect(screen.getByTestId('navigate')).toBeInTheDocument();
-    expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', ROUTES.LOGIN);
+    expect(screen.getByTestId('navigate')).toHaveAttribute(
+      'data-to',
+      ROUTES.LOGIN
+    );
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
   });
 
@@ -142,7 +149,9 @@ describe('ProtectedRoute', () => {
     );
 
     expect(screen.getByText('Access Denied')).toBeInTheDocument();
-    expect(screen.getByText(/Required permissions: EMPLOYEE_READ/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Required permissions: EMPLOYEE_READ/)
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
     expect(mockHasPermission).toHaveBeenCalledWith('EMPLOYEE_READ');
   });
@@ -192,9 +201,10 @@ describe('ProtectedRoute', () => {
   });
 
   it('handles multiple roles with requireAll=false (OR logic)', () => {
-    const mockHasRole = vi.fn()
+    const mockHasRole = vi
+      .fn()
       .mockReturnValueOnce(false) // First role check fails
-      .mockReturnValueOnce(true);  // Second role check passes
+      .mockReturnValueOnce(true); // Second role check passes
 
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
@@ -217,8 +227,9 @@ describe('ProtectedRoute', () => {
   });
 
   it('handles multiple roles with requireAll=true (AND logic)', () => {
-    const mockHasRole = vi.fn()
-      .mockReturnValueOnce(true)  // First role check passes
+    const mockHasRole = vi
+      .fn()
+      .mockReturnValueOnce(true) // First role check passes
       .mockReturnValueOnce(false); // Second role check fails
 
     mockUseAuth.mockReturnValue({
@@ -237,7 +248,9 @@ describe('ProtectedRoute', () => {
     );
 
     expect(screen.getByText('Access Denied')).toBeInTheDocument();
-    expect(screen.getByText(/Required roles: ADMIN AND MANAGER/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Required roles: ADMIN AND MANAGER/)
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
   });
 
@@ -250,7 +263,9 @@ describe('ProtectedRoute', () => {
       hasPermission: vi.fn(),
     });
 
-    const CustomFallback = () => <div data-testid="custom-fallback">Custom Access Denied</div>;
+    const CustomFallback = () => (
+      <div data-testid="custom-fallback">Custom Access Denied</div>
+    );
 
     render(
       <TestWrapper>

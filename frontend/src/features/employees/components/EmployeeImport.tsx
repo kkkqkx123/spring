@@ -388,6 +388,7 @@ export const EmployeeImport: React.FC<EmployeeImportProps> = ({
           ]}
           ref={fileInputRef}
           loading={isProcessing}
+          data-testid="employee-import-dropzone"
         >
           <Group
             justify="center"
@@ -446,6 +447,7 @@ export const EmployeeImport: React.FC<EmployeeImportProps> = ({
                 variant="subtle"
                 color="red"
                 onClick={() => setFile(null)}
+                aria-label="Remove file"
               >
                 <IconX size={16} />
               </ActionIcon>

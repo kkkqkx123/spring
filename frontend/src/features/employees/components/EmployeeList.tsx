@@ -29,7 +29,13 @@ import { DataTable } from '../../../components/ui/DataTable';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmployeeSearch } from './EmployeeSearch';
 import { EmployeeCard } from './EmployeeCard';
-import { useEmployees, useEmployeeSearch, useDeleteEmployees, useEmployeeExport, useEmployeeListState } from '../hooks/useEmployees';
+import {
+  useEmployees,
+  useEmployeeSearch,
+  useDeleteEmployees,
+  useEmployeeExport,
+  useEmployeeListState,
+} from '../hooks/useEmployees';
 import { useDepartments } from '../../departments/hooks/useDepartments';
 import { usePositions } from '../../positions/hooks/usePositions';
 import { Employee, DataTableColumn } from '../../../types';
@@ -52,7 +58,10 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
   onExportEmployees,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('table');
-  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
+  const [
+    deleteModalOpened,
+    { open: openDeleteModal, close: closeDeleteModal },
+  ] = useDisclosure(false);
 
   const {
     pageable,
@@ -101,7 +110,10 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
     updatePageable({ sort });
   };
 
-  const handleRowSelection = (selectedRowKeys: React.Key[], selectedRows: Employee[]) => {
+  const handleRowSelection = (
+    selectedRowKeys: React.Key[],
+    selectedRows: Employee[]
+  ) => {
     setSelectedEmployees(selectedRows.map(emp => emp.id));
   };
 
@@ -129,7 +141,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
       const blob = await exportEmployeesMutation.mutateAsync(
         selectedEmployees.length > 0 ? selectedEmployees : undefined
       );
-      
+
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -191,10 +203,16 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
       key: 'status',
       title: 'Status',
       sortable: true,
-      render: (value) => (
+      render: value => (
         <Text
           size="sm"
-          c={value === 'ACTIVE' ? 'green' : value === 'INACTIVE' ? 'yellow' : 'red'}
+          c={
+            value === 'ACTIVE'
+              ? 'green'
+              : value === 'INACTIVE'
+                ? 'yellow'
+                : 'red'
+          }
           fw={500}
         >
           {value}
@@ -218,9 +236,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
               </Menu.Item>
             )}
             {onEditEmployee && (
-              <Menu.Item onClick={() => onEditEmployee(record)}>
-                Edit
-              </Menu.Item>
+              <Menu.Item onClick={() => onEditEmployee(record)}>Edit</Menu.Item>
             )}
           </Menu.Dropdown>
         </Menu>
@@ -259,7 +275,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
               Add Employee
             </Button>
           )}
-          
+
           {selectedEmployees.length > 0 && (
             <>
               <Button
@@ -270,7 +286,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
               >
                 Delete ({selectedEmployees.length})
               </Button>
-              
+
               <Button
                 variant="light"
                 leftSection={<IconDownload size={16} />}
@@ -281,7 +297,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
               </Button>
             </>
           )}
-          
+
           <Menu shadow="md" width={200}>
             <Menu.Target>
               <Button variant="light" leftSection={<IconDots size={16} />}>
@@ -312,10 +328,10 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
           <Text size="sm" c="dimmed">
             {totalElements} employee{totalElements !== 1 ? 's' : ''}
           </Text>
-          
+
           <SegmentedControl
             value={viewMode}
-            onChange={(value) => setViewMode(value as ViewMode)}
+            onChange={value => setViewMode(value as ViewMode)}
             data={[
               { label: <IconList size={16} />, value: 'table' },
               { label: <IconGrid3X3 size={16} />, value: 'grid' },
@@ -330,7 +346,9 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
         <Center py="xl">
           <Stack align="center" gap="sm">
             <Loader size="md" />
-            <Text size="sm" c="dimmed">Loading employees...</Text>
+            <Text size="sm" c="dimmed">
+              Loading employees...
+            </Text>
           </Stack>
         </Center>
       ) : viewMode === 'table' ? (
@@ -351,16 +369,18 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
         />
       ) : (
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
-          {employees.map((employee) => (
+          {employees.map(employee => (
             <EmployeeCard
               key={employee.id}
               employee={employee}
               selected={selectedEmployees.includes(employee.id)}
-              onSelect={(selected) => {
+              onSelect={selected => {
                 if (selected) {
                   setSelectedEmployees(prev => [...prev, employee.id]);
                 } else {
-                  setSelectedEmployees(prev => prev.filter(id => id !== employee.id));
+                  setSelectedEmployees(prev =>
+                    prev.filter(id => id !== employee.id)
+                  );
                 }
               }}
               onView={onViewEmployee}

@@ -30,7 +30,9 @@ export class EmployeeApi {
   constructor(private client: ApiClient) {}
 
   async getEmployees(pageable: Pageable): Promise<PaginatedResponse<Employee>> {
-    const response = await this.client.get('/api/employees', { params: pageable });
+    const response = await this.client.get('/api/employees', {
+      params: pageable,
+    });
     return response.data;
   }
 
@@ -44,7 +46,10 @@ export class EmployeeApi {
     return response.data;
   }
 
-  async updateEmployee(id: number, employee: EmployeeUpdateRequest): Promise<Employee> {
+  async updateEmployee(
+    id: number,
+    employee: EmployeeUpdateRequest
+  ): Promise<Employee> {
     const response = await this.client.put(`/api/employees/${id}`, employee);
     return response.data;
   }
@@ -62,7 +67,7 @@ export class EmployeeApi {
     pageable: Pageable
   ): Promise<PaginatedResponse<Employee>> {
     const response = await this.client.post('/api/employees/search', criteria, {
-      params: pageable
+      params: pageable,
     });
     return response.data;
   }
@@ -71,15 +76,19 @@ export class EmployeeApi {
     const formData = new FormData();
     formData.append('file', file);
     const response = await this.client.post('/api/employees/import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   }
 
   async exportEmployees(ids?: number[]): Promise<Blob> {
-    const response = await this.client.post('/api/employees/export', ids || [], {
-      responseType: 'blob'
-    });
+    const response = await this.client.post(
+      '/api/employees/export',
+      ids || [],
+      {
+        responseType: 'blob',
+      }
+    );
     return response.data;
   }
 
@@ -90,7 +99,7 @@ export class EmployeeApi {
       `/api/employees/${employeeId}/profile-picture`,
       formData,
       {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
       }
     );
     return response.data;

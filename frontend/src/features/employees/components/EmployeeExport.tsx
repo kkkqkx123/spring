@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useCallback } from 'react';
 import {
   Modal,
@@ -55,7 +54,8 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
   selectedEmployees = [],
   allEmployees = [],
 }) => {
-  const [exportFields, setExportFields] = useState<ExportField[]>(defaultExportFields);
+  const [exportFields, setExportFields] =
+    useState<ExportField[]>(defaultExportFields);
   const [exportProgress, setExportProgress] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -64,9 +64,7 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
   const handleFieldToggle = useCallback((fieldKey: string) => {
     setExportFields(prev =>
       prev.map(field =>
-        field.key === fieldKey
-          ? { ...field, selected: !field.selected }
-          : field
+        field.key === fieldKey ? { ...field, selected: !field.selected } : field
       )
     );
   }, []);
@@ -80,7 +78,7 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
 
   const handleExport = useCallback(async () => {
     const selectedFields = exportFields.filter(field => field.selected);
-    
+
     if (selectedFields.length === 0) {
       notifications.show({
         title: 'No Fields Selected',
@@ -106,9 +104,10 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
         });
       }, 200);
 
-      const exportIds = selectedEmployees.length > 0 ? selectedEmployees : undefined;
+      const exportIds =
+        selectedEmployees.length > 0 ? selectedEmployees : undefined;
       const blob = await exportMutation.mutateAsync(exportIds);
-      
+
       clearInterval(progressInterval);
       setExportProgress(100);
 
@@ -150,8 +149,13 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
     onClose();
   }, [onClose]);
 
-  const selectedFieldsCount = exportFields.filter(field => field.selected).length;
-  const exportCount = selectedEmployees.length > 0 ? selectedEmployees.length : allEmployees.length;
+  const selectedFieldsCount = exportFields.filter(
+    field => field.selected
+  ).length;
+  const exportCount =
+    selectedEmployees.length > 0
+      ? selectedEmployees.length
+      : allEmployees.length;
 
   return (
     <Modal
@@ -181,19 +185,17 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
         <Stack gap="sm">
           <Group justify="space-between" align="center">
             <Text fw={500}>Select Fields to Export</Text>
-            <Button
-              variant="subtle"
-              size="xs"
-              onClick={handleSelectAll}
-            >
-              {exportFields.every(field => field.selected) ? 'Deselect All' : 'Select All'}
+            <Button variant="subtle" size="xs" onClick={handleSelectAll}>
+              {exportFields.every(field => field.selected)
+                ? 'Deselect All'
+                : 'Select All'}
             </Button>
           </Group>
 
           <Paper p="md" withBorder>
             <ScrollArea.Autosize mah={300}>
               <Stack gap="xs">
-                {exportFields.map((field) => (
+                {exportFields.map(field => (
                   <Checkbox
                     key={field.key}
                     label={field.label}
@@ -219,22 +221,28 @@ export const EmployeeExport: React.FC<EmployeeExportProps> = ({
         )}
 
         {/* Warning for sensitive data */}
-        {exportFields.some(field => field.key === 'salary' && field.selected) && (
+        {exportFields.some(
+          field => field.key === 'salary' && field.selected
+        ) && (
           <Alert
             icon={<IconAlertCircle size={16} />}
             title="Sensitive Data Warning"
             color="orange"
           >
             <Text size="sm">
-              You have selected to export salary information. Please ensure you have
-              the necessary permissions and handle this data securely.
+              You have selected to export salary information. Please ensure you
+              have the necessary permissions and handle this data securely.
             </Text>
           </Alert>
         )}
 
         {/* Action Buttons */}
         <Group justify="flex-end" mt="md">
-          <Button variant="outline" onClick={handleClose} disabled={isExporting}>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={isExporting}
+          >
             Cancel
           </Button>
           <Button

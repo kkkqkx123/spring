@@ -14,7 +14,11 @@ import {
   Paper,
   ScrollArea,
 } from '@mantine/core';
-import { IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons-react';
+import {
+  IconSearch,
+  IconSortAscending,
+  IconSortDescending,
+} from '@tabler/icons-react';
 import { DataTableProps, DataTableColumn } from '../../types';
 
 interface SortState {
@@ -29,18 +33,24 @@ export function DataTable<T extends Record<string, any>>({
   pagination,
   rowSelection,
 }: DataTableProps<T>) {
-  const [sortState, setSortState] = useState<SortState>({ key: null, direction: null });
+  const [sortState, setSortState] = useState<SortState>({
+    key: null,
+    direction: null,
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [pageSize, setPageSize] = useState(pagination?.pageSize || 10);
 
   // Filter data based on search term
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
-    
-    return data.filter((item) =>
-      columns.some((column) => {
+
+    return data.filter(item =>
+      columns.some(column => {
         const value = item[column.key];
-        return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        return value
+          ?.toString()
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
       })
     );
   }, [data, searchTerm, columns]);
@@ -54,7 +64,7 @@ export function DataTable<T extends Record<string, any>>({
       const bValue = b[sortState.key!];
 
       if (aValue === bValue) return 0;
-      
+
       const comparison = aValue < bValue ? -1 : 1;
       return sortState.direction === 'asc' ? comparison : -comparison;
     });
@@ -66,7 +76,8 @@ export function DataTable<T extends Record<string, any>>({
 
     setSortState(prev => {
       if (prev.key === columnKey) {
-        if (prev.direction === 'asc') return { key: columnKey, direction: 'desc' };
+        if (prev.direction === 'asc')
+          return { key: columnKey, direction: 'desc' };
         if (prev.direction === 'desc') return { key: null, direction: null };
       }
       return { key: columnKey, direction: 'asc' };
@@ -75,7 +86,7 @@ export function DataTable<T extends Record<string, any>>({
 
   const handleSelectAll = (checked: boolean) => {
     if (!rowSelection) return;
-    
+
     if (checked) {
       const allKeys = sortedData.map((_, index) => index);
       rowSelection.onChange(allKeys, sortedData);
@@ -90,22 +101,30 @@ export function DataTable<T extends Record<string, any>>({
     const newSelectedKeys = checked
       ? [...rowSelection.selectedRowKeys, index]
       : rowSelection.selectedRowKeys.filter(key => key !== index);
-    
-    const newSelectedRows = newSelectedKeys.map(key => sortedData[key as number]);
+
+    const newSelectedRows = newSelectedKeys.map(
+      key => sortedData[key as number]
+    );
     rowSelection.onChange(newSelectedKeys, newSelectedRows);
   };
 
   const getSortIcon = (columnKey: string) => {
     if (sortState.key !== columnKey) return null;
-    return sortState.direction === 'asc' ? <IconSortAscending size={14} /> : <IconSortDescending size={14} />;
+    return sortState.direction === 'asc' ? (
+      <IconSortAscending size={14} />
+    ) : (
+      <IconSortDescending size={14} />
+    );
   };
 
-  const isAllSelected = rowSelection && 
-    sortedData.length > 0 && 
+  const isAllSelected =
+    rowSelection &&
+    sortedData.length > 0 &&
     rowSelection.selectedRowKeys.length === sortedData.length;
 
-  const isIndeterminate = rowSelection && 
-    rowSelection.selectedRowKeys.length > 0 && 
+  const isIndeterminate =
+    rowSelection &&
+    rowSelection.selectedRowKeys.length > 0 &&
     rowSelection.selectedRowKeys.length < sortedData.length;
 
   if (loading) {
@@ -114,7 +133,9 @@ export function DataTable<T extends Record<string, any>>({
         <Center h={200}>
           <Stack align="center" gap="sm">
             <Loader size="md" />
-            <Text size="sm" c="dimmed">Loading data...</Text>
+            <Text size="sm" c="dimmed">
+              Loading data...
+            </Text>
           </Stack>
         </Center>
       </Paper>
@@ -130,14 +151,14 @@ export function DataTable<T extends Record<string, any>>({
             placeholder="Search..."
             leftSection={<IconSearch size={16} />}
             value={searchTerm}
-            onChange={(event) => setSearchTerm(event.currentTarget.value)}
+            onChange={event => setSearchTerm(event.currentTarget.value)}
             style={{ flex: 1, maxWidth: 300 }}
           />
-          
+
           {pagination && (
             <Select
               value={pageSize.toString()}
-              onChange={(value) => {
+              onChange={value => {
                 const newSize = parseInt(value || '10');
                 setPageSize(newSize);
                 pagination.onChange(1, newSize);
@@ -163,17 +184,19 @@ export function DataTable<T extends Record<string, any>>({
                     <Checkbox
                       checked={isAllSelected}
                       indeterminate={isIndeterminate}
-                      onChange={(event) => handleSelectAll(event.currentTarget.checked)}
+                      onChange={event =>
+                        handleSelectAll(event.currentTarget.checked)
+                      }
                       aria-label="Select all rows"
                     />
                   </Table.Th>
                 )}
-                {columns.map((column) => (
+                {columns.map(column => (
                   <Table.Th
                     key={String(column.key)}
-                    style={{ 
+                    style={{
                       cursor: column.sortable ? 'pointer' : 'default',
-                      userSelect: 'none'
+                      userSelect: 'none',
                     }}
                     onClick={() => handleSort(String(column.key))}
                   >
@@ -201,17 +224,18 @@ export function DataTable<T extends Record<string, any>>({
                       <Table.Td>
                         <Checkbox
                           checked={rowSelection.selectedRowKeys.includes(index)}
-                          onChange={(event) => handleSelectRow(index, event.currentTarget.checked)}
+                          onChange={event =>
+                            handleSelectRow(index, event.currentTarget.checked)
+                          }
                           aria-label={`Select row ${index + 1}`}
                         />
                       </Table.Td>
                     )}
-                    {columns.map((column) => (
+                    {columns.map(column => (
                       <Table.Td key={String(column.key)}>
-                        {column.render 
+                        {column.render
                           ? column.render(row[column.key], row)
-                          : row[column.key]?.toString() || '-'
-                        }
+                          : row[column.key]?.toString() || '-'}
                       </Table.Td>
                     ))}
                   </Table.Tr>
@@ -225,13 +249,16 @@ export function DataTable<T extends Record<string, any>>({
         {pagination && pagination.total > 0 && (
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
-              Showing {((pagination.current - 1) * pagination.pageSize) + 1} to{' '}
-              {Math.min(pagination.current * pagination.pageSize, pagination.total)} of{' '}
-              {pagination.total} entries
+              Showing {(pagination.current - 1) * pagination.pageSize + 1} to{' '}
+              {Math.min(
+                pagination.current * pagination.pageSize,
+                pagination.total
+              )}{' '}
+              of {pagination.total} entries
             </Text>
             <Pagination
               value={pagination.current}
-              onChange={(page) => pagination.onChange(page, pagination.pageSize)}
+              onChange={page => pagination.onChange(page, pagination.pageSize)}
               total={Math.ceil(pagination.total / pagination.pageSize)}
               size="sm"
             />

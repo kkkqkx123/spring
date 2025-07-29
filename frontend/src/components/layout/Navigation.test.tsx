@@ -28,12 +28,13 @@ const hrManagerUser: User = {
   roles: [{ id: 2, name: 'HR_MANAGER', permissions: [] }],
 };
 
-const renderWithProviders = (component: React.ReactElement, initialRoute = '/') => {
+const renderWithProviders = (
+  component: React.ReactElement,
+  initialRoute = '/'
+) => {
   return render(
     <MantineProvider>
-      <MemoryRouter initialEntries={[initialRoute]}>
-        {component}
-      </MemoryRouter>
+      <MemoryRouter initialEntries={[initialRoute]}>{component}</MemoryRouter>
     </MantineProvider>
   );
 };
@@ -47,7 +48,11 @@ describe('Navigation', () => {
   });
 
   it('renders username when first/last name not available', () => {
-    const userWithoutName = { ...mockUser, firstName: undefined, lastName: undefined };
+    const userWithoutName = {
+      ...mockUser,
+      firstName: undefined,
+      lastName: undefined,
+    };
     renderWithProviders(<Navigation user={userWithoutName} />);
 
     expect(screen.getByText('testuser')).toBeInTheDocument();
@@ -106,7 +111,9 @@ describe('Navigation', () => {
     const user = userEvent.setup();
     const mockOnNavigate = vi.fn();
 
-    renderWithProviders(<Navigation user={mockUser} onNavigate={mockOnNavigate} />);
+    renderWithProviders(
+      <Navigation user={mockUser} onNavigate={mockOnNavigate} />
+    );
 
     await user.click(screen.getByText('Dashboard'));
     expect(mockOnNavigate).toHaveBeenCalledTimes(1);

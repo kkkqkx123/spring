@@ -30,3 +30,20 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: () => {},
   }),
 });
+
+// Mock URL.createObjectURL
+Object.defineProperty(URL, 'createObjectURL', {
+  writable: true,
+  value: (obj: Blob | MediaSource) => {
+    if (obj instanceof Blob) {
+      return `blob:${obj.type}`;
+    }
+    return 'blob:';
+  },
+});
+
+// Mock URL.revokeObjectURL
+Object.defineProperty(URL, 'revokeObjectURL', {
+  writable: true,
+  value: () => {},
+});

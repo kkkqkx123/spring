@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -22,9 +21,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { IconUpload, IconUser, IconAlertCircle } from '@tabler/icons-react';
 import { type Employee, type EmployeeStatus } from '../../../types';
-import { type EmployeeCreateRequest, type EmployeeUpdateRequest } from '../services/employeeApi';
+import {
+  type EmployeeCreateRequest,
+  type EmployeeUpdateRequest,
+} from '../services/employeeApi';
 import { useDepartments } from '../../departments/hooks/useDepartments';
-import { usePositions, usePositionsByDepartment } from '../../positions/hooks/usePositions';
+import {
+  usePositions,
+  usePositionsByDepartment,
+} from '../../positions/hooks/usePositions';
 import { useUploadProfilePicture } from '../hooks/useEmployees';
 import { FormField } from '../../../components/ui';
 
@@ -64,13 +69,15 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
   loading = false,
 }) => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(
-    employee?.profilePicture || null
-  );
+  const [profilePicturePreview, setProfilePicturePreview] = useState<
+    string | null
+  >(employee?.profilePicture || null);
 
-  const { data: departments = [], isLoading: departmentsLoading } = useDepartments();
-  const { data: allPositions = [], isLoading: positionsLoading } = usePositions();
-  
+  const { data: departments = [], isLoading: departmentsLoading } =
+    useDepartments();
+  const { data: allPositions = [], isLoading: positionsLoading } =
+    usePositions();
+
   const uploadProfilePicture = useUploadProfilePicture();
 
   const {
@@ -97,7 +104,8 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
   });
 
   const selectedDepartmentId = watch('departmentId');
-  const { data: departmentPositions = [] } = usePositionsByDepartment(selectedDepartmentId);
+  const { data: departmentPositions = [] } =
+    usePositionsByDepartment(selectedDepartmentId);
 
   // Reset position when department changes
   useEffect(() => {
@@ -129,7 +137,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
     setProfilePicture(file);
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         setProfilePicturePreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
@@ -155,7 +163,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
 
     try {
       await onSubmit(formData);
-      
+
       // Upload profile picture if provided and employee was created/updated successfully
       if (profilePicture && employee?.id) {
         await uploadProfilePicture.mutateAsync({
@@ -168,12 +176,14 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
     }
   };
 
-  const departmentOptions = departments.map((dept) => ({
+  const departmentOptions = departments.map(dept => ({
     value: dept.id.toString(),
     label: dept.name,
   }));
 
-  const positionOptions = (selectedDepartmentId ? departmentPositions : allPositions).map((pos) => ({
+  const positionOptions = (
+    selectedDepartmentId ? departmentPositions : allPositions
+  ).map(pos => ({
     value: pos.id.toString(),
     label: pos.title,
   }));
@@ -182,8 +192,8 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
     <Card shadow="sm" padding="lg" radius="md">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <Stack gap="md">
-          <Text size="lg" fw={600}>
-            {employee ? 'Edit Employee' : 'Add New Employee'}
+          <Text size="lg" fw={600} component="h2">
+            {employee ? 'Employee Information' : 'New Employee Information'}
           </Text>
 
           <Divider />
@@ -235,6 +245,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       {...field}
                       placeholder="Enter employee number"
                       error={!!errors.employeeNumber}
+                      data-testid="employee-number-input"
                     />
                   )}
                 />
@@ -242,11 +253,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </Grid.Col>
 
             <Grid.Col span={6}>
-              <FormField
-                label="Status"
-                error={errors.status?.message}
-                required
-              >
+              <FormField label="Status" error={errors.status?.message} required>
                 <Controller
                   name="status"
                   control={control}
@@ -256,6 +263,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       data={statusOptions}
                       placeholder="Select status"
                       error={!!errors.status}
+                      data-testid="status-select"
                     />
                   )}
                 />
@@ -276,6 +284,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       {...field}
                       placeholder="Enter first name"
                       error={!!errors.firstName}
+                      data-testid="first-name-input"
                     />
                   )}
                 />
@@ -296,6 +305,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       {...field}
                       placeholder="Enter last name"
                       error={!!errors.lastName}
+                      data-testid="last-name-input"
                     />
                   )}
                 />
@@ -303,11 +313,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </Grid.Col>
 
             <Grid.Col span={6}>
-              <FormField
-                label="Email"
-                error={errors.email?.message}
-                required
-              >
+              <FormField label="Email" error={errors.email?.message} required>
                 <Controller
                   name="email"
                   control={control}
@@ -317,6 +323,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       type="email"
                       placeholder="Enter email address"
                       error={!!errors.email}
+                      data-testid="email-input"
                     />
                   )}
                 />
@@ -324,10 +331,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </Grid.Col>
 
             <Grid.Col span={6}>
-              <FormField
-                label="Phone"
-                error={errors.phone?.message}
-              >
+              <FormField label="Phone" error={errors.phone?.message}>
                 <Controller
                   name="phone"
                   control={control}
@@ -336,6 +340,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       {...field}
                       placeholder="Enter phone number"
                       error={!!errors.phone}
+                      data-testid="phone-input"
                     />
                   )}
                 />
@@ -360,12 +365,15 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                     <Select
                       {...field}
                       value={field.value ? field.value.toString() : ''}
-                      onChange={(value) => field.onChange(value ? parseInt(value) : 0)}
+                      onChange={value =>
+                        field.onChange(value ? parseInt(value) : 0)
+                      }
                       data={departmentOptions}
                       placeholder="Select department"
                       error={!!errors.departmentId}
                       disabled={departmentsLoading}
                       searchable
+                      data-testid="department-select"
                     />
                   )}
                 />
@@ -385,12 +393,15 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                     <Select
                       {...field}
                       value={field.value ? field.value.toString() : ''}
-                      onChange={(value) => field.onChange(value ? parseInt(value) : 0)}
+                      onChange={value =>
+                        field.onChange(value ? parseInt(value) : 0)
+                      }
                       data={positionOptions}
                       placeholder="Select position"
                       error={!!errors.positionId}
                       disabled={positionsLoading || !selectedDepartmentId}
                       searchable
+                      data-testid="position-select"
                     />
                   )}
                 />
@@ -412,6 +423,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       placeholder="Select hire date"
                       error={!!errors.hireDate}
                       maxDate={new Date()}
+                      data-testid="hire-date-input"
                     />
                   )}
                 />
@@ -419,10 +431,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
             </Grid.Col>
 
             <Grid.Col span={6}>
-              <FormField
-                label="Salary"
-                error={errors.salary?.message}
-              >
+              <FormField label="Salary" error={errors.salary?.message}>
                 <Controller
                   name="salary"
                   control={control}
@@ -436,6 +445,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
                       fixedDecimalScale
                       prefix="$"
                       thousandSeparator=","
+                      data-testid="salary-input"
                     />
                   )}
                 />
@@ -462,18 +472,10 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
 
           {/* Form Actions */}
           <Group justify="flex-end" gap="md">
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              disabled={loading}
-            >
+            <Button variant="outline" onClick={onCancel} disabled={loading}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              loading={loading}
-              disabled={!isValid}
-            >
+            <Button type="submit" loading={loading} disabled={!isValid}>
               {employee ? 'Update Employee' : 'Create Employee'}
             </Button>
           </Group>

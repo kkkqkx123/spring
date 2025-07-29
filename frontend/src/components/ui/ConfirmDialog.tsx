@@ -1,11 +1,11 @@
 import React from 'react';
 import { Modal, Text, Group, Button, Stack, ThemeIcon } from '@mantine/core';
-import { 
-  IconAlertTriangle, 
-  IconTrash, 
+import {
+  IconAlertTriangle,
+  IconTrash,
   IconExclamationMark,
   IconInfoCircle,
-  IconCheck
+  IconCheck,
 } from '@tabler/icons-react';
 
 export interface ConfirmDialogProps {
@@ -86,9 +86,7 @@ export function ConfirmDialog({
           {message}
         </Text>
 
-        {children && (
-          <div>{children}</div>
-        )}
+        {children && <div>{children}</div>}
 
         <Group justify="flex-end" gap="sm">
           <Button
@@ -191,8 +189,8 @@ export function SaveConfirmDialog({
       title="Unsaved Changes"
       message={
         hasUnsavedChanges
-          ? "You have unsaved changes. Do you want to save them before leaving?"
-          : "Do you want to save your changes?"
+          ? 'You have unsaved changes. Do you want to save them before leaving?'
+          : 'Do you want to save your changes?'
       }
       confirmLabel="Save Changes"
       cancelLabel="Discard"

@@ -2,14 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider, TextInput, Select, Checkbox } from '@mantine/core';
-import { FormField, TextFormField, SelectFormField, CheckboxFormField } from './FormField';
+import {
+  FormField,
+  TextFormField,
+  SelectFormField,
+  CheckboxFormField,
+} from './FormField';
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('FormField', () => {
@@ -54,7 +55,7 @@ describe('FormField', () => {
 
     const helpIcon = screen.getByLabelText('Field information');
     expect(helpIcon).toBeInTheDocument();
-    
+
     // The tooltip content is rendered in a portal, so we just check the icon exists
     expect(helpIcon).toHaveAttribute('aria-label', 'Field information');
   });
@@ -82,7 +83,7 @@ describe('FormField', () => {
 
     const label = screen.getByText('Test Field');
     const input = screen.getByRole('textbox');
-    
+
     expect(label).toHaveAttribute('for', input.id);
   });
 });
@@ -105,10 +106,10 @@ describe('SelectFormField', () => {
   it('renders as FormField with select input', () => {
     renderWithProvider(
       <SelectFormField label="Select Field">
-        <Select 
+        <Select
           data={[
             { value: '1', label: 'Option 1' },
-            { value: '2', label: 'Option 2' }
+            { value: '2', label: 'Option 2' },
           ]}
           placeholder="Choose option"
         />

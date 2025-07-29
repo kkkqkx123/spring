@@ -1,13 +1,19 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { EmployeePage } from './EmployeePage';
-import { type Employee, type Department, type Position, type User, type Role } from '../../../types';
+import {
+  type Employee,
+  type Department,
+  type Position,
+  type User,
+  type Role,
+} from '../../../types';
 import * as employeeHooks from '../hooks/useEmployees';
 import * as authHooks from '../../../hooks/useAuth';
 
@@ -104,9 +110,7 @@ const createWrapper = (initialEntries = ['/employees/1']) => {
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
-        <MemoryRouter initialEntries={initialEntries}>
-          {children}
-        </MemoryRouter>
+        <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
       </MantineProvider>
     </QueryClientProvider>
   );
@@ -138,9 +142,15 @@ describe('EmployeePage', () => {
       error: null,
     });
 
-    (employeeHooks.useCreateEmployee as any).mockReturnValue(mockCreateEmployee);
-    (employeeHooks.useUpdateEmployee as any).mockReturnValue(mockUpdateEmployee);
-    (employeeHooks.useDeleteEmployee as any).mockReturnValue(mockDeleteEmployee);
+    (employeeHooks.useCreateEmployee as any).mockReturnValue(
+      mockCreateEmployee
+    );
+    (employeeHooks.useUpdateEmployee as any).mockReturnValue(
+      mockUpdateEmployee
+    );
+    (employeeHooks.useDeleteEmployee as any).mockReturnValue(
+      mockDeleteEmployee
+    );
 
     // Mock auth hook
     (authHooks.useAuth as any).mockReturnValue({
@@ -162,8 +172,12 @@ describe('EmployeePage', () => {
   it('shows edit and delete buttons for admin user', () => {
     render(<EmployeePage />, { wrapper: createWrapper() });
 
-    expect(screen.getByRole('button', { name: /edit employee/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /delete employee/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /edit employee/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /delete employee/i })
+    ).toBeInTheDocument();
   });
 
   it('shows only edit button for HR manager', () => {
@@ -173,16 +187,20 @@ describe('EmployeePage', () => {
 
     render(<EmployeePage />, { wrapper: createWrapper() });
 
-    expect(screen.getByRole('button', { name: /edit employee/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /delete employee/i })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /edit employee/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /delete employee/i })
+    ).not.toBeInTheDocument();
   });
 
   it('switches to edit mode when edit button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
-    const editButton = screen.getByRole('button', { name: /edit employee/i });
+    const editButton = screen.getByTestId('edit-employee-button');
     await user.click(editButton);
 
     expect(screen.getByText('Edit Employee')).toBeInTheDocument();
@@ -192,21 +210,24 @@ describe('EmployeePage', () => {
 
   it('shows delete confirmation modal when delete button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
-    const deleteButton = screen.getByRole('button', { name: /delete employee/i });
+    const deleteButton = screen.getByTestId('delete-employee-button');
     await user.click(deleteButton);
 
-    expect(screen.getByText('Confirm Deletion')).toBeInTheDocument();
-    expect(screen.getByText(/are you sure you want to delete/i)).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(await screen.findByText('Confirm Deletion')).toBeInTheDocument();
+    expect(
+      await screen.findByText(/are you sure you want to delete/i)
+    ).toBeInTheDocument();
+    const modal = await screen.findByRole('dialog');
+    expect(within(modal).getByText(/john.*doe/i)).toBeInTheDocument();
   });
 
   it('handles employee update successfully', async () => {
     const user = userEvent.setup();
     mockUpdateEmployee.mutateAsync.mockResolvedValue(mockEmployee);
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     // Switch to edit mode
@@ -214,7 +235,9 @@ describe('EmployeePage', () => {
     await user.click(editButton);
 
     // Submit form (assuming form is valid)
-    const updateButton = screen.getByRole('button', { name: /update employee/i });
+    const updateButton = screen.getByRole('button', {
+      name: /update employee/i,
+    });
     await user.click(updateButton);
 
     await waitFor(() => {
@@ -232,15 +255,15 @@ describe('EmployeePage', () => {
   it('handles employee deletion successfully', async () => {
     const user = userEvent.setup();
     mockDeleteEmployee.mutateAsync.mockResolvedValue(undefined);
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     // Open delete modal
-    const deleteButton = screen.getByRole('button', { name: /delete employee/i });
+    const deleteButton = screen.getByTestId('delete-employee-button');
     await user.click(deleteButton);
 
     // Confirm deletion
-    const confirmButton = screen.getByRole('button', { name: /delete employee/i });
+    const confirmButton = await screen.findByTestId('confirm-delete-button');
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -258,8 +281,10 @@ describe('EmployeePage', () => {
 
   it('handles update error', async () => {
     const user = userEvent.setup();
-    mockUpdateEmployee.mutateAsync.mockRejectedValue(new Error('Update failed'));
-    
+    mockUpdateEmployee.mutateAsync.mockRejectedValue(
+      new Error('Update failed')
+    );
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     // Switch to edit mode
@@ -267,7 +292,9 @@ describe('EmployeePage', () => {
     await user.click(editButton);
 
     // Submit form
-    const updateButton = screen.getByRole('button', { name: /update employee/i });
+    const updateButton = screen.getByRole('button', {
+      name: /update employee/i,
+    });
     await user.click(updateButton);
 
     await waitFor(() => {
@@ -283,16 +310,23 @@ describe('EmployeePage', () => {
 
   it('handles delete error', async () => {
     const user = userEvent.setup();
-    mockDeleteEmployee.mutateAsync.mockRejectedValue(new Error('Delete failed'));
-    
+    mockDeleteEmployee.mutateAsync.mockRejectedValue(
+      new Error('Delete failed')
+    );
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     // Open delete modal
-    const deleteButton = screen.getByRole('button', { name: /delete employee/i });
+    const deleteButton = screen.getByRole('button', {
+      name: /delete employee/i,
+    });
     await user.click(deleteButton);
 
-    // Confirm deletion
-    const confirmButton = screen.getByRole('button', { name: /delete employee/i });
+    // Confirm deletion in modal
+    const modal = await screen.findByRole('dialog');
+    const confirmButton = within(modal).getByRole('button', {
+      name: /delete employee/i,
+    });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -308,10 +342,12 @@ describe('EmployeePage', () => {
 
   it('navigates back to employees list when back button is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
-    const backButton = screen.getByRole('button', { name: /back to employees/i });
+    const backButton = screen.getByRole('button', {
+      name: /back to employees/i,
+    });
     await user.click(backButton);
 
     expect(mockNavigate).toHaveBeenCalledWith('/employees');
@@ -352,12 +388,14 @@ describe('EmployeePage', () => {
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     expect(screen.getByText('Employee not found')).toBeInTheDocument();
-    expect(screen.getByText('The requested employee could not be found.')).toBeInTheDocument();
+    expect(
+      screen.getByText('The requested employee could not be found.')
+    ).toBeInTheDocument();
   });
 
   it('cancels edit mode and returns to view mode', async () => {
     const user = userEvent.setup();
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     // Switch to edit mode
@@ -375,19 +413,23 @@ describe('EmployeePage', () => {
 
   it('closes delete modal when cancel is clicked', async () => {
     const user = userEvent.setup();
-    
+
     render(<EmployeePage />, { wrapper: createWrapper() });
 
     // Open delete modal
-    const deleteButton = screen.getByRole('button', { name: /delete employee/i });
+    const deleteButton = screen.getByRole('button', {
+      name: /delete employee/i,
+    });
     await user.click(deleteButton);
 
-    expect(screen.getByText('Confirm Deletion')).toBeInTheDocument();
+    expect(await screen.findByText('Confirm Deletion')).toBeInTheDocument();
 
     // Cancel deletion
-    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    const cancelButton = await screen.findByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
 
-    expect(screen.queryByText('Confirm Deletion')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Confirm Deletion')).not.toBeInTheDocument();
+    });
   });
 });

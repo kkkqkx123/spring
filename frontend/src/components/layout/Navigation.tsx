@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Stack, Text, Group, ThemeIcon, Divider } from '@mantine/core';
-import { 
+import {
   IconDashboard,
   IconUsers,
   IconBuilding,
@@ -9,7 +9,7 @@ import {
   IconBell,
   IconSettings,
   IconShield,
-  IconLogout
+  IconLogout,
 } from '@tabler/icons-react';
 import { Link, useLocation } from 'react-router-dom';
 import { User } from '../../types';
@@ -83,7 +83,9 @@ export function Navigation({ user, onNavigate }: NavigationProps) {
   };
 
   const isActive = (href: string): boolean => {
-    return location.pathname === href || location.pathname.startsWith(href + '/');
+    return (
+      location.pathname === href || location.pathname.startsWith(href + '/')
+    );
   };
 
   const handleLogout = () => {
@@ -95,16 +97,19 @@ export function Navigation({ user, onNavigate }: NavigationProps) {
   return (
     <Stack gap="xs" h="100%">
       {/* User Info */}
-      <Group gap="sm" p="sm" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+      <Group
+        gap="sm"
+        p="sm"
+        style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}
+      >
         <ThemeIcon size="lg" variant="light">
           <IconUsers size={20} />
         </ThemeIcon>
         <div style={{ flex: 1 }}>
           <Text size="sm" fw={600}>
-            {user.firstName && user.lastName 
+            {user.firstName && user.lastName
               ? `${user.firstName} ${user.lastName}`
-              : user.username
-            }
+              : user.username}
           </Text>
           <Text size="xs" c="dimmed">
             {user.roles.map(role => role.name).join(', ')}
@@ -116,7 +121,7 @@ export function Navigation({ user, onNavigate }: NavigationProps) {
       <Stack gap="xs" style={{ flex: 1 }}>
         {navigationItems
           .filter(item => hasRequiredRole(item.requiredRoles))
-          .map((item) => {
+          .map(item => {
             const IconComponent = item.icon;
             const active = isActive(item.href);
 

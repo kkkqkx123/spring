@@ -8,7 +8,7 @@ const departmentApi = {
     const response = await apiClient.get('/api/departments');
     return response.data;
   },
-  
+
   getDepartmentTree: async (): Promise<Department[]> => {
     const response = await apiClient.get('/api/departments/tree');
     return response.data;

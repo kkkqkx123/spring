@@ -115,9 +115,10 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       <Title ta="center" mb="md">
         Forgot Password?
       </Title>
-      
+
       <Text c="dimmed" size="sm" ta="center" mb="xl">
-        Enter your email address and we'll send you a link to reset your password.
+        Enter your email address and we'll send you a link to reset your
+        password.
       </Text>
 
       {error && (

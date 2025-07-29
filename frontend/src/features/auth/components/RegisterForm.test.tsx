@@ -55,8 +55,12 @@ describe('RegisterForm', () => {
     it('should render registration form with all required fields', () => {
       renderWithProvider(defaultProps);
 
-      expect(screen.getByRole('heading', { name: 'Create Account' })).toBeInTheDocument();
-      expect(screen.getByText('Join us today and get started')).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Create Account' })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Join us today and get started')
+      ).toBeInTheDocument();
       expect(screen.getByTestId('first-name-input')).toBeInTheDocument();
       expect(screen.getByTestId('last-name-input')).toBeInTheDocument();
       expect(screen.getByTestId('username-input')).toBeInTheDocument();
@@ -95,7 +99,7 @@ describe('RegisterForm', () => {
 
       const registerButton = screen.getByTestId('register-button');
       expect(registerButton).toBeDisabled();
-      
+
       const inputs = [
         'first-name-input',
         'last-name-input',
@@ -125,8 +129,12 @@ describe('RegisterForm', () => {
         expect(screen.getByText('Username is required')).toBeInTheDocument();
         expect(screen.getByText('Email is required')).toBeInTheDocument();
         expect(screen.getByText('Password is required')).toBeInTheDocument();
-        expect(screen.getByText('Please confirm your password')).toBeInTheDocument();
-        expect(screen.getByText('You must accept the terms and conditions')).toBeInTheDocument();
+        expect(
+          screen.getByText('Please confirm your password')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('You must accept the terms and conditions')
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -143,7 +151,9 @@ describe('RegisterForm', () => {
       await user.click(registerButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Please enter a valid email address')).toBeInTheDocument();
+        expect(
+          screen.getByText('Please enter a valid email address')
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -160,7 +170,11 @@ describe('RegisterForm', () => {
       await user.click(registerButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Username can only contain letters, numbers, underscores, and hyphens')).toBeInTheDocument();
+        expect(
+          screen.getByText(
+            'Username can only contain letters, numbers, underscores, and hyphens'
+          )
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -177,7 +191,9 @@ describe('RegisterForm', () => {
       await user.click(registerButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Password must be at least 8 characters')).toBeInTheDocument();
+        expect(
+          screen.getByText('Password must be at least 8 characters')
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -215,7 +231,9 @@ describe('RegisterForm', () => {
       await user.click(registerButton);
 
       await waitFor(() => {
-        expect(screen.getByText('First name must be less than 50 characters')).toBeInTheDocument();
+        expect(
+          screen.getByText('First name must be less than 50 characters')
+        ).toBeInTheDocument();
       });
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -259,8 +277,12 @@ describe('RegisterForm', () => {
       await waitFor(() => {
         expect(screen.getByText('At least 8 characters')).toBeInTheDocument();
         expect(screen.getByText('Includes number')).toBeInTheDocument();
-        expect(screen.getByText('Includes lowercase letter')).toBeInTheDocument();
-        expect(screen.getByText('Includes uppercase letter')).toBeInTheDocument();
+        expect(
+          screen.getByText('Includes lowercase letter')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('Includes uppercase letter')
+        ).toBeInTheDocument();
         expect(screen.getByText('Includes special symbol')).toBeInTheDocument();
       });
     });
@@ -274,12 +296,27 @@ describe('RegisterForm', () => {
 
   describe('Form Submission', () => {
     const fillValidForm = async (user: any) => {
-      await user.type(screen.getByTestId('first-name-input'), validFormData.firstName);
-      await user.type(screen.getByTestId('last-name-input'), validFormData.lastName);
-      await user.type(screen.getByTestId('username-input'), validFormData.username);
+      await user.type(
+        screen.getByTestId('first-name-input'),
+        validFormData.firstName
+      );
+      await user.type(
+        screen.getByTestId('last-name-input'),
+        validFormData.lastName
+      );
+      await user.type(
+        screen.getByTestId('username-input'),
+        validFormData.username
+      );
       await user.type(screen.getByTestId('email-input'), validFormData.email);
-      await user.type(screen.getByTestId('password-input'), validFormData.password);
-      await user.type(screen.getByTestId('confirm-password-input'), validFormData.confirmPassword);
+      await user.type(
+        screen.getByTestId('password-input'),
+        validFormData.password
+      );
+      await user.type(
+        screen.getByTestId('confirm-password-input'),
+        validFormData.confirmPassword
+      );
       await user.click(screen.getByTestId('accept-terms-checkbox'));
     };
 
@@ -319,16 +356,20 @@ describe('RegisterForm', () => {
 
       // Wait for form reset
       await waitFor(() => {
-        const firstNameInput = screen.getByTestId('first-name-input') as HTMLInputElement;
+        const firstNameInput = screen.getByTestId(
+          'first-name-input'
+        ) as HTMLInputElement;
         expect(firstNameInput.value).toBe('');
       });
     });
 
     it('should handle submission errors gracefully', async () => {
       const user = userEvent.setup();
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       mockOnSubmit.mockRejectedValueOnce(new Error('Network error'));
-      
+
       renderWithProvider(defaultProps);
 
       await fillValidForm(user);
@@ -351,7 +392,7 @@ describe('RegisterForm', () => {
     it('should disable form during submission', async () => {
       const user = userEvent.setup();
       let resolveSubmit: () => void;
-      const submitPromise = new Promise<void>((resolve) => {
+      const submitPromise = new Promise<void>(resolve => {
         resolveSubmit = resolve;
       });
       mockOnSubmit.mockReturnValueOnce(submitPromise);
@@ -391,12 +432,12 @@ describe('RegisterForm', () => {
       renderWithProvider(defaultProps);
 
       const termsCheckbox = screen.getByTestId('accept-terms-checkbox');
-      
+
       expect(termsCheckbox).not.toBeChecked();
-      
+
       await user.click(termsCheckbox);
       expect(termsCheckbox).toBeChecked();
-      
+
       await user.click(termsCheckbox);
       expect(termsCheckbox).not.toBeChecked();
     });
@@ -404,7 +445,9 @@ describe('RegisterForm', () => {
     it('should have links to terms and privacy policy', () => {
       renderWithProvider(defaultProps);
 
-      const termsLink = screen.getByRole('link', { name: 'Terms and Conditions' });
+      const termsLink = screen.getByRole('link', {
+        name: 'Terms and Conditions',
+      });
       const privacyLink = screen.getByRole('link', { name: 'Privacy Policy' });
 
       expect(termsLink).toHaveAttribute('href', '/terms');
@@ -429,7 +472,9 @@ describe('RegisterForm', () => {
     it('should have proper button text', () => {
       renderWithProvider(defaultProps);
 
-      expect(screen.getByRole('button', { name: 'Create Account' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Create Account' })
+      ).toBeInTheDocument();
     });
 
     it('should have proper error announcements', async () => {

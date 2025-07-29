@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { useQueryWithError, useMutationWithFeedback } from './useQueryWithError';
+import {
+  useQueryWithError,
+  useMutationWithFeedback,
+} from './useQueryWithError';
 import { useUiStore } from '../stores/uiStore';
 
 // Mock the UI store
@@ -12,7 +15,7 @@ vi.mock('../stores/uiStore', () => ({
 
 // Mock the query client utilities
 vi.mock('../services/queryClient', () => ({
-  handleQueryError: vi.fn((error) => ({
+  handleQueryError: vi.fn(error => ({
     status: error.status || -1,
     message: error.message || 'Unknown error',
   })),
@@ -50,10 +53,9 @@ describe('useQueryWithError', () => {
     const mockData = { id: 1, name: 'Test' };
     const queryFn = vi.fn().mockResolvedValue(mockData);
 
-    const { result } = renderHook(
-      () => useQueryWithError(['test'], queryFn),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useQueryWithError(['test'], queryFn), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -67,10 +69,9 @@ describe('useQueryWithError', () => {
     const error = new Error('Test error');
     const queryFn = vi.fn().mockRejectedValue(error);
 
-    const { result } = renderHook(
-      () => useQueryWithError(['test'], queryFn),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useQueryWithError(['test'], queryFn), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -146,10 +147,9 @@ describe('useMutationWithFeedback', () => {
     const mockData = { id: 1, name: 'Created' };
     const mutationFn = vi.fn().mockResolvedValue(mockData);
 
-    const { result } = renderHook(
-      () => useMutationWithFeedback(mutationFn),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useMutationWithFeedback(mutationFn), {
+      wrapper: createWrapper(),
+    });
 
     result.current.mutate({ name: 'Test' });
 
@@ -168,10 +168,9 @@ describe('useMutationWithFeedback', () => {
     const error = new Error('Mutation failed');
     const mutationFn = vi.fn().mockRejectedValue(error);
 
-    const { result } = renderHook(
-      () => useMutationWithFeedback(mutationFn),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => useMutationWithFeedback(mutationFn), {
+      wrapper: createWrapper(),
+    });
 
     result.current.mutate({ name: 'Test' });
 

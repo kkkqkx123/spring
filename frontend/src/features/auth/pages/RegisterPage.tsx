@@ -14,7 +14,7 @@ export const RegisterPage: React.FC = () => {
   const handleRegister = async (userData: RegisterRequest) => {
     try {
       await registerMutation.mutateAsync(userData);
-      
+
       notifications.show({
         title: 'Registration Successful',
         message: 'Your account has been created. Please log in to continue.',

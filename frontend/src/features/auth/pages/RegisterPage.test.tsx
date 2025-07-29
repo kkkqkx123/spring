@@ -47,9 +47,7 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
         <Notifications />
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </MantineProvider>
     </QueryClientProvider>
   );
