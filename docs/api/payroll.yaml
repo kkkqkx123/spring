@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: 薪资模块 API
-  description: 提供薪资记录的创建、查询、更新、删除、计算和支付处理等功能。
+  description: 提供薪资记录的创建、查询、更新、删除、计算和支付处理等功能。访问此模块需要用户拥有 'ADMIN', 'PAYROLL_MANAGER', 'HR_MANAGER' 角色之一，或拥有 'PAYROLL_READ', 'PAYROLL_CREATE', 'PAYROLL_UPDATE', 'PAYROLL_DELETE' 等具体权限之一。
   version: 1.0.0
 tags:
   - name: 薪资管理

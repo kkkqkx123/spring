@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: 部门模块 API
-  description: 提供部门的增删改查、层级结构管理等功能。
+  description: 提供部门的增删改查、层级结构管理等功能。本模块的读取操作对所有认证用户开放，写入操作需要管理员或HR经理权限。
   version: 1.0.0
 tags:
   - name: 部门管理
@@ -13,7 +13,7 @@ paths:
       tags:
         - 部门管理
       summary: 获取所有部门列表
-      description: 返回系统中的所有部门信息。
+      description: 返回系统中的所有部门信息。对所有认证用户开放。
       operationId: getAllDepartments
       security:
         - bearerAuth: []
@@ -35,7 +35,7 @@ paths:
       tags:
         - 部门管理
       summary: 创建新部门
-      description: 创建一个新的部门。需要管理员或HR经理权限。
+      description: 创建一个新的部门。需要 'ADMIN' 或 'HR_MANAGER' 角色。
       operationId: createDepartment
       security:
         - bearerAuth: []
@@ -64,7 +64,7 @@ paths:
       tags:
         - 部门管理
       summary: 根据ID获取部门信息
-      description: 获取指定ID的部门详细信息。
+      description: 获取指定ID的部门详细信息。对所有认证用户开放。
       operationId: getDepartmentById
       security:
         - bearerAuth: []
@@ -92,7 +92,7 @@ paths:
       tags:
         - 部门管理
       summary: 更新部门信息
-      description: 更新指定ID的部门信息。需要管理员或HR经理权限。
+      description: 更新指定ID的部门信息。需要 'ADMIN' 或 'HR_MANAGER' 角色。
       operationId: updateDepartment
       security:
         - bearerAuth: []
@@ -130,7 +130,7 @@ paths:
       tags:
         - 部门管理
       summary: 删除部门
-      description: 删除指定ID的部门。需要管理员权限。
+      description: 删除指定ID的部门。需要 'ADMIN' 角色。
       operationId: deleteDepartment
       security:
         - bearerAuth: []
@@ -157,7 +157,7 @@ paths:
       tags:
         - 部门管理
       summary: 获取部门树形结构
-      description: 以树形结构返回所有部门。
+      description: 以树形结构返回所有部门。对所有认证用户开放。
       operationId: getDepartmentTree
       security:
         - bearerAuth: []
@@ -178,7 +178,7 @@ paths:
       tags:
         - 部门管理
       summary: 获取子部门列表
-      description: 获取指定父部门下的所有直接子部门。
+      description: 获取指定父部门下的所有直接子部门。对所有认证用户开放。
       operationId: getChildDepartments
       security:
         - bearerAuth: []
@@ -209,7 +209,7 @@ paths:
       tags:
         - 部门管理
       summary: 移动部门
-      description: 将一个部门移动到另一个部门下面。需要管理员或HR经理权限。
+      description: 将一个部门移动到另一个部门下面。需要 'ADMIN' 或 'HR_MANAGER' 角色。
       operationId: moveDepartment
       security:
         - bearerAuth: []
@@ -247,7 +247,7 @@ paths:
       tags:
         - 部门管理
       summary: 根据名称获取部门
-      description: 根据部门名称精确查找部门信息。
+      description: 根据部门名称精确查找部门信息。对所有认证用户开放。
       operationId: getDepartmentByName
       security:
         - bearerAuth: []

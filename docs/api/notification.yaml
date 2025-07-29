@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: 通知模块 API
-  description: 提供系统通知的发送、查询、标记已读和删除等功能。
+  description: 提供系统通知的发送、查询、标记已读和删除等功能。本模块所有接口均需要用户认证。
   version: 1.0.0
 tags:
   - name: 通知管理

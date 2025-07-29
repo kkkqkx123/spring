@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: 聊天模块 API
-  description: 提供实时聊天、消息管理和会话功能。
+  description: 提供实时聊天、消息管理和会话功能。本模块所有接口均需要用户认证。
   version: 1.0.0
 tags:
   - name: 聊天

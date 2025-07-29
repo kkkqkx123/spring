@@ -16,6 +16,7 @@ The application supports multiple environment profiles:
 ## Profile Activation
 
 ### Command Line
+
 ```bash
 # Development (default)
 java -jar employee-management-system.jar
@@ -31,12 +32,14 @@ java -jar employee-management-system.jar --spring.profiles.active=test
 ```
 
 ### Environment Variable
+
 ```bash
 export SPRING_PROFILES_ACTIVE=prod
 java -jar employee-management-system.jar
 ```
 
 ### Maven
+
 ```bash
 # Development
 mvn spring-boot:run
@@ -58,6 +61,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ### Database Configuration
 
 #### Development (H2)
+
 ```properties
 spring.datasource.url=jdbc:h2:mem:employeedb
 spring.datasource.username=sa
@@ -65,6 +69,7 @@ spring.datasource.password=
 ```
 
 #### Production (PostgreSQL)
+
 ```properties
 spring.datasource.url=${DATABASE_URL}
 spring.datasource.username=${DATABASE_USERNAME}
@@ -178,17 +183,20 @@ app.business.password-expiry-days=90
 ## Logging Configuration
 
 ### Development
+
 - Root level: INFO
 - Application level: DEBUG
 - SQL logging: Enabled
 
 ### Production
+
 - Root level: WARN
 - Application level: INFO
 - SQL logging: Disabled
 - File logging: Enabled with rotation
 
 ### Log Files
+
 - Location: `/var/log/employee-management/application.log`
 - Max size: 10MB
 - History: 30 days (prod), 7 days (staging)
@@ -198,21 +206,23 @@ app.business.password-expiry-days=90
 ### Actuator Endpoints
 
 #### Development
+
 - All endpoints exposed: `/actuator/*`
 - Health details: Always shown
 
 #### Production
+
 - Limited endpoints: `/actuator/health`, `/actuator/info`, `/actuator/metrics`
 - Health details: Only when authorized
 
 ### Health Check URL
-```
+
 GET /api/actuator/health
-```
 
 ## Security Considerations
 
 ### Production Security
+
 - Error details hidden from responses
 - HTTPS enforcement (when SSL enabled)
 - Secure session cookies
@@ -220,6 +230,7 @@ GET /api/actuator/health
 - Strong password requirements
 
 ### Development Security
+
 - Error details included for debugging
 - H2 console enabled
 - Relaxed CORS settings
