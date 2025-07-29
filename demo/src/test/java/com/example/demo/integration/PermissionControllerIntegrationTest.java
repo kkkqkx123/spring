@@ -26,7 +26,7 @@ class PermissionControllerIntegrationTest extends BaseIntegrationTest {
                 .with(user(adminUser.getUsername()).roles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$.length()").value(4))
                 .andExpect(jsonPath("$[?(@.name=='ROLE_ADMIN')]").exists())
                 .andExpect(jsonPath("$[?(@.name=='ROLE_HR_MANAGER')]").exists())
                 .andExpect(jsonPath("$[?(@.name=='ROLE_USER')]").exists());

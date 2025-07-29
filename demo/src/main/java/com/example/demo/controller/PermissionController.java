@@ -13,13 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/permissions")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class PermissionController {
 
     @Autowired
@@ -35,11 +35,13 @@ public class PermissionController {
     private UserRepository userRepository;
 
     @GetMapping("/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
 
     @GetMapping("/roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> getRoleById(@PathVariable Long id) {
         return roleRepository.findById(id)
                 .map(ResponseEntity::ok)
@@ -47,6 +49,7 @@ public class PermissionController {
     }
 
     @PostMapping("/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         if (roleRepository.findByName(role.getName()).isPresent()) {
             return ResponseEntity.badRequest().build();
@@ -56,6 +59,7 @@ public class PermissionController {
     }
 
     @PutMapping("/roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> updateRole(@PathVariable Long id, @RequestBody Role roleDetails) {
         return roleRepository.findById(id)
                 .map(role -> {
@@ -67,6 +71,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
         if (!roleRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -76,17 +81,20 @@ public class PermissionController {
     }
 
     @GetMapping("/resources")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<Resource> getAllResources() {
         return resourceRepository.findAll();
     }
 
     @PostMapping("/resources")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Resource> createResource(@RequestBody Resource resource) {
         Resource savedResource = resourceRepository.save(resource);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedResource);
     }
 
     @PostMapping("/users/{userId}/roles/{roleId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> assignRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
         User user = userRepository.findById(userId).orElse(null);
         Role role = roleRepository.findById(roleId).orElse(null);
@@ -101,6 +109,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/users/{userId}/roles/{roleId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
         User user = userRepository.findById(userId).orElse(null);
         Role role = roleRepository.findById(roleId).orElse(null);
@@ -115,20 +124,29 @@ public class PermissionController {
     }
 
     @GetMapping("/users/{userId}/roles")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == authentication.principal.id")
-    public ResponseEntity<Set<Role>> getUserRoles(@PathVariable Long userId) {
+    public ResponseEntity<Set<Role>> getUserRoles(@PathVariable Long userId, Principal principal) {
+        User requestingUser = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (requestingUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!requestingUser.hasRole("ROLE_ADMIN") && !requestingUser.getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
         return userRepository.findById(userId)
                 .map(user -> ResponseEntity.ok(user.getRoles()))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/roles/{roleName}/resources/{resourceId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> assignResourceToRole(@PathVariable String roleName, @PathVariable Long resourceId) {
         Role role = permissionService.assignResourceToRole(roleName, resourceId);
         return ResponseEntity.ok(role);
     }
 
     @DeleteMapping("/roles/{roleId}/resources/{resourceId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> removeResourceFromRole(@PathVariable Long roleId, @PathVariable Long resourceId) {
         Role role = roleRepository.findById(roleId).orElse(null);
         if (role == null) {
@@ -140,6 +158,7 @@ public class PermissionController {
     }
 
     @GetMapping("/roles/{roleId}/resources")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Set<Resource>> getRoleResources(@PathVariable Long roleId) {
         return roleRepository.findById(roleId)
                 .map(role -> ResponseEntity.ok(role.getResources()))
@@ -147,8 +166,15 @@ public class PermissionController {
     }
 
     @GetMapping("/users/{userId}/check")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == authentication.principal.id")
-    public ResponseEntity<?> checkUserPermission(@PathVariable Long userId, @RequestParam String resource) {
+    public ResponseEntity<?> checkUserPermission(@PathVariable Long userId, @RequestParam String resource, Principal principal) {
+        User requestingUser = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (requestingUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!requestingUser.hasRole("ROLE_ADMIN") && !requestingUser.getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity.notFound().build();
