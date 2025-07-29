@@ -188,8 +188,14 @@
     - Write tests for file upload and data processing
     - _Requirements: 3.6, 3.7_
 
-- [ ] 7. Department Management Feature
-  - [ ] 7.1 Create department tree structure
+- [x] 7. Department Management Feature
+
+
+
+
+  - [x] 7.1 Create department tree structure
+
+
     - Implement DepartmentTree component with expandable nodes
     - Add drag-and-drop functionality for department reordering
     - Create department hierarchy visualization
@@ -197,7 +203,9 @@
     - Write tests for tree operations and hierarchy management
     - _Requirements: 4.1, 4.5, 4.6_
 
-  - [ ] 7.2 Implement department CRUD operations
+
+
+  - [x] 7.2 Implement department CRUD operations
     - Build DepartmentForm component with parent relationship validation
     - Create department detail view with employee list
     - Add department move functionality with validation

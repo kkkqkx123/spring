@@ -1,0 +1,282 @@
+npm test src/features/employees/components/EmployeeImport.test.tsx ; "(Roo/PS Workaround: 10)" > $null
+
+
+错误信息：
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+Vitest caught 7 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "handles file selection and validation". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "rejects invalid file types". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "rejects files that are too large". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "displays validation errors". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "handles successful import". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "handles import failure". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+TypeError: Array.prototype.some called on null or undefined
+ ❯ isEvtWithFiles node_modules/react-dropzone/dist/es/utils/index.js:160:31
+ ❯ node_modules/react-dropzone/dist/es/index.js:727:9
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:207:12
+ ❯ node_modules/react-dropzone/dist/es/utils/index.js:205:16
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:16368:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1522:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:16418:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:17016:9
+
+This error originated in "src/features/employees/components/EmployeeImport.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "removes selected file when X button is clicked". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 6 passed (11)
+     Errors  7 errors
+   Start at  11:23:01
+   Duration  9.81s (transform 108ms, setup 138ms, collect 1.46s, tests 5.67s, environment 770ms, prepare 99ms)
+
+ FAIL  Tests failed. Watching for file changes...
+
+
+你遇到的错误信息：
+
+```
+TypeError: Array.prototype.some called on null or undefined
+```
+
+出现在 `react-dropzone` 的内部逻辑中，特别是在 `isEvtWithFiles` 函数中调用 `.some()` 时。这个错误表明某个本应是数组的对象是 `null` 或 `undefined`，导致调用 `.some()` 时抛出异常。
+
+---
+
+### 🔍 错误定位
+
+错误堆栈显示，错误来源于：
+
+```
+node_modules/react-dropzone/dist/es/utils/index.js:160:31
+```
+
+在 `isEvtWithFiles` 函数中，类似这样的代码：
+
+```js
+function isEvtWithFiles(event) {
+  if (!event.dataTransfer.types) return false;
+  return event.dataTransfer.types.some(type => type === 'Files');
+}
+```
+
+如果 `event.dataTransfer.types` 是 `null` 或 `undefined`，就会触发你看到的错误。
+
+---
+
+### 🧪 错误发生场景
+
+你在测试中使用了 `react-dropzone` 组件，模拟了文件拖拽或点击上传的操作。但测试中模拟的事件对象（event）可能不完整，导致 `event.dataTransfer` 或 `event.dataTransfer.types` 是 `undefined`。
+
+---
+
+### ✅ 解决方案
+
+#### ✅ 方法一：**完善模拟事件对象**
+
+在你的测试中，当你模拟文件上传事件（比如 `drop` 或 `change`）时，请确保你构造了一个完整的事件对象，并包含 `dataTransfer` 属性。
+
+例如：
+
+```tsx
+const createDt = (files: File[]) => ({
+  dataTransfer: {
+    files,
+    items: files.map(file => ({
+      kind: 'file',
+      type: file.type,
+      getAsFile: () => file,
+    })),
+    types: ['Files'],
+  },
+});
+
+// 模拟 drop 事件
+fireEvent.drop(dropzone, createDt([file]));
+```
+
+或者，如果你在模拟 `input` 的 `change` 事件：
+
+```tsx
+Object.defineProperty(input, 'files', {
+  value: [file],
+});
+```
+
+---
+
+#### ✅ 方法二：**Mock `react-dropzone` 内部函数（临时绕过）**
+
+如果你只是想让测试通过，可以临时 mock 掉 `isEvtWithFiles` 函数，防止它报错：
+
+```ts
+// 在测试文件顶部
+vi.mock('react-dropzone/utils', async () => {
+  const actual = await vi.importActual('react-dropzone/utils');
+  return {
+    ...actual,
+    isEvtWithFiles: () => true,
+  };
+});
+```
+
+⚠️ 这只是临时绕过错误，不推荐长期使用。
+
+---
+
+#### ✅ 方法三：**升级 `react-dropzone`**
+
+你可能正在使用一个较旧版本的 `react-dropzone`，该版本中存在对事件对象的不安全访问。
+
+尝试升级到最新版本：
+
+```bash
+npm install react-dropzone@latest
+```
+
+或使用 yarn：
+
+```bash
+yarn add react-dropzone@latest
+```
+
+---
+
+### 🧹 清理测试环境
+
+有时这些 unhandled errors 是因为测试环境未清理干净（比如组件未卸载、副作用未清理）。你可以在每个测试后添加：
+
+```ts
+afterEach(() => {
+  cleanup();
+});
+```
+
+并确保你使用的是 `@testing-library/react` 提供的 `cleanup()`。
+
+---
+
+### 🧪 额外建议：使用 `userEvent` 替代 `fireEvent`
+
+`@testing-library/user-event` 更贴近用户行为，能减少手动构造事件对象的问题。
+
+```ts
+import userEvent from '@testing-library/user-event';
+
+const user = userEvent.setup();
+
+await user.upload(input, file);
+```
+
+---
+
+### ✅ 总结
+
+| 方法 | 描述 |
+|------|------|
+| ✅ 完善模拟事件对象 | 确保 `event.dataTransfer.types` 是数组 |
+| 🧪 Mock `isEvtWithFiles` | 临时绕过错误（不推荐长期使用） |
+| 🔼 升级 `react-dropzone` | 修复潜在 bug |
+| 🧹 清理测试副作用 | 使用 `cleanup()` |
+| 🧑‍💻 使用 `userEvent` | 更安全地模拟用户行为 |
+
+---
+
+如需进一步帮助，你可以贴出你测试代码中模拟事件的部分，我可以帮你具体修改。
