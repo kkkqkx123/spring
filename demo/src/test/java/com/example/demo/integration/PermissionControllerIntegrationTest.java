@@ -1,5 +1,3 @@
-//not pass
-
 package com.example.demo.integration;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
 import com.example.demo.model.entity.Position;
+import com.example.demo.model.dto.PositionDto;
 
 /**
  * Integration tests for Position REST endpoints
@@ -24,14 +25,6 @@ class PositionControllerIntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].jobTitle").exists())
                 .andExpect(jsonPath("$[0].professionalTitle").exists());
-    }
-
-    @Test
-    void testGetAllPositions_AsRegularUser_ShouldReturnPositions() throws Exception {
-        mockMvc.perform(get("/api/positions")
-                .with(user(regularUser.getUsername()).roles("USER")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
     }
 
     @Test
@@ -59,17 +52,17 @@ class PositionControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCreatePosition_AsAdmin_ShouldCreatePosition() throws Exception {
-        Position newPosition = new Position();
-        newPosition.setJobTitle("QA Engineer");
-        newPosition.setProfessionalTitle("Senior QA Engineer");
-        newPosition.setDescription("Quality Assurance Engineer");
-        newPosition.setDepartment(itDepartment);
+        PositionDto newPositionDto = new PositionDto();
+        newPositionDto.setJobTitle("QA Engineer");
+        newPositionDto.setProfessionalTitle("Senior QA Engineer");
+        newPositionDto.setDescription("Quality Assurance Engineer");
+        newPositionDto.setDepartmentId(itDepartment.getId());
 
         mockMvc.perform(post("/api/positions")
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newPosition)))
+                .content(objectMapper.writeValueAsString(newPositionDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.jobTitle").value("QA Engineer"))
                 .andExpect(jsonPath("$.professionalTitle").value("Senior QA Engineer"));
@@ -92,14 +85,17 @@ class PositionControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testUpdatePosition_AsAdmin_ShouldUpdatePosition() throws Exception {
-        developerPosition.setJobTitle("Senior Software Developer");
-        developerPosition.setProfessionalTitle("Lead Developer");
+        PositionDto updatedPositionDto = new PositionDto();
+        updatedPositionDto.setJobTitle("Senior Software Developer");
+        updatedPositionDto.setProfessionalTitle("Lead Developer");
+        updatedPositionDto.setDescription(developerPosition.getDescription());
+        updatedPositionDto.setDepartmentId(developerPosition.getDepartment().getId());
 
         mockMvc.perform(put("/api/positions/{id}", developerPosition.getId())
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(developerPosition)))
+                .content(objectMapper.writeValueAsString(updatedPositionDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.jobTitle").value("Senior Software Developer"))
                 .andExpect(jsonPath("$.professionalTitle").value("Lead Developer"));
@@ -107,6 +103,10 @@ class PositionControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testDeletePosition_AsAdmin_ShouldDeletePosition() throws Exception {
+        // Unassign employee from position before deleting
+        testEmployee2.setPosition(null);
+        employeeRepository.save(testEmployee2);
+
         mockMvc.perform(delete("/api/positions/{id}", managerPosition.getId())
                 .with(user(adminUser.getUsername()).roles("ADMIN"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))

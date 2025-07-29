@@ -262,7 +262,15 @@ public abstract class BaseIntegrationTest {
         role.setName(name);
         role.setDescription(description);
         role.setResources(resources);
-        return roleRepository.save(role);
+        Role savedRole = roleRepository.save(role);
+        
+        // Ensure the role-resource relationships are persisted
+        if (resources != null && !resources.isEmpty()) {
+            savedRole.setResources(resources);
+            roleRepository.save(savedRole);
+        }
+        
+        return savedRole;
     }
 
     protected User createUser(String username, String email, String password, Set<Role> roles) {
@@ -275,7 +283,15 @@ public abstract class BaseIntegrationTest {
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         user.setRoles(roles);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Ensure the user-role relationships are persisted
+        if (roles != null && !roles.isEmpty()) {
+            savedUser.setRoles(roles);
+            userRepository.save(savedUser);
+        }
+        
+        return savedUser;
     }
 
     protected Department createDepartment(String name, Long parentId, String depPath, boolean isParent) {

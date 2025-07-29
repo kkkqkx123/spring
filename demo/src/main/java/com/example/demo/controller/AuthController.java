@@ -102,7 +102,7 @@ public class AuthController {
         user.setCredentialsNonExpired(true);
 
         // Default role for new users
-        Role userRole = roleRepository.findByName("USER")
+        Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
