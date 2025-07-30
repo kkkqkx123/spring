@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Text, Group, Avatar, Transition } from '@mantine/core';
-import { cn } from '../../../utils';
 
 interface TypingIndicatorProps {
   userName: string;

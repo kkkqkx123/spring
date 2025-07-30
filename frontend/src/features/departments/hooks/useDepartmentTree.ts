@@ -1,13 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import { queryKeys } from '../../../services/queryKeys';
-import {
-  DepartmentApi,
-  DepartmentCreateRequest,
-  DepartmentUpdateRequest,
-  DepartmentMoveRequest,
-} from '../services/departmentApi';
-import { Department } from '../../../types';
+import { DepartmentApi } from '../services/departmentApi';
+
+const getApiErrorMessage = (error: unknown): string => {
+  if (
+    error &&
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response &&
+    typeof error.response === 'object' &&
+    'data' in error.response &&
+    error.response.data &&
+    typeof error.response.data === 'object' &&
+    'message' in error.response.data &&
+    typeof error.response.data.message === 'string'
+  ) {
+    return error.response.data.message;
+  }
+  return 'An unexpected error occurred';
+};
 
 export const useDepartmentTree = () => {
   return useQuery({
@@ -39,10 +51,10 @@ export const useCreateDepartment = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to create department',
+        message: getApiErrorMessage(error) || 'Failed to create department',
         color: 'red',
       });
     },
@@ -66,10 +78,10 @@ export const useUpdateDepartment = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to update department',
+        message: getApiErrorMessage(error) || 'Failed to update department',
         color: 'red',
       });
     },
@@ -90,10 +102,10 @@ export const useDeleteDepartment = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to delete department',
+        message: getApiErrorMessage(error) || 'Failed to delete department',
         color: 'red',
       });
     },
@@ -114,10 +126,10 @@ export const useMoveDepartment = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to move department',
+        message: getApiErrorMessage(error) || 'Failed to move department',
         color: 'red',
       });
     },

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { DepartmentDetail } from './DepartmentDetail';
-import { Department } from '../../../types';
+import { type Department } from '../../../types';
 
 // Mock the hooks
 vi.mock('../hooks/useDepartmentTree');
@@ -182,7 +183,10 @@ describe('DepartmentDetail', () => {
 
     const deleteButton = screen
       .getAllByRole('button')
-      .find(button => button.querySelector('svg') && !button.disabled);
+      .find(
+        button =>
+          button.querySelector('svg') && !(button as HTMLButtonElement).disabled
+      );
 
     if (deleteButton) {
       fireEvent.click(deleteButton);
@@ -300,7 +304,10 @@ describe('DepartmentDetail', () => {
     // Click delete button
     const deleteButton = screen
       .getAllByRole('button')
-      .find(button => button.querySelector('svg') && !button.disabled);
+      .find(
+        button =>
+          button.querySelector('svg') && !(button as HTMLButtonElement).disabled
+      );
 
     if (deleteButton) {
       fireEvent.click(deleteButton);

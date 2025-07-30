@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
@@ -9,7 +10,7 @@ import { type Department } from '../../../types';
 // Mock the hooks
 vi.mock('../hooks/useDepartmentTree');
 vi.mock('./DepartmentSelect', () => ({
-  DepartmentSelect: ({ label, ...props }: any) => (
+  DepartmentSelect: (props: any) => (
     <select data-testid="department-select" {...props}>
       <option value="">No Parent Department</option>
       <option value="1">Engineering</option>

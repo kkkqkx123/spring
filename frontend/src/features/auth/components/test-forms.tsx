@@ -1,14 +1,15 @@
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
 import { LoginForm, RegisterForm, ForgotPasswordForm } from './index';
+import type { LoginRequest, RegisterRequest } from '../../../types';
 
 // Simple test component to verify forms render correctly
 export const TestAuthForms: React.FC = () => {
-  const handleLogin = async (data: any) => {
+  const handleLogin = async (data: LoginRequest) => {
     console.log('Login:', data);
   };
 
-  const handleRegister = async (data: any) => {
+  const handleRegister = async (data: RegisterRequest) => {
     console.log('Register:', data);
   };
 

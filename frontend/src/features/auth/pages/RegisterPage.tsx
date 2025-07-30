@@ -23,10 +23,14 @@ export const RegisterPage: React.FC = () => {
 
       // Navigate to login page after successful registration
       navigate(ROUTES.LOGIN);
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to create account. Please try again.';
       notifications.show({
         title: 'Registration Failed',
-        message: error.message || 'Failed to create account. Please try again.',
+        message: errorMessage,
         color: 'red',
       });
     }

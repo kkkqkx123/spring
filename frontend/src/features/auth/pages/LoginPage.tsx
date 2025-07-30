@@ -13,7 +13,9 @@ export const LoginPage: React.FC = () => {
   const loginMutation = useLogin();
 
   // Get the intended destination from location state, default to dashboard
-  const from = (location.state as any)?.from?.pathname || ROUTES.DASHBOARD;
+  const from =
+    (location.state as { from?: { pathname?: string } })?.from?.pathname ||
+    ROUTES.DASHBOARD;
 
   const handleLogin = async (credentials: LoginRequest) => {
     try {
@@ -27,10 +29,14 @@ export const LoginPage: React.FC = () => {
 
       // Navigate to intended destination or dashboard
       navigate(from, { replace: true });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Invalid credentials. Please try again.';
       notifications.show({
         title: 'Login Failed',
-        message: error.message || 'Invalid credentials. Please try again.',
+        message: errorMessage,
         color: 'red',
       });
     }

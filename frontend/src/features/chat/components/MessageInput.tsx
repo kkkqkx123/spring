@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   Box,
   Group,
@@ -6,7 +6,6 @@ import {
   ActionIcon,
   Popover,
   Text,
-  FileInput,
   Tooltip,
   Alert,
 } from '@mantine/core';
@@ -219,8 +218,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const { mutate: sendMessage, isPending: isSending } = useSendMessage();
 
   // Debounced typing indicator
-  const debouncedStopTyping = useCallback(
-    debounce(() => stopTyping(), 1000),
+  const debouncedStopTyping = useMemo(
+    () => debounce(() => stopTyping(), 1000),
     [stopTyping]
   );
 
@@ -301,8 +300,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
-  const handleFileSelect = (file: File | null) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFileError(null);
+    const file = event.target.files?.[0] || null;
 
     if (!file) {
       setAttachedFile(null);
@@ -490,7 +490,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       </Group>
 
       {/* Hidden file input */}
-      <FileInput
+      <input
+        type="file"
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={handleFileSelect}

@@ -212,7 +212,7 @@ describe('MessageInput', () => {
 
     mockUseSendMessage.mockReturnValue({
       ...mockSendMessageResult,
-      mutate: vi.fn((data, options) => {
+      mutate: vi.fn((_data, options) => {
         onSuccessCallback = options.onSuccess;
       }),
     });
