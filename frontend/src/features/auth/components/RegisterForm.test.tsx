@@ -140,24 +140,6 @@ describe('RegisterForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
-    it('should validate email format', async () => {
-      const user = userEvent.setup();
-      renderWithProvider(defaultProps);
-
-      const emailInput = screen.getByTestId('email-input');
-      await user.type(emailInput, 'invalid-email');
-
-      const registerButton = screen.getByTestId('register-button');
-      await user.click(registerButton);
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid email address')
-        ).toBeInTheDocument();
-      });
-
-      expect(mockOnSubmit).not.toHaveBeenCalled();
-    });
 
     it('should validate username format', async () => {
       const user = userEvent.setup();

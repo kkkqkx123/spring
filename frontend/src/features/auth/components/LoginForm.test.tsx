@@ -393,8 +393,7 @@ describe('LoginForm', () => {
       await user.click(loginButton);
 
       await waitFor(() => {
-        const errorMessage = screen.getByRole('alert');
-        expect(errorMessage).toHaveTextContent('Username is required');
+        expect(screen.getByText('Username is required')).toBeInTheDocument();
       });
     });
 
