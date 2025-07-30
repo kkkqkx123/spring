@@ -16,7 +16,22 @@ vi.mock('../../../services/auth', () => ({
     login: vi.fn(),
     register: vi.fn(),
     logout: vi.fn(),
-    initialize: vi.fn(),
+    initialize: vi.fn().mockResolvedValue(undefined),
+    hasAnyRole: vi.fn().mockImplementation((roles: string[]) => {
+      const userRoles =
+        useAuthStore.getState().user?.roles?.map(r => r.name) || [];
+      return roles.some(role => userRoles.includes(role));
+    }),
+    hasAnyPermission: vi.fn().mockImplementation((permissions: string[]) => {
+      const userPermissions =
+        useAuthStore
+          .getState()
+          .user?.roles?.flatMap(r => r.permissions?.map(p => p.name)) || [];
+      return permissions.some(permission =>
+        userPermissions.includes(permission)
+      );
+    }),
+    handleAuthError: vi.fn(),
   },
 }));
 
@@ -139,9 +154,7 @@ describe('Authentication Flow Integration', () => {
 
       // Should redirect to dashboard after successful login
       await waitFor(() => {
-        expect(
-          screen.getByText('Dashboard Page - To be implemented')
-        ).toBeInTheDocument();
+        expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
       });
     });
 
@@ -242,7 +255,7 @@ describe('Authentication Flow Integration', () => {
       });
     });
 
-    it('navigates between login and register pages', () => {
+    it('navigates between login and register pages', async () => {
       render(
         <TestWrapper initialEntries={[ROUTES.LOGIN]}>
           <AppRouter />
@@ -256,42 +269,47 @@ describe('Authentication Flow Integration', () => {
       fireEvent.click(screen.getByTestId('register-link'));
 
       // Should navigate to register page
-      expect(screen.getByText('Create Account')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: /create account/i })
+        ).toBeInTheDocument();
+      });
 
       // Click login link
       fireEvent.click(screen.getByTestId('login-link'));
 
       // Should navigate back to login page
-      expect(screen.getByText('Welcome back!')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Welcome back!')).toBeInTheDocument();
+      });
     });
   });
 
   describe('Authenticated User Flow', () => {
-    beforeEach(() => {
-      // Set up authenticated state
-      const mockUser = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        roles: [
-          {
-            id: 1,
-            name: 'USER',
-            permissions: [
-              { id: 1, name: 'EMPLOYEE_READ' },
-              { id: 2, name: 'DEPARTMENT_READ' },
-            ],
-          },
-        ],
-        enabled: true,
-        createdAt: '2023-01-01T00:00:00Z',
-        updatedAt: '2023-01-01T00:00:00Z',
-      };
+    const mockUser = {
+      id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      roles: [
+        {
+          id: 1,
+          name: 'USER',
+          permissions: [
+            { id: 1, name: 'EMPLOYEE_READ' },
+            { id: 2, name: 'DEPARTMENT_READ' },
+          ],
+        },
+      ],
+      enabled: true,
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: '2023-01-01T00:00:00Z',
+    };
 
+    beforeEach(() => {
       useAuthStore.getState().login(mockUser, 'test-token');
     });
 
-    it('redirects authenticated user away from public routes', () => {
+    it('redirects authenticated user away from public routes', async () => {
       render(
         <TestWrapper initialEntries={[ROUTES.LOGIN]}>
           <AppRouter />
@@ -299,32 +317,34 @@ describe('Authentication Flow Integration', () => {
       );
 
       // Should redirect to dashboard
-      expect(
-        screen.getByText('Dashboard Page - To be implemented')
-      ).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
+      });
     });
 
-    it('allows access to protected routes with sufficient permissions', () => {
+    it('allows access to protected routes with sufficient permissions', async () => {
       render(
         <TestWrapper initialEntries={[ROUTES.EMPLOYEES]}>
           <AppRouter />
         </TestWrapper>
       );
 
-      expect(
-        screen.getByText('Employees Page - To be implemented')
-      ).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(/employees/i)).toBeInTheDocument();
+      });
     });
 
-    it('denies access to protected routes without sufficient permissions', () => {
+    it('denies access to protected routes without sufficient permissions', async () => {
       render(
         <TestWrapper initialEntries={[ROUTES.PERMISSIONS]}>
           <AppRouter />
         </TestWrapper>
       );
 
-      expect(screen.getByText('Access Denied')).toBeInTheDocument();
-      expect(screen.getByText(/Required roles: ADMIN/)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Access Denied')).toBeInTheDocument();
+        expect(screen.getByText(/Required roles: ADMIN/)).toBeInTheDocument();
+      });
     });
 
     it('preserves intended destination after login', async () => {

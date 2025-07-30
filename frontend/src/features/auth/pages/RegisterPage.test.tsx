@@ -74,7 +74,9 @@ describe('RegisterPage', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText('Create Account')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /create account/i, level: 1 })
+    ).toBeInTheDocument();
     expect(screen.getByTestId('first-name-input')).toBeInTheDocument();
     expect(screen.getByTestId('last-name-input')).toBeInTheDocument();
     expect(screen.getByTestId('username-input')).toBeInTheDocument();
