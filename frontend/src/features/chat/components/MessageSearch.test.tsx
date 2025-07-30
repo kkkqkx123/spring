@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -5,6 +6,7 @@ import { MantineProvider } from '@mantine/core';
 import { MessageSearch } from './MessageSearch';
 import { useSearchMessages } from '../hooks/useChat';
 import type { ChatMessage, PaginatedResponse } from '../../../types';
+import { vi } from 'vitest';
 
 // Mock the hooks
 vi.mock('../hooks/useChat');
@@ -93,7 +95,7 @@ describe('MessageSearch', () => {
 
   it('shows search results when query is provided', async () => {
     // Set up the mock to return results for any query
-    mockUseSearchMessages.mockImplementation(query => {
+    mockUseSearchMessages.mockImplementation((query: string) => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -177,7 +179,7 @@ describe('MessageSearch', () => {
   });
 
   it('handles message selection', async () => {
-    mockUseSearchMessages.mockImplementation(query => {
+    mockUseSearchMessages.mockImplementation((query: string) => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -231,7 +233,7 @@ describe('MessageSearch', () => {
   });
 
   it('highlights search terms in results', async () => {
-    mockUseSearchMessages.mockImplementation(query => {
+    mockUseSearchMessages.mockImplementation((query: string) => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -260,7 +262,7 @@ describe('MessageSearch', () => {
   });
 
   it('shows sender and recipient information', async () => {
-    mockUseSearchMessages.mockImplementation(query => {
+    mockUseSearchMessages.mockImplementation((query: string) => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,
@@ -291,7 +293,7 @@ describe('MessageSearch', () => {
   });
 
   it('shows read status badges', async () => {
-    mockUseSearchMessages.mockImplementation(query => {
+    mockUseSearchMessages.mockImplementation((query: string) => {
       if (query && query.trim()) {
         return {
           data: mockSearchResults,

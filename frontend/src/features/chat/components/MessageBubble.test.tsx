@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { MessageBubble } from './MessageBubble';
 import { useAuth } from '../../../hooks/useAuth';
 import type { ChatMessage } from '../../../types';
+import { vi } from 'vitest';
 
 // Mock the useAuth hook
 vi.mock('../../../hooks/useAuth');
@@ -10,7 +12,7 @@ const mockUseAuth = useAuth as any;
 
 // Mock the formatDate utility
 vi.mock('../../../utils', () => ({
-  formatDate: vi.fn((date, format) => {
+  formatDate: vi.fn((_date, format) => {
     if (format === 'long') return 'January 1, 2024, 10:30 AM';
     return 'Jan 1, 2024';
   }),

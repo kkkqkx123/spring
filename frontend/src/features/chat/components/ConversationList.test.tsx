@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
@@ -5,14 +6,6 @@ import { ConversationList } from './ConversationList';
 import { useConversations } from '../hooks/useChat';
 import { useRealTimeChat } from '../hooks/useRealTimeChat';
 import type { Conversation } from '../../../types';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
 import { vi } from 'vitest';
 
 // Mock the hooks

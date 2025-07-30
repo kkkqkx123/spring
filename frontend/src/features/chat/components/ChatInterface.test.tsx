@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
@@ -10,24 +11,6 @@ import {
 } from '../hooks/useChat';
 import { useRealTimeChat, useTypingIndicator } from '../hooks/useRealTimeChat';
 import type { ChatMessage, PaginatedResponse } from '../../../types';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
-import { vi } from 'vitest';
 import { vi } from 'vitest';
 
 // Mock the hooks

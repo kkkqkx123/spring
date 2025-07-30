@@ -68,6 +68,17 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
     setHasLoadedInitial(false);
   }, [userId]);
 
+  const scrollToBottom = useCallback(() => {
+    if (scrollAreaRef.current) {
+      const scrollElement = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
+    }
+  }, []);
+
   // Auto-scroll to bottom for new messages (only on first page)
   useEffect(() => {
     if (autoScroll && hasLoadedInitial && pageable.page === 0) {
@@ -79,18 +90,8 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
     autoScroll,
     hasLoadedInitial,
     pageable.page,
+    scrollToBottom,
   ]);
-
-  const scrollToBottom = useCallback(() => {
-    if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector(
-        '[data-radix-scroll-area-viewport]'
-      );
-      if (scrollElement) {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-      }
-    }
-  }, []);
 
   const loadMoreMessages = () => {
     if (canLoadMore && !isLoading) {
@@ -198,7 +199,6 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
                 icon={<IconAlertCircle size={14} />}
                 color="red"
                 variant="light"
-                size="sm"
               >
                 <Group gap="xs">
                   <Text size="xs">Failed to load messages</Text>
