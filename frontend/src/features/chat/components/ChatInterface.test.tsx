@@ -4,29 +4,28 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { ChatInterface } from './ChatInterface';
 import { useAuth } from '../../../hooks/useAuth';
-import {
-  useConversation,
-  useConversations,
-  useSendMessage,
-} from '../hooks/useChat';
 import { useRealTimeChat, useTypingIndicator } from '../hooks/useRealTimeChat';
 import type { ChatMessage, PaginatedResponse } from '../../../types';
 import { vi } from 'vitest';
+import { chatApi } from '../services/chatApi';
+import { useConversations, useSendMessage } from '../hooks/useChat';
 
 // Mock the hooks
 vi.mock('../../../hooks/useAuth');
-vi.mock('../hooks/useChat', () => ({
-  useConversation: vi.fn(),
-  useConversations: vi.fn(),
-  useSendMessage: vi.fn(),
-}));
+vi.mock('../hooks/useChat', async () => {
+  const originalModule = await vi.importActual('../hooks/useChat');
+  return {
+    ...originalModule,
+    useConversations: vi.fn(),
+    useSendMessage: vi.fn(),
+  };
+});
 vi.mock('../hooks/useRealTimeChat', () => ({
   useRealTimeChat: vi.fn(),
   useTypingIndicator: vi.fn(),
 }));
 
 const mockUseAuth = useAuth as any;
-const mockUseConversation = useConversation as any;
 const mockUseRealTimeChat = useRealTimeChat as any;
 const mockUseConversations = useConversations as any;
 const mockUseSendMessage = useSendMessage as any;
@@ -90,18 +89,31 @@ describe('ChatInterface', () => {
       register: vi.fn(),
     } as any);
 
-    mockUseConversation.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-      refetch: vi.fn(),
-    } as any);
+    vi.spyOn(chatApi, 'getConversation').mockResolvedValue(
+      mockConversationData
+    );
 
     mockUseConversations.mockReturnValue({
-      data: [],
+      data: [
+        {
+          userId: 2,
+          userName: 'John Doe',
+          lastMessage: {
+            id: 1,
+            content: 'Hello!',
+            senderId: 2,
+            senderName: 'John Doe',
+            recipientId: 1,
+            recipientName: 'Jane Smith',
+            createdAt: '2024-01-01T10:30:00Z',
+            read: true,
+          },
+          unreadCount: 0,
+        },
+      ],
       isLoading: false,
       error: null,
-    } as any);
+    });
 
     mockUseRealTimeChat.mockReturnValue({
       onlineUsers: new Set([2]),
@@ -113,7 +125,6 @@ describe('ChatInterface', () => {
       connectionState: 'connected',
     } as any);
 
-    // Mock the hooks used by MessageInput and MessageHistory
     mockUseSendMessage.mockReturnValue({
       mutate: vi.fn(),
       isPending: false,
@@ -127,7 +138,7 @@ describe('ChatInterface', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('renders chat interface with conversation list', () => {
@@ -139,52 +150,44 @@ describe('ChatInterface', () => {
     expect(screen.getByText('Select a conversation')).toBeInTheDocument();
   });
 
-  it('shows selected conversation with messages', () => {
-    mockUseConversation.mockReturnValue({
-      data: mockConversationData,
-      isLoading: false,
-      error: null,
-    } as any);
+  it('shows selected conversation with messages', async () => {
+    renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
+
+    expect(await screen.findByText('Hello!')).toBeInTheDocument();
+    expect(await screen.findByText('Hi there!')).toBeInTheDocument();
+  });
+
+  it('shows loading state when loading messages', async () => {
+    vi.spyOn(chatApi, 'getConversation').mockImplementation(
+      () => new Promise(() => {})
+    ); // Never resolves
 
     renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
-    expect(screen.getByText('Hello!')).toBeInTheDocument();
-    expect(screen.getByText('Hi there!')).toBeInTheDocument();
+    expect(await screen.findByTestId('loader-container')).toBeInTheDocument();
   });
 
-  it('shows loading state when loading messages', () => {
-    mockUseConversation.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-    } as any);
+  it('shows error state when messages fail to load', async () => {
+    vi.spyOn(chatApi, 'getConversation').mockRejectedValue(
+      new Error('Failed to load')
+    );
 
     renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
-    expect(document.querySelector('.mantine-Loader-root')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Error loading messages')
+    ).toBeInTheDocument();
   });
 
-  it('shows error state when messages fail to load', () => {
-    mockUseConversation.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error('Failed to load'),
-    } as any);
+  it('shows empty state when no messages', async () => {
+    vi.spyOn(chatApi, 'getConversation').mockResolvedValue({
+      ...mockConversationData,
+      content: [],
+    });
 
     renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
 
-    expect(screen.getByText('Error loading messages')).toBeInTheDocument();
+    expect(await screen.findByText('No messages yet')).toBeInTheDocument();
   });
 
-  it('shows empty state when no messages', () => {
-    mockUseConversation.mockReturnValue({
-      data: { ...mockConversationData, content: [] },
-      isLoading: false,
-      error: null,
-    } as any);
-
-    renderWithProviders(<ChatInterface defaultSelectedUserId={2} />);
-
-    expect(screen.getByText('No messages yet')).toBeInTheDocument();
-  });
 });

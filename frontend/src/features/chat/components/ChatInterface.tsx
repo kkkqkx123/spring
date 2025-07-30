@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -10,14 +10,15 @@ import {
   ActionIcon,
   Drawer,
 } from '@mantine/core';
-import { IconWifiOff, IconArrowLeft, IconUsers } from '@tabler/icons-react';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { IconWifiOff, IconArrowLeft } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
 import { ConversationList } from './ConversationList';
 import { MessageHistory } from './MessageHistory';
 import { MessageInput } from './MessageInput';
 import { OnlineStatus } from './OnlineStatus';
 import { useRealTimeChat } from '../hooks/useRealTimeChat';
 import { useIsMobile, useIsTablet } from '../../../utils/responsive';
+import { useConversations } from '../hooks/useChat';
 
 interface ChatInterfaceProps {
   height?: number;
@@ -32,10 +33,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     defaultSelectedUserId
   );
   const [selectedUserName, setSelectedUserName] = useState<string>('');
-  const [
-    conversationDrawerOpened,
-    { open: openConversationDrawer, close: closeConversationDrawer },
-  ] = useDisclosure(false);
+  const { data: conversations } = useConversations();
+
+  useEffect(() => {
+    if (defaultSelectedUserId && conversations) {
+      const selectedConversation = conversations.find(
+        conv => conv.userId === defaultSelectedUserId
+      );
+      if (selectedConversation) {
+        setSelectedUserName(selectedConversation.userName);
+      }
+    }
+  }, [defaultSelectedUserId, conversations]);
+  const [, { close: closeConversationDrawer }] = useDisclosure(false);
 
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
@@ -174,7 +184,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {/* Chat area */}
         <Grid.Col span={isTablet ? 7 : 8}>
           {selectedUserId ? (
-            <Box h="100%" style={{ display: 'flex', flexDirection: 'column' }}>
+            <Box
+              data-testid="message-history-container"
+              h="100%"
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
               {/* Chat header */}
               <Box
                 p={isTablet ? 'sm' : 'md'}

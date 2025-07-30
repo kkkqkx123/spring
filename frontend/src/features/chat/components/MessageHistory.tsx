@@ -22,6 +22,8 @@ interface MessageHistoryProps {
   userName: string;
   height?: number;
   autoScroll?: boolean;
+  isMobile?: boolean;
+  isTablet?: boolean;
 }
 
 export const MessageHistory: React.FC<MessageHistoryProps> = ({
@@ -59,13 +61,11 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
         setAllMessages(prev => [...conversationData.content, ...prev]);
       }
     }
-  }, [conversationData, pageable.page]);
+  }, [conversationData]);
 
   // Reset when user changes
   useEffect(() => {
-    setAllMessages([]);
     setPageable({ page: 0, size: 20 });
-    setHasLoadedInitial(false);
   }, [userId]);
 
   const scrollToBottom = useCallback(() => {
@@ -124,7 +124,15 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
     []
   );
 
-  if (error && !hasLoadedInitial) {
+  if (isLoading && allMessages.length === 0) {
+    return (
+      <Center h={height} data-testid="loader-container">
+        <Loader size="md" />
+      </Center>
+    );
+  }
+
+  if (error && allMessages.length === 0) {
     return (
       <Center h={height} p="md">
         <Alert
@@ -144,15 +152,7 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
     );
   }
 
-  if (isLoading && !hasLoadedInitial) {
-    return (
-      <Center h={height}>
-        <Loader size="md" />
-      </Center>
-    );
-  }
-
-  if (allMessages.length === 0 && hasLoadedInitial) {
+  if (allMessages.length === 0 && !isLoading) {
     return (
       <Center h={height} p="md">
         <Stack align="center" gap="sm">
@@ -227,18 +227,6 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
           {/* Typing indicator */}
           {typingUser && (
             <TypingIndicator userName={typingUser} isVisible={true} />
-          )}
-
-          {/* Loading indicator for pagination */}
-          {isLoading && pageable.page > 0 && (
-            <Center py="md">
-              <Group gap="xs">
-                <Loader size="sm" />
-                <Text size="xs" c="dimmed">
-                  Loading messages...
-                </Text>
-              </Group>
-            </Center>
           )}
         </Stack>
       </ScrollArea>

@@ -26,6 +26,8 @@ interface MessageInputProps {
   recipientName: string;
   disabled?: boolean;
   placeholder?: string;
+  isMobile?: boolean;
+  isTablet?: boolean;
 }
 
 // Common emoji list for the picker

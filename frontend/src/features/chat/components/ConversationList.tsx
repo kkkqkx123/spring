@@ -23,6 +23,8 @@ interface ConversationListProps {
   selectedUserId?: number;
   onSelectConversation: (userId: number, userName: string) => void;
   height?: number;
+  isMobile?: boolean;
+  isTablet?: boolean;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
