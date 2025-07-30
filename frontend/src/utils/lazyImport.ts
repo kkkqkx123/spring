@@ -48,20 +48,22 @@ export function lazyWithRetry<T extends ComponentType<any>>(
 ): T {
   const LazyComponent = lazy(async () => {
     let lastError: Error;
-    
+
     for (let i = 0; i < maxRetries; i++) {
       try {
         return await importFunc();
       } catch (error) {
         lastError = error as Error;
-        
+
         // Wait before retrying (exponential backoff)
         if (i < maxRetries - 1) {
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+          await new Promise(resolve =>
+            setTimeout(resolve, Math.pow(2, i) * 1000)
+          );
         }
       }
     }
-    
+
     throw lastError!;
   });
 

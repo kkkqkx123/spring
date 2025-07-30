@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../../../services/queryKeys';
-import { permissionApi, type RoleCreateRequest, type RoleUpdateRequest, type UserRoleAssignment as UserRoleAssignmentRequest } from '../services/permissionApi';
+import {
+  permissionApi,
+  type RoleCreateRequest,
+  type RoleUpdateRequest,
+  type UserRoleAssignment as UserRoleAssignmentRequest,
+} from '../services/permissionApi';
 import type { Role, Permission, User, Pageable } from '../../../types';
 import { notifications } from '@mantine/notifications';
 
@@ -59,7 +64,9 @@ export const useUpdateRole = () => {
     mutationFn: (role: RoleUpdateRequest) => permissionApi.updateRole(role),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.permissions.roles });
-      queryClient.invalidateQueries({ queryKey: queryKeys.permissions.role(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.permissions.role(variables.id),
+      });
       notifications.show({
         title: 'Success',
         message: 'Role updated successfully',
@@ -121,10 +128,11 @@ export const useAssignUserRoles = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (assignment: UserRoleAssignmentRequest) => permissionApi.assignUserRoles(assignment),
+    mutationFn: (assignment: UserRoleAssignmentRequest) =>
+      permissionApi.assignUserRoles(assignment),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.permissions.userRoles(variables.userId) 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.permissions.userRoles(variables.userId),
       });
       notifications.show({
         title: 'Success',
@@ -146,11 +154,11 @@ export const useRemoveUserRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, roleId }: { userId: number; roleId: number }) => 
+    mutationFn: ({ userId, roleId }: { userId: number; roleId: number }) =>
       permissionApi.removeUserRole(userId, roleId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.permissions.userRoles(variables.userId) 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.permissions.userRoles(variables.userId),
       });
       notifications.show({
         title: 'Success',
@@ -171,8 +179,13 @@ export const useRemoveUserRole = () => {
 // Permission impact analysis
 export const usePermissionImpactAnalysis = () => {
   return useMutation({
-    mutationFn: ({ roleId, permissionIds }: { roleId: number; permissionIds: number[] }) =>
-      permissionApi.analyzePermissionImpact(roleId, permissionIds),
+    mutationFn: ({
+      roleId,
+      permissionIds,
+    }: {
+      roleId: number;
+      permissionIds: number[];
+    }) => permissionApi.analyzePermissionImpact(roleId, permissionIds),
   });
 };
 
@@ -189,8 +202,13 @@ export const useUpdateRolePermissions = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ roleId, permissionIds }: { roleId: number; permissionIds: number[] }) =>
-      permissionApi.updateRolePermissions(roleId, permissionIds),
+    mutationFn: ({
+      roleId,
+      permissionIds,
+    }: {
+      roleId: number;
+      permissionIds: number[];
+    }) => permissionApi.updateRolePermissions(roleId, permissionIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permissions', 'matrix'] });
       queryClient.invalidateQueries({ queryKey: queryKeys.permissions.roles });
@@ -224,8 +242,13 @@ export const useBulkAssignRoles = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userIds, roleIds }: { userIds: number[]; roleIds: number[] }) =>
-      permissionApi.bulkAssignRoles(userIds, roleIds),
+    mutationFn: ({
+      userIds,
+      roleIds,
+    }: {
+      userIds: number[];
+      roleIds: number[];
+    }) => permissionApi.bulkAssignRoles(userIds, roleIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permissions', 'users'] });
       notifications.show({
@@ -248,8 +271,13 @@ export const useBulkRemoveRoles = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userIds, roleIds }: { userIds: number[]; roleIds: number[] }) =>
-      permissionApi.bulkRemoveRoles(userIds, roleIds),
+    mutationFn: ({
+      userIds,
+      roleIds,
+    }: {
+      userIds: number[];
+      roleIds: number[];
+    }) => permissionApi.bulkRemoveRoles(userIds, roleIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['permissions', 'users'] });
       notifications.show({

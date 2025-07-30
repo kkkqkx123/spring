@@ -1,10 +1,18 @@
 import React from 'react';
 import { Box, List, ListProps } from '@mantine/core';
-import { useKeyboardNavigation, useAriaSelected } from '../../utils/accessibility';
+import {
+  useKeyboardNavigation,
+  useAriaSelected,
+} from '../../utils/accessibility';
 
 interface AccessibleListProps<T> extends Omit<ListProps, 'children'> {
   items: T[];
-  renderItem: (item: T, index: number, isSelected: boolean, isFocused: boolean) => React.ReactNode;
+  renderItem: (
+    item: T,
+    index: number,
+    isSelected: boolean,
+    isFocused: boolean
+  ) => React.ReactNode;
   onSelect?: (item: T, index: number) => void;
   multiSelect?: boolean;
   orientation?: 'horizontal' | 'vertical' | 'grid';
@@ -70,17 +78,18 @@ export function AccessibleList<T>({
             aria-selected={multiSelect ? isSelected(index) : undefined}
             tabIndex={focusedIndex === index ? 0 : -1}
             onClick={() => handleItemClick(item, index)}
-            onKeyDown={(e) => handleItemKeyDown(e, item, index)}
+            onKeyDown={e => handleItemKeyDown(e, item, index)}
             style={{
               cursor: 'pointer',
               padding: '0.5rem',
               borderRadius: '0.25rem',
-              backgroundColor: isSelected(index) 
-                ? 'var(--mantine-color-blue-1)' 
+              backgroundColor: isSelected(index)
+                ? 'var(--mantine-color-blue-1)'
                 : 'transparent',
-              border: focusedIndex === index 
-                ? '2px solid var(--mantine-color-blue-6)' 
-                : '2px solid transparent',
+              border:
+                focusedIndex === index
+                  ? '2px solid var(--mantine-color-blue-6)'
+                  : '2px solid transparent',
               outline: 'none',
             }}
           >

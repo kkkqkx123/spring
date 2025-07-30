@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/// <reference types="vitest" />
 import '@testing-library/jest-dom';
 
 // Mock IntersectionObserver
@@ -46,4 +48,16 @@ Object.defineProperty(URL, 'createObjectURL', {
 Object.defineProperty(URL, 'revokeObjectURL', {
   writable: true,
   value: () => {},
+});
+
+// Mock scrollIntoView
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+// Mock Notification API
+Object.defineProperty(window, 'Notification', {
+  writable: true,
+  value: vi.fn().mockImplementation(() => ({
+    permission: 'default',
+    requestPermission: vi.fn().mockResolvedValue('default'),
+  })),
 });

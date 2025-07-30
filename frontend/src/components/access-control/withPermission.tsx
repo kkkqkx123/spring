@@ -1,5 +1,8 @@
 import React from 'react';
-import { useAccessControl, type AccessControlOptions } from '../../hooks/useAccessControl';
+import {
+  useAccessControl,
+  type AccessControlOptions,
+} from '../../hooks/useAccessControl';
 import { Alert, Text } from '@mantine/core';
 import { IconLock } from '@tabler/icons-react';
 
@@ -31,7 +34,7 @@ export function withPermission<P extends object>(
     ...accessControlOptions
   } = options;
 
-  const WithPermissionComponent: React.FC<P> = (props) => {
+  const WithPermissionComponent: React.FC<P> = props => {
     const accessControl = useAccessControl();
 
     // Combine single and array requirements
@@ -39,19 +42,22 @@ export function withPermission<P extends object>(
       ...(permission ? [permission] : []),
       ...permissions,
     ];
-    const allRoles = [
-      ...(role ? [role] : []),
-      ...roles,
-    ];
+    const allRoles = [...(role ? [role] : []), ...roles];
 
     // Check permissions
     const hasRequiredPermissions = (() => {
       if (allPermissions.length === 0) return true;
 
       if (requireAll) {
-        return accessControl.hasAllPermissions(allPermissions, accessControlOptions);
+        return accessControl.hasAllPermissions(
+          allPermissions,
+          accessControlOptions
+        );
       } else {
-        return accessControl.hasAnyPermission(allPermissions, accessControlOptions);
+        return accessControl.hasAnyPermission(
+          allPermissions,
+          accessControlOptions
+        );
       }
     })();
 
@@ -88,7 +94,7 @@ export function withPermission<P extends object>(
           <Text size="sm">
             You don't have the required permissions to access this feature.
           </Text>
-          
+
           {allRoles.length > 0 && (
             <Text size="xs" c="dimmed" mt="xs">
               Required roles: {allRoles.join(requireAll ? ' AND ' : ' OR ')}
@@ -97,7 +103,8 @@ export function withPermission<P extends object>(
 
           {allPermissions.length > 0 && (
             <Text size="xs" c="dimmed" mt="xs">
-              Required permissions: {allPermissions.join(requireAll ? ' AND ' : ' OR ')}
+              Required permissions:{' '}
+              {allPermissions.join(requireAll ? ' AND ' : ' OR ')}
             </Text>
           )}
         </Alert>
@@ -150,7 +157,7 @@ export function withCrudPermission<P extends object>(
   options: Omit<WithPermissionOptions, 'permission'> = {}
 ) {
   const permission = `${resource.toUpperCase()}_${action.toUpperCase()}`;
-  
+
   return withPermission(WrappedComponent, {
     ...options,
     permission,

@@ -32,11 +32,11 @@ function App() {
       <MantineProvider theme={theme}>
         {/* Skip links for keyboard navigation */}
         <SkipLinks links={skipLinks} />
-        
+
         {/* Live region for screen reader announcements */}
         <LiveRegion />
-        
-        <Notifications 
+
+        <Notifications
           position="top-right"
           // Ensure notifications are announced to screen readers
           styles={{
@@ -50,7 +50,7 @@ function App() {
             },
           }}
         />
-        
+
         <QueryErrorBoundary>
           <BrowserRouter>
             <AppRouter />

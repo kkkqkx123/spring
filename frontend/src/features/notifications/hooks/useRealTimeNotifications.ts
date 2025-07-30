@@ -190,11 +190,7 @@ export function useRealTimeNotifications(): UseRealTimeNotificationsReturn {
       unsubscribeNotificationRead();
       unsubscribeCountUpdate();
     };
-  }, [
-    handleNewNotification,
-    handleNotificationRead,
-    handleUnreadCountUpdate,
-  ]);
+  }, [handleNewNotification, handleNotificationRead, handleUnreadCountUpdate]);
 
   // Auto-cleanup old notifications on mount and periodically
   useEffect(() => {
@@ -245,7 +241,10 @@ function playNotificationSound(type: string): void {
     // Fade in and out
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.05);
-    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+    gainNode.gain.linearRampToValueAtTime(
+      0,
+      audioContext.currentTime + duration
+    );
 
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + duration);

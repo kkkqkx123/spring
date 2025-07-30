@@ -2,7 +2,8 @@ import React from 'react';
 import { TextInput, TextInputProps, Text, Box } from '@mantine/core';
 import { useAccessibleFormField } from '../../utils/accessibility';
 
-interface AccessibleFormFieldProps extends Omit<TextInputProps, 'id' | 'label'> {
+interface AccessibleFormFieldProps
+  extends Omit<TextInputProps, 'id' | 'label'> {
   id: string;
   label: string;
   error?: string;
@@ -18,7 +19,7 @@ export const AccessibleFormField: React.FC<AccessibleFormFieldProps> = ({
   required = false,
   ...inputProps
 }) => {
-  const { fieldProps, labelProps, errorProps, descriptionProps } = 
+  const { fieldProps, labelProps, errorProps, descriptionProps } =
     useAccessibleFormField(id, label, required, error, description);
 
   return (

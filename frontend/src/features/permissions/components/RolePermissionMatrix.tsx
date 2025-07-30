@@ -18,7 +18,12 @@ import {
   Textarea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus, IconEdit, IconTrash, IconInfoCircle } from '@tabler/icons-react';
+import {
+  IconPlus,
+  IconEdit,
+  IconTrash,
+  IconInfoCircle,
+} from '@tabler/icons-react';
 import {
   useAllRoles,
   useAllPermissions,
@@ -27,7 +32,7 @@ import {
   useCreateRole,
   useUpdateRole,
   useDeleteRole,
-  usePermissionImpactAnalysis
+  usePermissionImpactAnalysis,
 } from '../hooks/usePermissions';
 import type { Role, Permission } from '../../../types';
 import { RoleForm } from './RoleForm';
@@ -48,12 +53,18 @@ export const RolePermissionMatrix: React.FC<RolePermissionMatrixProps> = ({
     permissionIds: number[];
   } | null>(null);
 
-  const [roleFormOpened, { open: openRoleForm, close: closeRoleForm }] = useDisclosure(false);
-  const [impactDialogOpened, { open: openImpactDialog, close: closeImpactDialog }] = useDisclosure(false);
+  const [roleFormOpened, { open: openRoleForm, close: closeRoleForm }] =
+    useDisclosure(false);
+  const [
+    impactDialogOpened,
+    { open: openImpactDialog, close: closeImpactDialog },
+  ] = useDisclosure(false);
 
   const { data: roles = [], isLoading: rolesLoading } = useAllRoles();
-  const { data: permissions = [], isLoading: permissionsLoading } = useAllPermissions();
-  const { data: matrix = {}, isLoading: matrixLoading } = useRolePermissionMatrix();
+  const { data: permissions = [], isLoading: permissionsLoading } =
+    useAllPermissions();
+  const { data: matrix = {}, isLoading: matrixLoading } =
+    useRolePermissionMatrix();
 
   const updateRolePermissions = useUpdateRolePermissions();
   const createRole = useCreateRole();
@@ -76,7 +87,11 @@ export const RolePermissionMatrix: React.FC<RolePermissionMatrixProps> = ({
     return groups;
   }, [permissions]);
 
-  const handlePermissionToggle = async (roleId: number, permissionId: number, checked: boolean) => {
+  const handlePermissionToggle = async (
+    roleId: number,
+    permissionId: number,
+    checked: boolean
+  ) => {
     const currentPermissions = matrix[roleId] || [];
     const newPermissions = checked
       ? [...currentPermissions, permissionId]
@@ -87,7 +102,10 @@ export const RolePermissionMatrix: React.FC<RolePermissionMatrixProps> = ({
       setImpactAnalysisData({ roleId, permissionIds: newPermissions });
       openImpactDialog();
     } else {
-      await updateRolePermissions.mutateAsync({ roleId, permissionIds: newPermissions });
+      await updateRolePermissions.mutateAsync({
+        roleId,
+        permissionIds: newPermissions,
+      });
     }
   };
 
@@ -113,7 +131,11 @@ export const RolePermissionMatrix: React.FC<RolePermissionMatrixProps> = ({
   };
 
   const handleRoleDelete = async (roleId: number) => {
-    if (window.confirm('Are you sure you want to delete this role? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to delete this role? This action cannot be undone.'
+      )
+    ) {
       await deleteRole.mutateAsync(roleId);
     }
   };
@@ -185,51 +207,55 @@ export const RolePermissionMatrix: React.FC<RolePermissionMatrixProps> = ({
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {Object.entries(groupedPermissions).map(([category, categoryPermissions]) => (
-                  <React.Fragment key={category}>
-                    <Table.Tr>
-                      <Table.Td colSpan={roles.length + 1}>
-                        <Badge variant="light" size="sm">
-                          {category}
-                        </Badge>
-                      </Table.Td>
-                    </Table.Tr>
-                    {categoryPermissions.map(permission => (
-                      <Table.Tr key={permission.id}>
-                        <Table.Td>
-                          <Stack gap={2}>
-                            <Text size="sm" fw={500}>
-                              {permission.name.split(':').pop()}
-                            </Text>
-                            {permission.description && (
-                              <Text size="xs" c="dimmed">
-                                {permission.description}
-                              </Text>
-                            )}
-                          </Stack>
+                {Object.entries(groupedPermissions).map(
+                  ([category, categoryPermissions]) => (
+                    <React.Fragment key={category}>
+                      <Table.Tr>
+                        <Table.Td colSpan={roles.length + 1}>
+                          <Badge variant="light" size="sm">
+                            {category}
+                          </Badge>
                         </Table.Td>
-                        {roles.map(role => {
-                          const hasPermission = (matrix[role.id] || []).includes(permission.id);
-                          return (
-                            <Table.Td key={role.id} ta="center">
-                              <Checkbox
-                                checked={hasPermission}
-                                onChange={(event) =>
-                                  handlePermissionToggle(
-                                    role.id,
-                                    permission.id,
-                                    event.currentTarget.checked
-                                  )
-                                }
-                                disabled={updateRolePermissions.isPending}
-                              />
-                            </Table.Td>
-                          );
-                        })}
                       </Table.Tr>
-                    ))}
-                  </React.Fragment>
-                ))}
+                      {categoryPermissions.map(permission => (
+                        <Table.Tr key={permission.id}>
+                          <Table.Td>
+                            <Stack gap={2}>
+                              <Text size="sm" fw={500}>
+                                {permission.name.split(':').pop()}
+                              </Text>
+                              {permission.description && (
+                                <Text size="xs" c="dimmed">
+                                  {permission.description}
+                                </Text>
+                              )}
+                            </Stack>
+                          </Table.Td>
+                          {roles.map(role => {
+                            const hasPermission = (
+                              matrix[role.id] || []
+                            ).includes(permission.id);
+                            return (
+                              <Table.Td key={role.id} ta="center">
+                                <Checkbox
+                                  checked={hasPermission}
+                                  onChange={event =>
+                                    handlePermissionToggle(
+                                      role.id,
+                                      permission.id,
+                                      event.currentTarget.checked
+                                    )
+                                  }
+                                  disabled={updateRolePermissions.isPending}
+                                />
+                              </Table.Td>
+                            );
+                          })}
+                        </Table.Tr>
+                      ))}
+                    </React.Fragment>
+                  )
+                )}
               </Table.Tbody>
             </Table>
           </div>

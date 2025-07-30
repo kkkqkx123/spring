@@ -70,7 +70,12 @@ export function Header({
   const showFullUserInfo = !isMobile && !isTablet;
 
   return (
-    <Group h="100%" px={getHeaderPadding()} justify="space-between" wrap="nowrap">
+    <Group
+      h="100%"
+      px={getHeaderPadding()}
+      justify="space-between"
+      wrap="nowrap"
+    >
       {/* Left Section */}
       <Group gap="sm" style={{ minWidth: 0 }}>
         {isMobile && (
@@ -87,12 +92,12 @@ export function Header({
           />
         )}
 
-        <Text 
-          size={isMobile ? 'md' : 'lg'} 
-          fw={700} 
+        <Text
+          size={isMobile ? 'md' : 'lg'}
+          fw={700}
           c="blue"
           truncate
-          style={{ 
+          style={{
             maxWidth: isMobile ? '120px' : 'none',
           }}
         >
@@ -105,7 +110,9 @@ export function Header({
         <Group style={{ flex: 1, maxWidth: getSearchMaxWidth() }}>
           <form onSubmit={handleSearch} style={{ width: '100%' }}>
             <TextInput
-              placeholder={isTablet ? "Search..." : "Search employees, departments..."}
+              placeholder={
+                isTablet ? 'Search...' : 'Search employees, departments...'
+              }
               leftSection={<IconSearch size={16} />}
               value={searchValue}
               onChange={event => setSearchValue(event.currentTarget.value)}
@@ -171,7 +178,7 @@ export function Header({
                 <Menu.Divider />
               </>
             )}
-            
+
             <Menu.Label>Account</Menu.Label>
             <Menu.Item
               leftSection={<IconUser size={16} />}

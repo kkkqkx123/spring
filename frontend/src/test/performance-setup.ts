@@ -19,7 +19,7 @@ Object.defineProperty(window, 'performance', {
 });
 
 // Mock PerformanceObserver
-global.PerformanceObserver = vi.fn().mockImplementation((callback) => ({
+global.PerformanceObserver = vi.fn().mockImplementation(callback => ({
   observe: vi.fn(),
   disconnect: vi.fn(),
   takeRecords: vi.fn(() => []),
@@ -37,7 +37,9 @@ Object.defineProperty(navigator, 'connection', {
 });
 
 // Performance test utilities
-export const measureRenderPerformance = async (renderFn: () => Promise<void> | void) => {
+export const measureRenderPerformance = async (
+  renderFn: () => Promise<void> | void
+) => {
   const startTime = performance.now();
   await renderFn();
   const endTime = performance.now();

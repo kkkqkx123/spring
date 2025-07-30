@@ -17,9 +17,7 @@ const mockImpactAnalysis: PermissionImpactAnalysis = {
 
 const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
-    <MantineProvider>
-      {children}
-    </MantineProvider>
+    <MantineProvider>{children}</MantineProvider>
   );
 };
 
@@ -48,7 +46,9 @@ describe('PermissionImpactDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.queryByText('Permission Change Impact Analysis')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Permission Change Impact Analysis')
+    ).not.toBeInTheDocument();
   });
 
   it('should render when opened', () => {
@@ -62,7 +62,9 @@ describe('PermissionImpactDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('Permission Change Impact Analysis')).toBeInTheDocument();
+    expect(
+      screen.getByText('Permission Change Impact Analysis')
+    ).toBeInTheDocument();
   });
 
   it('should trigger impact analysis when opened with role and permission data', () => {
@@ -101,7 +103,9 @@ describe('PermissionImpactDialog', () => {
     );
 
     // Loading overlay should be visible
-    expect(screen.getByText('Permission Change Impact Analysis')).toBeInTheDocument();
+    expect(
+      screen.getByText('Permission Change Impact Analysis')
+    ).toBeInTheDocument();
   });
 
   it('should display error when analysis fails', () => {
@@ -120,7 +124,9 @@ describe('PermissionImpactDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('Failed to analyze impact: Failed to analyze impact')).toBeInTheDocument();
+    expect(
+      screen.getByText('Failed to analyze impact: Failed to analyze impact')
+    ).toBeInTheDocument();
   });
 
   it('should display impact analysis results', () => {
@@ -140,7 +146,9 @@ describe('PermissionImpactDialog', () => {
     );
 
     expect(screen.getByText('MEDIUM RISK')).toBeInTheDocument();
-    expect(screen.getByText('This change will affect 5 user(s)')).toBeInTheDocument();
+    expect(
+      screen.getByText('This change will affect 5 user(s)')
+    ).toBeInTheDocument();
     expect(screen.getByText('User Management')).toBeInTheDocument();
     expect(screen.getByText('Report Generation')).toBeInTheDocument();
   });
@@ -162,8 +170,12 @@ describe('PermissionImpactDialog', () => {
     );
 
     expect(screen.getByText('Warnings')).toBeInTheDocument();
-    expect(screen.getByText('This change will affect 5 users')).toBeInTheDocument();
-    expect(screen.getByText('Some users may lose access to critical features')).toBeInTheDocument();
+    expect(
+      screen.getByText('This change will affect 5 users')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Some users may lose access to critical features')
+    ).toBeInTheDocument();
   });
 
   it('should show correct risk level colors and icons', () => {
@@ -347,6 +359,10 @@ describe('PermissionImpactDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('Are you sure you want to proceed with this permission change?')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Are you sure you want to proceed with this permission change?'
+      )
+    ).toBeInTheDocument();
   });
 });

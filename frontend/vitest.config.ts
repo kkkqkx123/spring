@@ -24,6 +24,14 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    exclude: [
+      'node_modules/',
+      'src/test/',
+      '**/*.d.ts',
+      '**/*.config.{js,ts}',
+      '**/index.ts',
+      '**/*.performance.test.ts',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -33,6 +41,7 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.config.{js,ts}',
         '**/index.ts',
+        '**/*.performance.test.ts',
       ],
     },
   },

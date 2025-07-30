@@ -76,7 +76,12 @@ const navigationItems: NavigationItem[] = [
   },
 ];
 
-export function Navigation({ user, onNavigate, isMobile = false, isTablet = false }: NavigationProps) {
+export function Navigation({
+  user,
+  onNavigate,
+  isMobile = false,
+  isTablet = false,
+}: NavigationProps) {
   const location = useLocation();
 
   const hasRequiredRole = (requiredRoles?: string[]): boolean => {
@@ -118,7 +123,7 @@ export function Navigation({ user, onNavigate, isMobile = false, isTablet = fals
       <Group
         gap="sm"
         p={isMobile ? 'md' : 'sm'}
-        style={{ 
+        style={{
           borderBottom: '1px solid var(--mantine-color-gray-3)',
           // Add touch-friendly spacing on mobile
           minHeight: isMobile ? '60px' : 'auto',

@@ -1,26 +1,31 @@
 import React from 'react';
 import { Stack, Title, Button, Group, Card, Text, Badge } from '@mantine/core';
 import { IconPlus, IconEdit, IconTrash, IconEye } from '@tabler/icons-react';
-import { 
-  PermissionGuard, 
-  RoleGuard, 
-  CrudGuard, 
+import {
+  PermissionGuard,
+  RoleGuard,
+  CrudGuard,
   AdminGuard,
   withPermission,
   withAdminPermission,
-  withCrudPermission
+  withCrudPermission,
 } from '../access-control';
-import { useAccessControl, usePermissionCheck, useRoleCheck, useResourcePermissions } from '../../hooks/useAccessControl';
+import {
+  useAccessControl,
+  usePermissionCheck,
+  useRoleCheck,
+  useResourcePermissions,
+} from '../../hooks/useAccessControl';
 
 // Example component demonstrating permission-based UI rendering
 export const AccessControlExample: React.FC = () => {
-  const { 
-    isAdmin, 
-    isManager, 
-    userPermissions, 
+  const {
+    isAdmin,
+    isManager,
+    userPermissions,
     userRoles,
     hasPermission,
-    hasRole 
+    hasRole,
   } = useAccessControl();
 
   // Hook-based permission checks
@@ -49,7 +54,8 @@ export const AccessControlExample: React.FC = () => {
         </Text>
         <Text size="sm">
           <strong>Permissions:</strong> {userPermissions.slice(0, 5).join(', ')}
-          {userPermissions.length > 5 && ` ... and ${userPermissions.length - 5} more`}
+          {userPermissions.length > 5 &&
+            ` ... and ${userPermissions.length - 5} more`}
         </Text>
       </Card>
 
@@ -57,27 +63,34 @@ export const AccessControlExample: React.FC = () => {
       <Card withBorder>
         <Title order={3}>Permission Guard Examples</Title>
         <Stack gap="md" mt="md">
-          
           {/* Single permission check */}
           <PermissionGuard permission="EMPLOYEE_READ">
-            <Button leftSection={<IconEye size={16} />} variant="light" color="blue">
+            <Button
+              leftSection={<IconEye size={16} />}
+              variant="light"
+              color="blue"
+            >
               View Employees (EMPLOYEE_READ required)
             </Button>
           </PermissionGuard>
 
           {/* Multiple permissions (any) */}
-          <PermissionGuard 
-            permissions={['EMPLOYEE_CREATE', 'EMPLOYEE_UPDATE']} 
+          <PermissionGuard
+            permissions={['EMPLOYEE_CREATE', 'EMPLOYEE_UPDATE']}
             requireAll={false}
           >
-            <Button leftSection={<IconEdit size={16} />} variant="light" color="green">
+            <Button
+              leftSection={<IconEdit size={16} />}
+              variant="light"
+              color="green"
+            >
               Modify Employees (CREATE or UPDATE required)
             </Button>
           </PermissionGuard>
 
           {/* Multiple permissions (all) */}
-          <PermissionGuard 
-            permissions={['EMPLOYEE_READ', 'EMPLOYEE_UPDATE']} 
+          <PermissionGuard
+            permissions={['EMPLOYEE_READ', 'EMPLOYEE_UPDATE']}
             requireAll={true}
             fallback={
               <Text size="sm" c="dimmed">
@@ -85,11 +98,14 @@ export const AccessControlExample: React.FC = () => {
               </Text>
             }
           >
-            <Button leftSection={<IconEdit size={16} />} variant="light" color="orange">
+            <Button
+              leftSection={<IconEdit size={16} />}
+              variant="light"
+              color="orange"
+            >
               Edit Employee Details (READ and UPDATE required)
             </Button>
           </PermissionGuard>
-
         </Stack>
       </Card>
 
@@ -97,23 +113,25 @@ export const AccessControlExample: React.FC = () => {
       <Card withBorder>
         <Title order={3}>Role Guard Examples</Title>
         <Stack gap="md" mt="md">
-          
           <RoleGuard role="ADMIN">
             <Button variant="light" color="red">
               Admin Only Button
             </Button>
           </RoleGuard>
 
-          <RoleGuard 
-            roles={['ADMIN', 'MANAGER']} 
+          <RoleGuard
+            roles={['ADMIN', 'MANAGER']}
             requireAll={false}
-            fallback={<Text size="sm" c="dimmed">Manager or Admin access required</Text>}
+            fallback={
+              <Text size="sm" c="dimmed">
+                Manager or Admin access required
+              </Text>
+            }
           >
             <Button variant="light" color="blue">
               Management Functions
             </Button>
           </RoleGuard>
-
         </Stack>
       </Card>
 
@@ -121,7 +139,6 @@ export const AccessControlExample: React.FC = () => {
       <Card withBorder>
         <Title order={3}>CRUD Guard Examples</Title>
         <Group gap="md" mt="md">
-          
           <CrudGuard resource="employee" action="create">
             <Button leftSection={<IconPlus size={16} />} color="green">
               Create Employee
@@ -146,16 +163,17 @@ export const AccessControlExample: React.FC = () => {
             </Button>
           </CrudGuard>
 
-          <CrudGuard 
-            resource="employee" 
+          <CrudGuard
+            resource="employee"
             action="any"
-            fallback={<Text size="sm" c="dimmed">No employee access</Text>}
+            fallback={
+              <Text size="sm" c="dimmed">
+                No employee access
+              </Text>
+            }
           >
-            <Button variant="outline">
-              Any Employee Action
-            </Button>
+            <Button variant="outline">Any Employee Action</Button>
           </CrudGuard>
-
         </Group>
       </Card>
 
@@ -173,7 +191,6 @@ export const AccessControlExample: React.FC = () => {
       <Card withBorder>
         <Title order={3}>Hook-based Permission Checks</Title>
         <Stack gap="md" mt="md">
-          
           <Group gap="md">
             <Badge color={canReadEmployees ? 'green' : 'red'}>
               Can Read Employees: {canReadEmployees ? 'Yes' : 'No'}
@@ -190,16 +207,25 @@ export const AccessControlExample: React.FC = () => {
             <strong>Employee Resource Permissions:</strong>
           </Text>
           <Group gap="xs">
-            <Badge color={employeePermissions.create ? 'green' : 'red'} size="sm">
+            <Badge
+              color={employeePermissions.create ? 'green' : 'red'}
+              size="sm"
+            >
               Create: {employeePermissions.create ? '✓' : '✗'}
             </Badge>
             <Badge color={employeePermissions.read ? 'green' : 'red'} size="sm">
               Read: {employeePermissions.read ? '✓' : '✗'}
             </Badge>
-            <Badge color={employeePermissions.update ? 'green' : 'red'} size="sm">
+            <Badge
+              color={employeePermissions.update ? 'green' : 'red'}
+              size="sm"
+            >
               Update: {employeePermissions.update ? '✓' : '✗'}
             </Badge>
-            <Badge color={employeePermissions.delete ? 'green' : 'red'} size="sm">
+            <Badge
+              color={employeePermissions.delete ? 'green' : 'red'}
+              size="sm"
+            >
               Delete: {employeePermissions.delete ? '✓' : '✗'}
             </Badge>
           </Group>
@@ -212,11 +238,8 @@ export const AccessControlExample: React.FC = () => {
           )}
 
           {hasRole('ADMIN') && (
-            <Button color="red">
-              Hook-based Admin Button
-            </Button>
+            <Button color="red">Hook-based Admin Button</Button>
           )}
-
         </Stack>
       </Card>
 
@@ -224,8 +247,7 @@ export const AccessControlExample: React.FC = () => {
       <Card withBorder>
         <Title order={3}>Programmatic Actions</Title>
         <Group gap="md" mt="md">
-          
-          <Button 
+          <Button
             onClick={() => {
               if (hasPermission('EMPLOYEE_DELETE')) {
                 alert('Delete action would be performed');
@@ -237,7 +259,7 @@ export const AccessControlExample: React.FC = () => {
             Try Delete Action
           </Button>
 
-          <Button 
+          <Button
             onClick={() => {
               if (hasRole('ADMIN')) {
                 alert('Admin action would be performed');
@@ -248,10 +270,8 @@ export const AccessControlExample: React.FC = () => {
           >
             Try Admin Action
           </Button>
-
         </Group>
       </Card>
-
     </Stack>
   );
 };
@@ -260,23 +280,31 @@ export const AccessControlExample: React.FC = () => {
 const AdminOnlyComponent: React.FC = () => (
   <Card withBorder p="md">
     <Text>This component is only visible to admins</Text>
-    <Button color="red" mt="md">Admin Function</Button>
+    <Button color="red" mt="md">
+      Admin Function
+    </Button>
   </Card>
 );
 
 const EmployeeCreateComponent: React.FC = () => (
   <Card withBorder p="md">
     <Text>This component requires EMPLOYEE_CREATE permission</Text>
-    <Button color="green" mt="md">Create Employee</Button>
+    <Button color="green" mt="md">
+      Create Employee
+    </Button>
   </Card>
 );
 
 // Wrapped components using HOCs
 export const AdminOnlyWrapped = withAdminPermission(AdminOnlyComponent);
-export const EmployeeCreateWrapped = withCrudPermission(EmployeeCreateComponent, 'employee', 'create');
-export const ManagerOnlyWrapped = withPermission(AdminOnlyComponent, { 
-  roles: ['ADMIN', 'MANAGER'], 
-  requireAll: false 
+export const EmployeeCreateWrapped = withCrudPermission(
+  EmployeeCreateComponent,
+  'employee',
+  'create'
+);
+export const ManagerOnlyWrapped = withPermission(AdminOnlyComponent, {
+  roles: ['ADMIN', 'MANAGER'],
+  requireAll: false,
 });
 
 export default AccessControlExample;

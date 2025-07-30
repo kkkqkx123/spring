@@ -39,11 +39,11 @@ export const SkipLinks: React.FC<SkipLinksProps> = ({ links }) => {
             backgroundColor: 'rgba(255, 255, 255, 0.1)',
             border: '2px solid transparent',
           }}
-          onFocus={(e) => {
+          onFocus={e => {
             e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
             e.currentTarget.style.borderColor = 'white';
           }}
-          onBlur={(e) => {
+          onBlur={e => {
             e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
             e.currentTarget.style.borderColor = 'transparent';
           }}

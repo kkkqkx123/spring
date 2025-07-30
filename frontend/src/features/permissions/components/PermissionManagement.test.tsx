@@ -33,9 +33,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -71,7 +69,9 @@ describe('PermissionManagement', () => {
     });
 
     mockHooks.useCreateRole.mockReturnValue({
-      mutateAsync: vi.fn().mockResolvedValue({ id: 4, name: 'New Role', permissions: [] }),
+      mutateAsync: vi
+        .fn()
+        .mockResolvedValue({ id: 4, name: 'New Role', permissions: [] }),
       isPending: false,
     });
 
@@ -123,7 +123,9 @@ describe('PermissionManagement', () => {
     render(<PermissionManagement />, { wrapper: createWrapper() });
 
     expect(screen.getByText('Permission Management')).toBeInTheDocument();
-    expect(screen.getByText('Manage roles, permissions, and user access control')).toBeInTheDocument();
+    expect(
+      screen.getByText('Manage roles, permissions, and user access control')
+    ).toBeInTheDocument();
   });
 
   it('should display role and permission counts', () => {
@@ -156,7 +158,10 @@ describe('PermissionManagement', () => {
     fireEvent.click(userRoleTab);
 
     // The tab should be active (this would be indicated by the tab panel being visible)
-    expect(userRoleTab.closest('[role="tab"]')).toHaveAttribute('aria-selected', 'true');
+    expect(userRoleTab.closest('[role="tab"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
   });
 
   it('should display help section with guidance', () => {
@@ -190,10 +195,15 @@ describe('PermissionManagement', () => {
   });
 
   it('should accept defaultTab prop', () => {
-    render(<PermissionManagement defaultTab="users" />, { wrapper: createWrapper() });
+    render(<PermissionManagement defaultTab="users" />, {
+      wrapper: createWrapper(),
+    });
 
     const userRoleTab = screen.getByText('User Role Assignment');
-    expect(userRoleTab.closest('[role="tab"]')).toHaveAttribute('aria-selected', 'true');
+    expect(userRoleTab.closest('[role="tab"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
   });
 
   it('should handle role selection callback', () => {

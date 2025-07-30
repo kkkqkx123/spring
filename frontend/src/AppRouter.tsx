@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Center, Loader } from '@mantine/core';
 import { ROUTES } from './constants';
 import { ProtectedRoute, PublicRoute } from './components/routing';
@@ -37,7 +38,7 @@ export const AppRouter = () => {
   useEffect(() => {
     if (isAuthenticated) {
       preloadCriticalPages();
-      
+
       if (user?.roles) {
         const roleNames = user.roles.map(role => role.name);
         preloadRoleBasedPages(roleNames);
@@ -70,7 +71,7 @@ export const AppRouter = () => {
         path={ROUTES.DASHBOARD}
         element={
           <ProtectedRoute>
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="page">
                 <DashboardPage />
               </LazyComponentWrapper>
@@ -82,7 +83,7 @@ export const AppRouter = () => {
         path={ROUTES.EMPLOYEES}
         element={
           <ProtectedRoute requiredPermission="EMPLOYEE_READ">
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="table">
                 <EmployeesPage />
               </LazyComponentWrapper>
@@ -94,7 +95,7 @@ export const AppRouter = () => {
         path="/employees/:id"
         element={
           <ProtectedRoute requiredPermission="EMPLOYEE_READ">
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="form">
                 <EmployeePage />
               </LazyComponentWrapper>
@@ -106,7 +107,7 @@ export const AppRouter = () => {
         path="/employees/new"
         element={
           <ProtectedRoute requiredPermission="EMPLOYEE_CREATE">
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="form">
                 <EmployeePage />
               </LazyComponentWrapper>
@@ -118,7 +119,7 @@ export const AppRouter = () => {
         path={ROUTES.DEPARTMENTS}
         element={
           <ProtectedRoute requiredPermission="DEPARTMENT_READ">
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="page">
                 <DepartmentsPage />
               </LazyComponentWrapper>
@@ -130,7 +131,7 @@ export const AppRouter = () => {
         path={ROUTES.CHAT}
         element={
           <ProtectedRoute>
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="page">
                 <ChatPage />
               </LazyComponentWrapper>
@@ -142,7 +143,7 @@ export const AppRouter = () => {
         path={ROUTES.EMAIL}
         element={
           <ProtectedRoute requiredPermission="EMAIL_SEND">
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="form">
                 <EmailPage />
               </LazyComponentWrapper>
@@ -154,7 +155,7 @@ export const AppRouter = () => {
         path={ROUTES.NOTIFICATIONS}
         element={
           <ProtectedRoute>
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="list">
                 <NotificationsPage />
               </LazyComponentWrapper>
@@ -166,7 +167,7 @@ export const AppRouter = () => {
         path={ROUTES.PERMISSIONS}
         element={
           <ProtectedRoute requiredRole="ADMIN">
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="table">
                 <PermissionsPage />
               </LazyComponentWrapper>
@@ -178,7 +179,7 @@ export const AppRouter = () => {
         path={ROUTES.PROFILE}
         element={
           <ProtectedRoute>
-            <AppShell>
+            <AppShell user={user!}>
               <LazyComponentWrapper skeletonVariant="form">
                 <ProfilePage />
               </LazyComponentWrapper>

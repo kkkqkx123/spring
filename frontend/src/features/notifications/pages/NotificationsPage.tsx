@@ -24,7 +24,11 @@ import {
 } from '@tabler/icons-react';
 import { NotificationList } from '../components/NotificationList';
 import { NotificationSettings } from '../components/NotificationSettings';
-import { useNotifications, useMarkAllAsRead, useClearAllNotifications } from '../hooks/useNotifications';
+import {
+  useNotifications,
+  useMarkAllAsRead,
+  useClearAllNotifications,
+} from '../hooks/useNotifications';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
 
@@ -135,9 +139,7 @@ const NotificationsPage: React.FC = () => {
                 </Badge>
               )}
             </Group>
-            <Text c="dimmed">
-              Stay updated with the latest activities
-            </Text>
+            <Text c="dimmed">Stay updated with the latest activities</Text>
           </div>
 
           <Group gap="sm">
@@ -187,8 +189,8 @@ const NotificationsPage: React.FC = () => {
               <Tabs.Tab value="all" leftSection={<IconBell size={16} />}>
                 All ({notificationsData?.length || 0})
               </Tabs.Tab>
-              <Tabs.Tab 
-                value="unread" 
+              <Tabs.Tab
+                value="unread"
                 leftSection={<IconBell size={16} />}
                 rightSection={
                   unreadCount > 0 ? (
@@ -203,27 +205,30 @@ const NotificationsPage: React.FC = () => {
               <Tabs.Tab value="read" leftSection={<IconBellOff size={16} />}>
                 Read ({(notificationsData?.length || 0) - unreadCount})
               </Tabs.Tab>
-              <Tabs.Tab value="settings" leftSection={<IconSettings size={16} />}>
+              <Tabs.Tab
+                value="settings"
+                leftSection={<IconSettings size={16} />}
+              >
                 Settings
               </Tabs.Tab>
             </Tabs.List>
 
             <Tabs.Panel value="all" pt="lg">
-              <NotificationList 
+              <NotificationList
                 notifications={filteredNotifications}
                 onNotificationUpdate={refetch}
               />
             </Tabs.Panel>
 
             <Tabs.Panel value="unread" pt="lg">
-              <NotificationList 
+              <NotificationList
                 notifications={filteredNotifications}
                 onNotificationUpdate={refetch}
               />
             </Tabs.Panel>
 
             <Tabs.Panel value="read" pt="lg">
-              <NotificationList 
+              <NotificationList
                 notifications={filteredNotifications}
                 onNotificationUpdate={refetch}
               />
@@ -244,12 +249,11 @@ const NotificationsPage: React.FC = () => {
                 No notifications
               </Text>
               <Text size="sm" c="dimmed" ta="center">
-                {activeTab === 'unread' 
+                {activeTab === 'unread'
                   ? "You're all caught up! No unread notifications."
                   : activeTab === 'read'
-                  ? "No read notifications to display."
-                  : "You don't have any notifications yet."
-                }
+                    ? 'No read notifications to display.'
+                    : "You don't have any notifications yet."}
               </Text>
             </Stack>
           </Card>

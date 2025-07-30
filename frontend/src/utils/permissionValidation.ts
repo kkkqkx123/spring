@@ -18,9 +18,9 @@ export interface ValidationOptions {
  */
 export class PermissionValidator {
   private static instance: PermissionValidator;
-  
+
   private constructor() {}
-  
+
   public static getInstance(): PermissionValidator {
     if (!PermissionValidator.instance) {
       PermissionValidator.instance = new PermissionValidator();
@@ -94,7 +94,9 @@ export class PermissionValidator {
 
     const result: ValidationResult = {
       allowed: hasPermission,
-      reason: hasPermission ? undefined : `Missing required permission: ${permission}`,
+      reason: hasPermission
+        ? undefined
+        : `Missing required permission: ${permission}`,
       requiredPermissions: [permission],
       userPermissions,
     };
@@ -192,8 +194,8 @@ export class PermissionValidator {
     }
 
     // Check if user has all required permissions
-    const missingPermissions = permissions.filter(permission =>
-      !userPermissions.includes(permission)
+    const missingPermissions = permissions.filter(
+      permission => !userPermissions.includes(permission)
     );
     const hasAllPermissions = missingPermissions.length === 0;
 
@@ -286,7 +288,7 @@ export class PermissionValidator {
     }
 
     const userRoles = this.getUserRoles(user);
-    
+
     let hasRequiredRoles: boolean;
     let reason: string | undefined;
 
@@ -341,10 +343,8 @@ export const validateCrudOperation = (
   options?: ValidationOptions
 ) => permissionValidator.validateCrudOperation(resource, operation, options);
 
-export const validateRole = (
-  role: string,
-  options?: ValidationOptions
-) => permissionValidator.validateRole(role, options);
+export const validateRole = (role: string, options?: ValidationOptions) =>
+  permissionValidator.validateRole(role, options);
 
 export const validateRoles = (
   roles: string[],

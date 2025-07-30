@@ -330,10 +330,15 @@ export class OptimizedWebSocketService {
       return;
     }
 
-    this.eventBus.emit('reconnect_attempt', this.connectionManager.getAttempts() + 1);
+    this.eventBus.emit(
+      'reconnect_attempt',
+      this.connectionManager.getAttempts() + 1
+    );
 
     try {
-      const success = await this.connectionManager.attemptReconnect(() => this.connect());
+      const success = await this.connectionManager.attemptReconnect(() =>
+        this.connect()
+      );
       if (success) {
         this.eventBus.emit('reconnect', this.connectionManager.getAttempts());
       }
@@ -407,12 +412,12 @@ export class OptimizedWebSocketService {
   disconnect(): void {
     this.stopHeartbeat();
     this.connectionManager.cancel();
-    
+
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
     }
-    
+
     this.isConnecting = false;
     this.connectionPromise = null;
     this.messageQueue.clear();

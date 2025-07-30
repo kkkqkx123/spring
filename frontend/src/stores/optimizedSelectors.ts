@@ -10,14 +10,22 @@ import { createMemoizedSelector } from '../utils/memoization';
 // Auth store selectors
 export const authSelectors = {
   // Basic selectors
-  user: createMemoizedSelector((state: ReturnType<typeof useAuthStore.getState>) => state.user),
-  token: createMemoizedSelector((state: ReturnType<typeof useAuthStore.getState>) => state.token),
-  isAuthenticated: createMemoizedSelector((state: ReturnType<typeof useAuthStore.getState>) => state.isAuthenticated),
-  isLoading: createMemoizedSelector((state: ReturnType<typeof useAuthStore.getState>) => state.isLoading),
+  user: createMemoizedSelector(
+    (state: ReturnType<typeof useAuthStore.getState>) => state.user
+  ),
+  token: createMemoizedSelector(
+    (state: ReturnType<typeof useAuthStore.getState>) => state.token
+  ),
+  isAuthenticated: createMemoizedSelector(
+    (state: ReturnType<typeof useAuthStore.getState>) => state.isAuthenticated
+  ),
+  isLoading: createMemoizedSelector(
+    (state: ReturnType<typeof useAuthStore.getState>) => state.isLoading
+  ),
 
   // Computed selectors
   userRoles: createMemoizedSelector(
-    (state: ReturnType<typeof useAuthStore.getState>) => 
+    (state: ReturnType<typeof useAuthStore.getState>) =>
       state.user?.roles?.map(role => role.name) || [],
     (a, b) => JSON.stringify(a) === JSON.stringify(b)
   ),
@@ -25,7 +33,7 @@ export const authSelectors = {
   userPermissions: createMemoizedSelector(
     (state: ReturnType<typeof useAuthStore.getState>) => {
       if (!state.user?.roles) return [];
-      return state.user.roles.flatMap(role => 
+      return state.user.roles.flatMap(role =>
         role.permissions.map(permission => permission.name)
       );
     },
@@ -57,9 +65,15 @@ export const authSelectors = {
 // UI store selectors
 export const uiSelectors = {
   // Basic selectors
-  theme: createMemoizedSelector((state: ReturnType<typeof useUiStore.getState>) => state.theme),
-  sidebarCollapsed: createMemoizedSelector((state: ReturnType<typeof useUiStore.getState>) => state.sidebarCollapsed),
-  loading: createMemoizedSelector((state: ReturnType<typeof useUiStore.getState>) => state.loading),
+  theme: createMemoizedSelector(
+    (state: ReturnType<typeof useUiStore.getState>) => state.theme
+  ),
+  sidebarCollapsed: createMemoizedSelector(
+    (state: ReturnType<typeof useUiStore.getState>) => state.sidebarCollapsed
+  ),
+  loading: createMemoizedSelector(
+    (state: ReturnType<typeof useUiStore.getState>) => state.loading
+  ),
   notifications: createMemoizedSelector(
     (state: ReturnType<typeof useUiStore.getState>) => state.notifications,
     (a, b) => JSON.stringify(a) === JSON.stringify(b)
@@ -67,11 +81,13 @@ export const uiSelectors = {
 
   // Computed selectors
   notificationCount: createMemoizedSelector(
-    (state: ReturnType<typeof useUiStore.getState>) => state.notifications.length
+    (state: ReturnType<typeof useUiStore.getState>) =>
+      state.notifications.length
   ),
 
   hasNotifications: createMemoizedSelector(
-    (state: ReturnType<typeof useUiStore.getState>) => state.notifications.length > 0
+    (state: ReturnType<typeof useUiStore.getState>) =>
+      state.notifications.length > 0
   ),
 
   uiState: createMemoizedSelector(
@@ -103,22 +119,31 @@ export const uiSelectors = {
 export const notificationSelectors = {
   // Basic selectors
   notifications: createMemoizedSelector(
-    (state: ReturnType<typeof useNotificationStore.getState>) => state.notifications,
+    (state: ReturnType<typeof useNotificationStore.getState>) =>
+      state.notifications,
     (a, b) => JSON.stringify(a) === JSON.stringify(b)
   ),
-  unreadCount: createMemoizedSelector((state: ReturnType<typeof useNotificationStore.getState>) => state.unreadCount),
-  isLoading: createMemoizedSelector((state: ReturnType<typeof useNotificationStore.getState>) => state.isLoading),
-  lastUpdated: createMemoizedSelector((state: ReturnType<typeof useNotificationStore.getState>) => state.lastUpdated),
+  unreadCount: createMemoizedSelector(
+    (state: ReturnType<typeof useNotificationStore.getState>) =>
+      state.unreadCount
+  ),
+  isLoading: createMemoizedSelector(
+    (state: ReturnType<typeof useNotificationStore.getState>) => state.isLoading
+  ),
+  lastUpdated: createMemoizedSelector(
+    (state: ReturnType<typeof useNotificationStore.getState>) =>
+      state.lastUpdated
+  ),
 
   // Computed selectors
   unreadNotifications: createMemoizedSelector(
-    (state: ReturnType<typeof useNotificationStore.getState>) => 
+    (state: ReturnType<typeof useNotificationStore.getState>) =>
       state.notifications.filter(n => !n.read),
     (a, b) => JSON.stringify(a) === JSON.stringify(b)
   ),
 
   readNotifications: createMemoizedSelector(
-    (state: ReturnType<typeof useNotificationStore.getState>) => 
+    (state: ReturnType<typeof useNotificationStore.getState>) =>
       state.notifications.filter(n => n.read),
     (a, b) => JSON.stringify(a) === JSON.stringify(b)
   ),
@@ -157,15 +182,21 @@ export const notificationSelectors = {
 };
 
 // Hooks for using optimized selectors
-export function useOptimizedAuthSelector<T>(selector: (state: ReturnType<typeof useAuthStore.getState>) => T) {
+export function useOptimizedAuthSelector<T>(
+  selector: (state: ReturnType<typeof useAuthStore.getState>) => T
+) {
   return useAuthStore(selector);
 }
 
-export function useOptimizedUiSelector<T>(selector: (state: ReturnType<typeof useUiStore.getState>) => T) {
+export function useOptimizedUiSelector<T>(
+  selector: (state: ReturnType<typeof useUiStore.getState>) => T
+) {
   return useUiStore(selector);
 }
 
-export function useOptimizedNotificationSelector<T>(selector: (state: ReturnType<typeof useNotificationStore.getState>) => T) {
+export function useOptimizedNotificationSelector<T>(
+  selector: (state: ReturnType<typeof useNotificationStore.getState>) => T
+) {
   return useNotificationStore(selector);
 }
 

@@ -9,8 +9,12 @@ vi.mock('../../hooks/useAccessControl');
 
 const mockUseAccessControl = useAccessControl as any;
 
-const TestComponent = () => <div data-testid="protected-content">Protected Content</div>;
-const FallbackComponent = () => <div data-testid="fallback-content">Access Denied</div>;
+const TestComponent = () => (
+  <div data-testid="protected-content">Protected Content</div>
+);
+const FallbackComponent = () => (
+  <div data-testid="fallback-content">Access Denied</div>
+);
 
 describe('PermissionGuard', () => {
   beforeEach(() => {
@@ -67,7 +71,10 @@ describe('PermissionGuard', () => {
       });
 
       render(
-        <PermissionGuard permission="EMPLOYEE_READ" fallback={<FallbackComponent />}>
+        <PermissionGuard
+          permission="EMPLOYEE_READ"
+          fallback={<FallbackComponent />}
+        >
           <TestComponent />
         </PermissionGuard>
       );
@@ -89,7 +96,10 @@ describe('PermissionGuard', () => {
       });
 
       render(
-        <PermissionGuard permissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']} requireAll={false}>
+        <PermissionGuard
+          permissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']}
+          requireAll={false}
+        >
           <TestComponent />
         </PermissionGuard>
       );
@@ -108,7 +118,10 @@ describe('PermissionGuard', () => {
       });
 
       render(
-        <PermissionGuard permissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']} requireAll={true}>
+        <PermissionGuard
+          permissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']}
+          requireAll={true}
+        >
           <TestComponent />
         </PermissionGuard>
       );
@@ -127,7 +140,10 @@ describe('PermissionGuard', () => {
       });
 
       render(
-        <PermissionGuard permissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']} requireAll={true}>
+        <PermissionGuard
+          permissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']}
+          requireAll={true}
+        >
           <TestComponent />
         </PermissionGuard>
       );
@@ -273,12 +289,19 @@ describe('PermissionGuard', () => {
       const options = { strict: true, fallbackValue: false };
 
       render(
-        <PermissionGuard permission="EMPLOYEE_READ" role="MANAGER" options={options}>
+        <PermissionGuard
+          permission="EMPLOYEE_READ"
+          role="MANAGER"
+          options={options}
+        >
           <TestComponent />
         </PermissionGuard>
       );
 
-      expect(mockHasAnyPermission).toHaveBeenCalledWith(['EMPLOYEE_READ'], options);
+      expect(mockHasAnyPermission).toHaveBeenCalledWith(
+        ['EMPLOYEE_READ'],
+        options
+      );
       expect(mockHasAnyRole).toHaveBeenCalledWith(['MANAGER'], options);
     });
   });

@@ -33,8 +33,8 @@ import { PermissionGuard } from '@/components/access-control';
 </PermissionGuard>
 
 // Multiple permissions (all required)
-<PermissionGuard 
-  permissions={['EMPLOYEE_READ', 'EMPLOYEE_UPDATE']} 
+<PermissionGuard
+  permissions={['EMPLOYEE_READ', 'EMPLOYEE_UPDATE']}
   requireAll={true}
   fallback={<Text>Insufficient permissions</Text>}
 >
@@ -42,8 +42,8 @@ import { PermissionGuard } from '@/components/access-control';
 </PermissionGuard>
 
 // With options
-<PermissionGuard 
-  permission="EMPLOYEE_DELETE" 
+<PermissionGuard
+  permission="EMPLOYEE_DELETE"
   options={{ strict: true, fallbackValue: false }}
 >
   <Button>Delete Employee</Button>
@@ -123,30 +123,30 @@ import { withPermission } from '@/components/access-control';
 
 const ProtectedComponent = withPermission(MyComponent, {
   permission: 'EMPLOYEE_READ',
-  showFallback: true
+  showFallback: true,
 });
 
 // Multiple permissions
 const MultiPermissionComponent = withPermission(MyComponent, {
   permissions: ['EMPLOYEE_READ', 'EMPLOYEE_WRITE'],
-  requireAll: false
+  requireAll: false,
 });
 
 // Combined permissions and roles
 const CombinedComponent = withPermission(MyComponent, {
   permission: 'EMPLOYEE_READ',
   role: 'MANAGER',
-  fallback: CustomFallbackComponent
+  fallback: CustomFallbackComponent,
 });
 ```
 
 ### Specialized HOCs
 
 ```tsx
-import { 
-  withAdminPermission, 
-  withManagerPermission, 
-  withCrudPermission 
+import {
+  withAdminPermission,
+  withManagerPermission,
+  withCrudPermission,
 } from '@/components/access-control';
 
 // Admin only
@@ -156,7 +156,11 @@ const AdminComponent = withAdminPermission(MyComponent);
 const ManagerComponent = withManagerPermission(MyComponent);
 
 // CRUD permission
-const CreateEmployeeComponent = withCrudPermission(MyComponent, 'employee', 'create');
+const CreateEmployeeComponent = withCrudPermission(
+  MyComponent,
+  'employee',
+  'create'
+);
 ```
 
 ## React Hooks
@@ -177,7 +181,7 @@ const MyComponent = () => {
     hasAllPermissions,
     hasAnyRole,
     hasAllRoles,
-    
+
     // CRUD operations
     canCreate,
     canRead,
@@ -185,16 +189,16 @@ const MyComponent = () => {
     canDelete,
     canAccessResource,
     getResourcePermissions,
-    
+
     // Convenience checks
     isAdmin,
     isManager,
-    
+
     // User data
     userPermissions,
     userRoles,
     user,
-    isAuthenticated
+    isAuthenticated,
   } = useAccessControl();
 
   return (
@@ -211,11 +215,11 @@ const MyComponent = () => {
 ### Specialized Hooks
 
 ```tsx
-import { 
-  usePermissionCheck, 
-  useRoleCheck, 
+import {
+  usePermissionCheck,
+  useRoleCheck,
   useResourcePermissions,
-  useFeatureAccess 
+  useFeatureAccess,
 } from '@/hooks/useAccessControl';
 
 const MyComponent = () => {
@@ -258,7 +262,7 @@ import { ProtectedRoute } from '@/components/routing';
 </ProtectedRoute>
 
 // Multiple requirements
-<ProtectedRoute 
+<ProtectedRoute
   requiredPermissions={['EMPLOYEE_READ', 'EMPLOYEE_WRITE']}
   requireAll={false}
   accessControlOptions={{ strict: true }}
@@ -267,7 +271,7 @@ import { ProtectedRoute } from '@/components/routing';
 </ProtectedRoute>
 
 // Custom redirect
-<ProtectedRoute 
+<ProtectedRoute
   requiredRole="ADMIN"
   redirectTo="/access-denied"
   fallback={<AccessDeniedPage />}
@@ -281,22 +285,22 @@ import { ProtectedRoute } from '@/components/routing';
 For business logic and complex validation scenarios.
 
 ```tsx
-import { 
-  validatePermission, 
-  validateCrudOperation, 
+import {
+  validatePermission,
+  validateCrudOperation,
   validateRole,
-  permissionValidator 
+  permissionValidator,
 } from '@/utils/permissionValidation';
 
 // Simple validation
 const handleDeleteEmployee = (employeeId: number) => {
   const result = validateCrudOperation('employee', 'delete');
-  
+
   if (!result.allowed) {
     alert(result.reason);
     return;
   }
-  
+
   // Proceed with deletion
   deleteEmployee(employeeId);
 };
@@ -315,7 +319,7 @@ const handleAdminAction = () => {
 const handleComplexOperation = () => {
   const permissionResult = validatePermission('EMPLOYEE_UPDATE');
   const roleResult = validateRole('MANAGER');
-  
+
   if (permissionResult.allowed && roleResult.allowed) {
     // Proceed with operation
   } else {
@@ -331,8 +335,8 @@ const handleComplexOperation = () => {
 
 ```tsx
 interface AccessControlOptions {
-  fallbackValue?: boolean;  // Default return value when not authenticated
-  strict?: boolean;         // If true, admin role doesn't bypass permission checks
+  fallbackValue?: boolean; // Default return value when not authenticated
+  strict?: boolean; // If true, admin role doesn't bypass permission checks
 }
 ```
 
@@ -354,7 +358,7 @@ const canView = hasPermission('EMPLOYEE_READ', { fallbackValue: true }); // true
 The system uses a consistent naming convention for permissions:
 
 - **Format**: `{RESOURCE}_{ACTION}`
-- **Examples**: 
+- **Examples**:
   - `EMPLOYEE_READ`
   - `EMPLOYEE_CREATE`
   - `EMPLOYEE_UPDATE`
@@ -431,31 +435,36 @@ beforeEach(() => {
 If migrating from a simpler permission system:
 
 1. Replace direct permission checks with hooks:
+
    ```tsx
    // Before
    if (user.permissions.includes('EMPLOYEE_READ')) { ... }
-   
+
    // After
    const canRead = usePermissionCheck('EMPLOYEE_READ');
    if (canRead) { ... }
    ```
 
 2. Replace conditional rendering with guards:
+
    ```tsx
    // Before
-   {hasPermission && <Button>Action</Button>}
-   
+   {
+     hasPermission && <Button>Action</Button>;
+   }
+
    // After
    <PermissionGuard permission="ACTION_PERMISSION">
      <Button>Action</Button>
-   </PermissionGuard>
+   </PermissionGuard>;
    ```
 
 3. Update route protection:
+
    ```tsx
    // Before
    <Route path="/admin" element={user.isAdmin ? <AdminPanel /> : <Redirect />} />
-   
+
    // After
    <Route path="/admin" element={
      <ProtectedRoute requiredRole="ADMIN">

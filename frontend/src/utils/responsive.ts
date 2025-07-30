@@ -22,7 +22,7 @@ export const useScreenSize = () => {
   useEffect(() => {
     const updateScreenSize = () => {
       const width = window.innerWidth;
-      
+
       if (width < breakpoints.xs) {
         setScreenSize('xs');
       } else if (width < breakpoints.sm) {
@@ -38,7 +38,7 @@ export const useScreenSize = () => {
 
     updateScreenSize();
     window.addEventListener('resize', updateScreenSize);
-    
+
     return () => window.removeEventListener('resize', updateScreenSize);
   }, []);
 
@@ -72,21 +72,23 @@ export const useIsDesktop = () => {
 /**
  * Get responsive value based on screen size
  */
-export const useResponsiveValue = <T>(values: Partial<Record<Breakpoint, T>>) => {
+export const useResponsiveValue = <T>(
+  values: Partial<Record<Breakpoint, T>>
+) => {
   const screenSize = useScreenSize();
-  
+
   // Find the appropriate value for current screen size
   // Falls back to smaller breakpoints if current size not defined
   const breakpointOrder: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl'];
   const currentIndex = breakpointOrder.indexOf(screenSize);
-  
+
   for (let i = currentIndex; i >= 0; i--) {
     const breakpoint = breakpointOrder[i];
     if (values[breakpoint] !== undefined) {
       return values[breakpoint];
     }
   }
-  
+
   // Return the first available value if no match found
   return Object.values(values)[0];
 };
@@ -104,7 +106,9 @@ export interface TouchGestureHandlers {
 }
 
 export const useTouchGestures = (handlers: TouchGestureHandlers) => {
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(
+    null
+  );
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -148,7 +152,10 @@ export const useTouchGestures = (handlers: TouchGestureHandlers) => {
 
     // Check for swipe
     if (deltaTime < maxSwipeTime) {
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      if (
+        Math.abs(deltaX) > Math.abs(deltaY) &&
+        Math.abs(deltaX) > minSwipeDistance
+      ) {
         // Horizontal swipe
         if (deltaX > 0) {
           handlers.onSwipeRight?.();

@@ -1,5 +1,8 @@
 import React from 'react';
-import { useAccessControl, type AccessControlOptions } from '../../hooks/useAccessControl';
+import {
+  useAccessControl,
+  type AccessControlOptions,
+} from '../../hooks/useAccessControl';
 
 export interface PermissionGuardProps {
   children: React.ReactNode;
@@ -28,14 +31,8 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   const accessControl = useAccessControl();
 
   // Combine single and array requirements
-  const allPermissions = [
-    ...(permission ? [permission] : []),
-    ...permissions,
-  ];
-  const allRoles = [
-    ...(role ? [role] : []),
-    ...roles,
-  ];
+  const allPermissions = [...(permission ? [permission] : []), ...permissions];
+  const allRoles = [...(role ? [role] : []), ...roles];
 
   // Check permissions
   const hasRequiredPermissions = (() => {

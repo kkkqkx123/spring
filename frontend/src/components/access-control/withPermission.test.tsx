@@ -2,7 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { withPermission, withAdminPermission, withManagerPermission, withCrudPermission } from './withPermission';
+import {
+  withPermission,
+  withAdminPermission,
+  withManagerPermission,
+  withCrudPermission,
+} from './withPermission';
 import { useAccessControl } from '../../hooks/useAccessControl';
 
 // Mock the useAccessControl hook
@@ -10,11 +15,11 @@ vi.mock('../../hooks/useAccessControl');
 
 const mockUseAccessControl = useAccessControl as any;
 
-const TestComponent: React.FC<{ message?: string }> = ({ message = 'Test Content' }) => (
-  <div data-testid="test-component">{message}</div>
-);
+const TestComponent: React.FC<{ message?: string }> = ({
+  message = 'Test Content',
+}) => <div data-testid="test-component">{message}</div>;
 
-const CustomFallback: React.FC<any> = (props) => (
+const CustomFallback: React.FC<any> = props => (
   <div data-testid="custom-fallback">Custom Fallback: {props.message}</div>
 );
 
@@ -98,7 +103,11 @@ describe('withPermission', () => {
 
       expect(screen.queryByTestId('test-component')).not.toBeInTheDocument();
       expect(screen.getByText('Access Denied')).toBeInTheDocument();
-      expect(screen.getByText('You don\'t have the required permissions to access this feature.')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "You don't have the required permissions to access this feature."
+        )
+      ).toBeInTheDocument();
     });
 
     it('should render custom fallback when provided', () => {
@@ -124,7 +133,9 @@ describe('withPermission', () => {
 
       expect(screen.queryByTestId('test-component')).not.toBeInTheDocument();
       expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
-      expect(screen.getByText('Custom Fallback: Test Message')).toBeInTheDocument();
+      expect(
+        screen.getByText('Custom Fallback: Test Message')
+      ).toBeInTheDocument();
     });
 
     it('should render nothing when showFallback is false', () => {
@@ -150,7 +161,9 @@ describe('withPermission', () => {
 
       expect(screen.queryByTestId('test-component')).not.toBeInTheDocument();
       // Should render nothing when showFallback is false
-      expect(container.querySelector('[data-testid="test-component"]')).toBeNull();
+      expect(
+        container.querySelector('[data-testid="test-component"]')
+      ).toBeNull();
     });
   });
 
@@ -308,7 +321,9 @@ describe('withPermission', () => {
         permission: 'EMPLOYEE_READ',
       });
 
-      expect(WrappedComponent.displayName).toBe('withPermission(TestComponent)');
+      expect(WrappedComponent.displayName).toBe(
+        'withPermission(TestComponent)'
+      );
     });
 
     it('should handle components without display name', () => {
@@ -317,7 +332,9 @@ describe('withPermission', () => {
         permission: 'EMPLOYEE_READ',
       });
 
-      expect(WrappedComponent.displayName).toBe('withPermission(AnonymousComponent)');
+      expect(WrappedComponent.displayName).toBe(
+        'withPermission(AnonymousComponent)'
+      );
     });
   });
 });
@@ -328,9 +345,9 @@ describe('withAdminPermission', () => {
       hasPermission: vi.fn(() => false),
       hasAnyPermission: vi.fn(() => false),
       hasAllPermissions: vi.fn(() => false),
-      hasRole: vi.fn((role) => role === 'ADMIN'),
-      hasAnyRole: vi.fn((roles) => roles.includes('ADMIN')),
-      hasAllRoles: vi.fn((roles) => roles.every(role => role === 'ADMIN')),
+      hasRole: vi.fn(role => role === 'ADMIN'),
+      hasAnyRole: vi.fn(roles => roles.includes('ADMIN')),
+      hasAllRoles: vi.fn(roles => roles.every(role => role === 'ADMIN')),
     });
   });
 
@@ -375,7 +392,7 @@ describe('withManagerPermission', () => {
       hasAnyPermission: vi.fn(() => false),
       hasAllPermissions: vi.fn(() => false),
       hasRole: vi.fn(() => false),
-      hasAnyRole: vi.fn((roles) => roles.includes('MANAGER')),
+      hasAnyRole: vi.fn(roles => roles.includes('MANAGER')),
       hasAllRoles: vi.fn(() => false),
     });
   });
@@ -398,7 +415,7 @@ describe('withManagerPermission', () => {
       hasAnyPermission: vi.fn(() => false),
       hasAllPermissions: vi.fn(() => false),
       hasRole: vi.fn(() => false),
-      hasAnyRole: vi.fn((roles) => roles.includes('ADMIN')),
+      hasAnyRole: vi.fn(roles => roles.includes('ADMIN')),
       hasAllRoles: vi.fn(() => false),
     });
 
@@ -442,15 +459,21 @@ describe('withCrudPermission', () => {
 
   it('should render when user has required CRUD permission', () => {
     mockUseAccessControl.mockReturnValue({
-      hasPermission: vi.fn((permission) => permission === 'EMPLOYEE_READ'),
-      hasAnyPermission: vi.fn((permissions) => permissions.includes('EMPLOYEE_READ')),
+      hasPermission: vi.fn(permission => permission === 'EMPLOYEE_READ'),
+      hasAnyPermission: vi.fn(permissions =>
+        permissions.includes('EMPLOYEE_READ')
+      ),
       hasAllPermissions: vi.fn(() => false),
       hasRole: vi.fn(() => false),
       hasAnyRole: vi.fn(() => false),
       hasAllRoles: vi.fn(() => false),
     });
 
-    const WrappedComponent = withCrudPermission(TestComponent, 'employee', 'read');
+    const WrappedComponent = withCrudPermission(
+      TestComponent,
+      'employee',
+      'read'
+    );
 
     render(
       <TestWrapper>
@@ -471,7 +494,11 @@ describe('withCrudPermission', () => {
       hasAllRoles: vi.fn(() => false),
     });
 
-    const WrappedComponent = withCrudPermission(TestComponent, 'employee', 'create');
+    const WrappedComponent = withCrudPermission(
+      TestComponent,
+      'employee',
+      'create'
+    );
 
     render(
       <TestWrapper>
@@ -493,7 +520,11 @@ describe('withCrudPermission', () => {
       hasAllRoles: vi.fn(() => false),
     });
 
-    const WrappedComponent = withCrudPermission(TestComponent, 'department', 'update');
+    const WrappedComponent = withCrudPermission(
+      TestComponent,
+      'department',
+      'update'
+    );
 
     render(
       <TestWrapper>
@@ -501,6 +532,9 @@ describe('withCrudPermission', () => {
       </TestWrapper>
     );
 
-    expect(mockHasAnyPermission).toHaveBeenCalledWith(['DEPARTMENT_UPDATE'], {});
+    expect(mockHasAnyPermission).toHaveBeenCalledWith(
+      ['DEPARTMENT_UPDATE'],
+      {}
+    );
   });
 });

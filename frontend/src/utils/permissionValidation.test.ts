@@ -95,7 +95,9 @@ describe('PermissionValidator', () => {
       const result = permissionValidator.validatePermission('EMPLOYEE_DELETE');
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing required permission: EMPLOYEE_DELETE');
+      expect(result.reason).toBe(
+        'Missing required permission: EMPLOYEE_DELETE'
+      );
       expect(result.requiredPermissions).toEqual(['EMPLOYEE_DELETE']);
       expect(result.userPermissions).toEqual(['EMPLOYEE_READ']);
     });
@@ -103,7 +105,9 @@ describe('PermissionValidator', () => {
     it('should return allowed=true for admin users in non-strict mode', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
 
-      const result = permissionValidator.validatePermission('NONEXISTENT_PERMISSION');
+      const result = permissionValidator.validatePermission(
+        'NONEXISTENT_PERMISSION'
+      );
 
       expect(result.allowed).toBe(true);
     });
@@ -111,10 +115,15 @@ describe('PermissionValidator', () => {
     it('should return allowed=false for admin users in strict mode', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
 
-      const result = permissionValidator.validatePermission('NONEXISTENT_PERMISSION', { strict: true });
+      const result = permissionValidator.validatePermission(
+        'NONEXISTENT_PERMISSION',
+        { strict: true }
+      );
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing required permission: NONEXISTENT_PERMISSION');
+      expect(result.reason).toBe(
+        'Missing required permission: NONEXISTENT_PERMISSION'
+      );
     });
 
     it('should return allowed=false when user is not authenticated', () => {
@@ -132,7 +141,9 @@ describe('PermissionValidator', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
       expect(() => {
-        permissionValidator.validatePermission('EMPLOYEE_DELETE', { throwOnFailure: true });
+        permissionValidator.validatePermission('EMPLOYEE_DELETE', {
+          throwOnFailure: true,
+        });
       }).toThrow('Missing required permission: EMPLOYEE_DELETE');
     });
   });
@@ -141,7 +152,10 @@ describe('PermissionValidator', () => {
     it('should return allowed=true when user has any of the required permissions', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateAnyPermission(['EMPLOYEE_READ', 'EMPLOYEE_DELETE']);
+      const result = permissionValidator.validateAnyPermission([
+        'EMPLOYEE_READ',
+        'EMPLOYEE_DELETE',
+      ]);
 
       expect(result.allowed).toBe(true);
     });
@@ -149,17 +163,27 @@ describe('PermissionValidator', () => {
     it('should return allowed=false when user has none of the required permissions', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
-      const result = permissionValidator.validateAnyPermission(['EMPLOYEE_CREATE', 'EMPLOYEE_DELETE']);
+      const result = permissionValidator.validateAnyPermission([
+        'EMPLOYEE_CREATE',
+        'EMPLOYEE_DELETE',
+      ]);
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing any of required permissions: EMPLOYEE_CREATE, EMPLOYEE_DELETE');
-      expect(result.requiredPermissions).toEqual(['EMPLOYEE_CREATE', 'EMPLOYEE_DELETE']);
+      expect(result.reason).toBe(
+        'Missing any of required permissions: EMPLOYEE_CREATE, EMPLOYEE_DELETE'
+      );
+      expect(result.requiredPermissions).toEqual([
+        'EMPLOYEE_CREATE',
+        'EMPLOYEE_DELETE',
+      ]);
     });
 
     it('should return allowed=true for admin users in non-strict mode', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
 
-      const result = permissionValidator.validateAnyPermission(['NONEXISTENT_PERMISSION']);
+      const result = permissionValidator.validateAnyPermission([
+        'NONEXISTENT_PERMISSION',
+      ]);
 
       expect(result.allowed).toBe(true);
     });
@@ -168,8 +192,13 @@ describe('PermissionValidator', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
       expect(() => {
-        permissionValidator.validateAnyPermission(['EMPLOYEE_CREATE', 'EMPLOYEE_DELETE'], { throwOnFailure: true });
-      }).toThrow('Missing any of required permissions: EMPLOYEE_CREATE, EMPLOYEE_DELETE');
+        permissionValidator.validateAnyPermission(
+          ['EMPLOYEE_CREATE', 'EMPLOYEE_DELETE'],
+          { throwOnFailure: true }
+        );
+      }).toThrow(
+        'Missing any of required permissions: EMPLOYEE_CREATE, EMPLOYEE_DELETE'
+      );
     });
   });
 
@@ -177,7 +206,10 @@ describe('PermissionValidator', () => {
     it('should return allowed=true when user has all required permissions', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateAllPermissions(['EMPLOYEE_READ', 'EMPLOYEE_CREATE']);
+      const result = permissionValidator.validateAllPermissions([
+        'EMPLOYEE_READ',
+        'EMPLOYEE_CREATE',
+      ]);
 
       expect(result.allowed).toBe(true);
     });
@@ -185,17 +217,27 @@ describe('PermissionValidator', () => {
     it('should return allowed=false when user lacks some required permissions', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateAllPermissions(['EMPLOYEE_READ', 'EMPLOYEE_DELETE']);
+      const result = permissionValidator.validateAllPermissions([
+        'EMPLOYEE_READ',
+        'EMPLOYEE_DELETE',
+      ]);
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing required permissions: EMPLOYEE_DELETE');
-      expect(result.requiredPermissions).toEqual(['EMPLOYEE_READ', 'EMPLOYEE_DELETE']);
+      expect(result.reason).toBe(
+        'Missing required permissions: EMPLOYEE_DELETE'
+      );
+      expect(result.requiredPermissions).toEqual([
+        'EMPLOYEE_READ',
+        'EMPLOYEE_DELETE',
+      ]);
     });
 
     it('should return allowed=true for admin users in non-strict mode', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
 
-      const result = permissionValidator.validateAllPermissions(['NONEXISTENT_PERMISSION']);
+      const result = permissionValidator.validateAllPermissions([
+        'NONEXISTENT_PERMISSION',
+      ]);
 
       expect(result.allowed).toBe(true);
     });
@@ -204,8 +246,13 @@ describe('PermissionValidator', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
       expect(() => {
-        permissionValidator.validateAllPermissions(['EMPLOYEE_CREATE', 'EMPLOYEE_DELETE'], { throwOnFailure: true });
-      }).toThrow('Missing required permissions: EMPLOYEE_CREATE, EMPLOYEE_DELETE');
+        permissionValidator.validateAllPermissions(
+          ['EMPLOYEE_CREATE', 'EMPLOYEE_DELETE'],
+          { throwOnFailure: true }
+        );
+      }).toThrow(
+        'Missing required permissions: EMPLOYEE_CREATE, EMPLOYEE_DELETE'
+      );
     });
   });
 
@@ -213,7 +260,10 @@ describe('PermissionValidator', () => {
     it('should validate create operation correctly', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateCrudOperation('employee', 'create');
+      const result = permissionValidator.validateCrudOperation(
+        'employee',
+        'create'
+      );
 
       expect(result.allowed).toBe(true);
     });
@@ -221,7 +271,10 @@ describe('PermissionValidator', () => {
     it('should validate read operation correctly', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
-      const result = permissionValidator.validateCrudOperation('employee', 'read');
+      const result = permissionValidator.validateCrudOperation(
+        'employee',
+        'read'
+      );
 
       expect(result.allowed).toBe(true);
     });
@@ -229,25 +282,38 @@ describe('PermissionValidator', () => {
     it('should validate update operation correctly', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
-      const result = permissionValidator.validateCrudOperation('employee', 'update');
+      const result = permissionValidator.validateCrudOperation(
+        'employee',
+        'update'
+      );
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing required permission: EMPLOYEE_UPDATE');
+      expect(result.reason).toBe(
+        'Missing required permission: EMPLOYEE_UPDATE'
+      );
     });
 
     it('should validate delete operation correctly', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateCrudOperation('employee', 'delete');
+      const result = permissionValidator.validateCrudOperation(
+        'employee',
+        'delete'
+      );
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing required permission: EMPLOYEE_DELETE');
+      expect(result.reason).toBe(
+        'Missing required permission: EMPLOYEE_DELETE'
+      );
     });
 
     it('should handle different resource names', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
 
-      const result = permissionValidator.validateCrudOperation('department', 'read');
+      const result = permissionValidator.validateCrudOperation(
+        'department',
+        'read'
+      );
 
       expect(result.allowed).toBe(true);
     });
@@ -293,7 +359,10 @@ describe('PermissionValidator', () => {
     it('should return allowed=true when user has any required role (requireAll=false)', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateRoles(['ADMIN', 'MANAGER'], false);
+      const result = permissionValidator.validateRoles(
+        ['ADMIN', 'MANAGER'],
+        false
+      );
 
       expect(result.allowed).toBe(true);
     });
@@ -301,16 +370,24 @@ describe('PermissionValidator', () => {
     it('should return allowed=false when user has none of the required roles (requireAll=false)', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
-      const result = permissionValidator.validateRoles(['ADMIN', 'MANAGER'], false);
+      const result = permissionValidator.validateRoles(
+        ['ADMIN', 'MANAGER'],
+        false
+      );
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe('Missing any of required roles: ADMIN, MANAGER');
+      expect(result.reason).toBe(
+        'Missing any of required roles: ADMIN, MANAGER'
+      );
     });
 
     it('should return allowed=false when user lacks some required roles (requireAll=true)', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
 
-      const result = permissionValidator.validateRoles(['ADMIN', 'MANAGER'], true);
+      const result = permissionValidator.validateRoles(
+        ['ADMIN', 'MANAGER'],
+        true
+      );
 
       expect(result.allowed).toBe(false);
       expect(result.reason).toBe('Missing required roles: ADMIN');
@@ -328,7 +405,9 @@ describe('PermissionValidator', () => {
       mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
 
       expect(() => {
-        permissionValidator.validateRoles(['ADMIN', 'MANAGER'], false, { throwOnFailure: true });
+        permissionValidator.validateRoles(['ADMIN', 'MANAGER'], false, {
+          throwOnFailure: true,
+        });
       }).toThrow('Missing any of required roles: ADMIN, MANAGER');
     });
   });
@@ -385,11 +464,7 @@ describe('error classes', () => {
   });
 
   it('should create RoleError correctly', () => {
-    const error = new RoleError(
-      'Role required',
-      ['ADMIN'],
-      ['USER']
-    );
+    const error = new RoleError('Role required', ['ADMIN'], ['USER']);
 
     expect(error.name).toBe('RoleError');
     expect(error.message).toBe('Role required');

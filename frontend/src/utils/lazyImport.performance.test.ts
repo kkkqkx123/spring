@@ -5,18 +5,30 @@ import { lazyImport, lazyWithRetry, preloadComponent } from './lazyImport';
 import { measureRenderPerformance } from '../test/performance-setup';
 
 // Mock components for testing
-const MockComponent = () => React.createElement('div', { 'data-testid': 'mock-component' }, 'Mock Component');
+const MockComponent = () =>
+  React.createElement(
+    'div',
+    { 'data-testid': 'mock-component' },
+    'Mock Component'
+  );
 const SlowMockComponent = () => {
   // Simulate slow component
   const start = Date.now();
   while (Date.now() - start < 50) {
     // Busy wait for 50ms
   }
-  return React.createElement('div', { 'data-testid': 'slow-mock-component' }, 'Slow Mock Component');
+  return React.createElement(
+    'div',
+    { 'data-testid': 'slow-mock-component' },
+    'Slow Mock Component'
+  );
 };
 
 // Helper function to create Suspense wrapper
-const createSuspenseWrapper = (component: React.ComponentType, fallbackText = 'Loading...') => {
+const createSuspenseWrapper = (
+  component: React.ComponentType,
+  fallbackText = 'Loading...'
+) => {
   return React.createElement(
     Suspense,
     { fallback: React.createElement('div', {}, fallbackText) },
@@ -32,12 +44,12 @@ describe('Lazy Import Performance', () => {
   describe('lazyImport', () => {
     it('should create lazy component without performance impact', async () => {
       const mockImport = vi.fn().mockResolvedValue({ default: MockComponent });
-      
+
       const renderTime = await measureRenderPerformance(async () => {
         const LazyComponent = lazyImport(mockImport);
-        
+
         render(createSuspenseWrapper(LazyComponent));
-        
+
         await waitFor(() => {
           expect(mockImport).toHaveBeenCalledTimes(1);
         });
@@ -49,14 +61,14 @@ describe('Lazy Import Performance', () => {
 
     it('should handle import errors gracefully', async () => {
       const mockImport = vi.fn().mockRejectedValue(new Error('Import failed'));
-      
+
       const LazyComponent = lazyImport(mockImport);
-      
+
       const { getByText } = render(createSuspenseWrapper(LazyComponent));
 
       // Should show loading initially
       expect(getByText('Loading...')).toBeInTheDocument();
-      
+
       // Error should be handled by error boundary
       await waitFor(() => {
         expect(mockImport).toHaveBeenCalledTimes(1);
@@ -76,14 +88,17 @@ describe('Lazy Import Performance', () => {
       });
 
       const LazyComponent = lazyWithRetry(mockImport, 3);
-      
+
       const startTime = performance.now();
-      
+
       render(createSuspenseWrapper(LazyComponent));
 
-      await waitFor(() => {
-        expect(mockImport).toHaveBeenCalledTimes(3);
-      }, { timeout: 5000 });
+      await waitFor(
+        () => {
+          expect(mockImport).toHaveBeenCalledTimes(3);
+        },
+        { timeout: 5000 }
+      );
 
       const endTime = performance.now();
       const totalTime = endTime - startTime;
@@ -94,33 +109,38 @@ describe('Lazy Import Performance', () => {
     });
 
     it('should fail after max retries', async () => {
-      const mockImport = vi.fn().mockRejectedValue(new Error('Persistent error'));
-      
+      const mockImport = vi
+        .fn()
+        .mockRejectedValue(new Error('Persistent error'));
+
       const LazyComponent = lazyWithRetry(mockImport, 2);
-      
+
       render(createSuspenseWrapper(LazyComponent));
 
-      await waitFor(() => {
-        expect(mockImport).toHaveBeenCalledTimes(2);
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          expect(mockImport).toHaveBeenCalledTimes(2);
+        },
+        { timeout: 3000 }
+      );
     });
   });
 
   describe('preloadComponent', () => {
     it('should preload component without blocking', async () => {
       const mockImport = vi.fn().mockResolvedValue({ default: MockComponent });
-      
+
       const startTime = performance.now();
-      
+
       // Preload should not block
       preloadComponent(mockImport);
-      
+
       const endTime = performance.now();
       const preloadTime = endTime - startTime;
 
       // Preload should be nearly instantaneous
       expect(preloadTime).toBeLessThan(5);
-      
+
       // Import should be called asynchronously
       await waitFor(() => {
         expect(mockImport).toHaveBeenCalledTimes(1);
@@ -129,8 +149,10 @@ describe('Lazy Import Performance', () => {
 
     it('should handle preload errors silently', async () => {
       const mockImport = vi.fn().mockRejectedValue(new Error('Preload failed'));
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       // Should not throw
       expect(() => {
         preloadComponent(mockImport);
@@ -142,7 +164,7 @@ describe('Lazy Import Performance', () => {
 
       // Should not log errors (silent failure)
       expect(consoleSpy).not.toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
   });
@@ -150,26 +172,35 @@ describe('Lazy Import Performance', () => {
   describe('Bundle Splitting Performance', () => {
     it('should demonstrate code splitting benefits', async () => {
       // Simulate large component that would benefit from code splitting
-      const heavyImport = vi.fn().mockImplementation(() => 
-        new Promise(resolve => {
-          setTimeout(() => {
-            resolve({ default: SlowMockComponent });
-          }, 100); // Simulate network delay
-        })
+      const heavyImport = vi.fn().mockImplementation(
+        () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              resolve({ default: SlowMockComponent });
+            }, 100); // Simulate network delay
+          })
       );
 
       const LazyHeavyComponent = lazyImport(heavyImport);
-      
+
       const renderTime = await measureRenderPerformance(async () => {
-        const { getByText } = render(createSuspenseWrapper(LazyHeavyComponent, 'Loading heavy component...'));
+        const { getByText } = render(
+          createSuspenseWrapper(
+            LazyHeavyComponent,
+            'Loading heavy component...'
+          )
+        );
 
         // Should show loading state immediately
         expect(getByText('Loading heavy component...')).toBeInTheDocument();
-        
+
         // Wait for component to load
-        await waitFor(() => {
-          expect(getByText('Slow Mock Component')).toBeInTheDocument();
-        }, { timeout: 1000 });
+        await waitFor(
+          () => {
+            expect(getByText('Slow Mock Component')).toBeInTheDocument();
+          },
+          { timeout: 1000 }
+        );
       });
 
       // Total render time should include loading time
@@ -181,8 +212,8 @@ describe('Lazy Import Performance', () => {
   describe('Memory Usage', () => {
     it('should not cause memory leaks with multiple lazy components', async () => {
       const components = Array.from({ length: 10 }, (_, i) => {
-        const mockImport = vi.fn().mockResolvedValue({ 
-          default: () => React.createElement('div', {}, `Component ${i}`)
+        const mockImport = vi.fn().mockResolvedValue({
+          default: () => React.createElement('div', {}, `Component ${i}`),
         });
         return lazyImport(mockImport);
       });

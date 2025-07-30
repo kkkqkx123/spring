@@ -1,6 +1,11 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useAccessControl, usePermissionCheck, useRoleCheck, useResourcePermissions } from './useAccessControl';
+import {
+  useAccessControl,
+  usePermissionCheck,
+  useRoleCheck,
+  useResourcePermissions,
+} from './useAccessControl';
 import { useAuth } from './useAuth';
 import type { User, Role, Permission } from '../types';
 
@@ -75,20 +80,24 @@ describe('useAccessControl', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: mockUsers.admin,
-        hasPermission: vi.fn((permission: string) => 
+        hasPermission: vi.fn((permission: string) =>
           mockUsers.admin.roles[0].permissions.some(p => p.name === permission)
         ),
-        hasRole: vi.fn((role: string) => 
+        hasRole: vi.fn((role: string) =>
           mockUsers.admin.roles.some(r => r.name === role)
         ),
         hasAnyPermission: vi.fn((permissions: string[]) =>
           permissions.some(permission =>
-            mockUsers.admin.roles[0].permissions.some(p => p.name === permission)
+            mockUsers.admin.roles[0].permissions.some(
+              p => p.name === permission
+            )
           )
         ),
         hasAllPermissions: vi.fn((permissions: string[]) =>
           permissions.every(permission =>
-            mockUsers.admin.roles[0].permissions.some(p => p.name === permission)
+            mockUsers.admin.roles[0].permissions.some(
+              p => p.name === permission
+            )
           )
         ),
         hasAnyRole: vi.fn((roles: string[]) =>
@@ -144,7 +153,9 @@ describe('useAccessControl', () => {
 
       // Even if the specific permission doesn't exist, admin should have access
       expect(result.current.hasPermission('NONEXISTENT_PERMISSION')).toBe(true);
-      expect(result.current.hasPermission('NONEXISTENT_PERMISSION', { strict: true })).toBe(false);
+      expect(
+        result.current.hasPermission('NONEXISTENT_PERMISSION', { strict: true })
+      ).toBe(false);
     });
   });
 
@@ -153,27 +164,35 @@ describe('useAccessControl', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: mockUsers.manager,
-        hasPermission: vi.fn((permission: string) => 
-          mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
+        hasPermission: vi.fn((permission: string) =>
+          mockUsers.manager.roles[0].permissions.some(
+            p => p.name === permission
+          )
         ),
-        hasRole: vi.fn((role: string) => 
+        hasRole: vi.fn((role: string) =>
           mockUsers.manager.roles.some(r => r.name === role)
         ),
         hasAnyPermission: vi.fn((permissions: string[]) =>
           permissions.some(permission =>
-            mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
+            mockUsers.manager.roles[0].permissions.some(
+              p => p.name === permission
+            )
           )
         ),
         hasAllPermissions: vi.fn((permissions: string[]) =>
           permissions.every(permission =>
-            mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
+            mockUsers.manager.roles[0].permissions.some(
+              p => p.name === permission
+            )
           )
         ),
         hasAnyRole: vi.fn((roles: string[]) =>
           roles.some(role => mockUsers.manager.roles.some(r => r.name === role))
         ),
         hasAllRoles: vi.fn((roles: string[]) =>
-          roles.every(role => mockUsers.manager.roles.some(r => r.name === role))
+          roles.every(role =>
+            mockUsers.manager.roles.some(r => r.name === role)
+          )
         ),
       });
     });
@@ -212,10 +231,10 @@ describe('useAccessControl', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: mockUsers.user,
-        hasPermission: vi.fn((permission: string) => 
+        hasPermission: vi.fn((permission: string) =>
           mockUsers.user.roles[0].permissions.some(p => p.name === permission)
         ),
-        hasRole: vi.fn((role: string) => 
+        hasRole: vi.fn((role: string) =>
           mockUsers.user.roles.some(r => r.name === role)
         ),
         hasAnyPermission: vi.fn((permissions: string[]) =>
@@ -293,8 +312,12 @@ describe('useAccessControl', () => {
     it('should return fallback values', () => {
       const { result } = renderHook(() => useAccessControl());
 
-      expect(result.current.hasPermission('EMPLOYEE_READ', { fallbackValue: true })).toBe(true);
-      expect(result.current.hasRole('USER', { fallbackValue: true })).toBe(true);
+      expect(
+        result.current.hasPermission('EMPLOYEE_READ', { fallbackValue: true })
+      ).toBe(true);
+      expect(result.current.hasRole('USER', { fallbackValue: true })).toBe(
+        true
+      );
     });
   });
 
@@ -303,27 +326,35 @@ describe('useAccessControl', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: mockUsers.manager,
-        hasPermission: vi.fn((permission: string) => 
-          mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
+        hasPermission: vi.fn((permission: string) =>
+          mockUsers.manager.roles[0].permissions.some(
+            p => p.name === permission
+          )
         ),
-        hasRole: vi.fn((role: string) => 
+        hasRole: vi.fn((role: string) =>
           mockUsers.manager.roles.some(r => r.name === role)
         ),
         hasAnyPermission: vi.fn((permissions: string[]) =>
           permissions.some(permission =>
-            mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
+            mockUsers.manager.roles[0].permissions.some(
+              p => p.name === permission
+            )
           )
         ),
         hasAllPermissions: vi.fn((permissions: string[]) =>
           permissions.every(permission =>
-            mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
+            mockUsers.manager.roles[0].permissions.some(
+              p => p.name === permission
+            )
           )
         ),
         hasAnyRole: vi.fn((roles: string[]) =>
           roles.some(role => mockUsers.manager.roles.some(r => r.name === role))
         ),
         hasAllRoles: vi.fn((roles: string[]) =>
-          roles.every(role => mockUsers.manager.roles.some(r => r.name === role))
+          roles.every(role =>
+            mockUsers.manager.roles.some(r => r.name === role)
+          )
         ),
       });
     });
@@ -331,15 +362,26 @@ describe('useAccessControl', () => {
     it('should check any permission correctly', () => {
       const { result } = renderHook(() => useAccessControl());
 
-      expect(result.current.hasAnyPermission(['EMPLOYEE_READ', 'EMPLOYEE_DELETE'])).toBe(true);
-      expect(result.current.hasAnyPermission(['EMPLOYEE_DELETE', 'DEPARTMENT_DELETE'])).toBe(false);
+      expect(
+        result.current.hasAnyPermission(['EMPLOYEE_READ', 'EMPLOYEE_DELETE'])
+      ).toBe(true);
+      expect(
+        result.current.hasAnyPermission([
+          'EMPLOYEE_DELETE',
+          'DEPARTMENT_DELETE',
+        ])
+      ).toBe(false);
     });
 
     it('should check all permissions correctly', () => {
       const { result } = renderHook(() => useAccessControl());
 
-      expect(result.current.hasAllPermissions(['EMPLOYEE_READ', 'EMPLOYEE_CREATE'])).toBe(true);
-      expect(result.current.hasAllPermissions(['EMPLOYEE_READ', 'EMPLOYEE_DELETE'])).toBe(false);
+      expect(
+        result.current.hasAllPermissions(['EMPLOYEE_READ', 'EMPLOYEE_CREATE'])
+      ).toBe(true);
+      expect(
+        result.current.hasAllPermissions(['EMPLOYEE_READ', 'EMPLOYEE_DELETE'])
+      ).toBe(false);
     });
 
     it('should check any role correctly', () => {
@@ -363,7 +405,7 @@ describe('usePermissionCheck', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: mockUsers.manager,
-      hasPermission: vi.fn((permission: string) => 
+      hasPermission: vi.fn((permission: string) =>
         mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
       ),
       hasRole: vi.fn(() => false),
@@ -391,7 +433,7 @@ describe('useRoleCheck', () => {
       isAuthenticated: true,
       user: mockUsers.manager,
       hasPermission: vi.fn(),
-      hasRole: vi.fn((role: string) => 
+      hasRole: vi.fn((role: string) =>
         mockUsers.manager.roles.some(r => r.name === role)
       ),
       hasAnyPermission: vi.fn(),
@@ -417,7 +459,7 @@ describe('useResourcePermissions', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: mockUsers.manager,
-      hasPermission: vi.fn((permission: string) => 
+      hasPermission: vi.fn((permission: string) =>
         mockUsers.manager.roles[0].permissions.some(p => p.name === permission)
       ),
       hasRole: vi.fn(),
@@ -430,7 +472,7 @@ describe('useResourcePermissions', () => {
 
   it('should return resource permissions', () => {
     const { result } = renderHook(() => useResourcePermissions('employee'));
-    
+
     expect(result.current).toEqual({
       create: true,
       read: true,

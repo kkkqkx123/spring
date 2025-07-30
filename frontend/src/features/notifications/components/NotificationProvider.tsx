@@ -14,7 +14,9 @@ interface NotificationContextValue {
   cleanupOldNotifications: () => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextValue | null>(null);
+const NotificationContext = createContext<NotificationContextValue | null>(
+  null
+);
 
 export interface NotificationProviderProps {
   children: ReactNode;
@@ -36,7 +38,7 @@ export function NotificationProvider({
       const initializeConnection = async () => {
         try {
           await webSocketService.connect();
-          
+
           // Load initial notifications from API
           setLoading(true);
           const response = await notificationApi.getNotifications({
@@ -110,7 +112,8 @@ export function NotificationProvider({
       () => {
         notifications.show({
           title: 'Connection Failed',
-          message: 'Unable to reconnect to notification service. Please refresh the page.',
+          message:
+            'Unable to reconnect to notification service. Please refresh the page.',
           color: 'red',
           autoClose: false,
         });
@@ -202,7 +205,8 @@ export function ConnectionStatus({ className }: ConnectionStatusProps) {
           height: '8px',
           borderRadius: '50%',
           backgroundColor: `var(--mantine-color-${getStatusColor()}-6)`,
-          animation: connectionState === 'connecting' ? 'pulse 1.5s infinite' : 'none',
+          animation:
+            connectionState === 'connecting' ? 'pulse 1.5s infinite' : 'none',
         }}
       />
       {getStatusText()}

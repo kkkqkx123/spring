@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Box, ScrollArea } from '@mantine/core';
 
 interface VirtualizedListProps<T> {
@@ -27,7 +33,10 @@ export function VirtualizedList<T>({
 
   // Calculate visible range
   const visibleRange = useMemo(() => {
-    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
+    const startIndex = Math.max(
+      0,
+      Math.floor(scrollTop / itemHeight) - overscan
+    );
     const endIndex = Math.min(
       items.length - 1,
       Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
@@ -49,20 +58,26 @@ export function VirtualizedList<T>({
   }, [items, visibleRange, getItemKey]);
 
   // Handle scroll
-  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
-    const newScrollTop = event.currentTarget.scrollTop;
-    setScrollTop(newScrollTop);
-    onScroll?.(newScrollTop);
-  }, [onScroll]);
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement>) => {
+      const newScrollTop = event.currentTarget.scrollTop;
+      setScrollTop(newScrollTop);
+      onScroll?.(newScrollTop);
+    },
+    [onScroll]
+  );
 
   // Scroll to index
-  const scrollToIndex = useCallback((index: number) => {
-    if (scrollElementRef.current) {
-      const scrollTop = index * itemHeight;
-      scrollElementRef.current.scrollTop = scrollTop;
-      setScrollTop(scrollTop);
-    }
-  }, [itemHeight]);
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (scrollElementRef.current) {
+        const scrollTop = index * itemHeight;
+        scrollElementRef.current.scrollTop = scrollTop;
+        setScrollTop(scrollTop);
+      }
+    },
+    [itemHeight]
+  );
 
   // Expose scroll methods
   React.useImperativeHandle(

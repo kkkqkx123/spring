@@ -18,20 +18,18 @@ vi.mock('../hooks/usePermissions');
 const mockHooks = permissionHooks as any;
 
 const mockRoles: Role[] = [
-  { 
-    id: 1, 
-    name: 'Admin', 
+  {
+    id: 1,
+    name: 'Admin',
     permissions: [
       { id: 1, name: 'user:read', description: 'Read user data' },
       { id: 2, name: 'user:write', description: 'Write user data' },
-    ]
+    ],
   },
-  { 
-    id: 2, 
-    name: 'User', 
-    permissions: [
-      { id: 1, name: 'user:read', description: 'Read user data' },
-    ]
+  {
+    id: 2,
+    name: 'User',
+    permissions: [{ id: 1, name: 'user:read', description: 'Read user data' }],
   },
 ];
 
@@ -43,7 +41,7 @@ const mockPermissions: Permission[] = [
 
 const mockMatrix = {
   1: [1, 2], // Admin has permissions 1 and 2
-  2: [1],    // User has permission 1
+  2: [1], // User has permission 1
 };
 
 const createWrapper = () => {
@@ -56,9 +54,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -93,7 +89,9 @@ describe('RolePermissionMatrix', () => {
     });
 
     mockHooks.useCreateRole.mockReturnValue({
-      mutateAsync: vi.fn().mockResolvedValue({ id: 4, name: 'New Role', permissions: [] }),
+      mutateAsync: vi
+        .fn()
+        .mockResolvedValue({ id: 4, name: 'New Role', permissions: [] }),
       isPending: false,
     });
 
@@ -183,9 +181,10 @@ describe('RolePermissionMatrix', () => {
 
     // Find edit buttons (they would be in the role headers)
     const editButtons = screen.getAllByRole('button');
-    const editButton = editButtons.find(button => 
-      button.querySelector('svg') && 
-      button.querySelector('svg')?.classList.contains('tabler-icon-edit')
+    const editButton = editButtons.find(
+      button =>
+        button.querySelector('svg') &&
+        button.querySelector('svg')?.classList.contains('tabler-icon-edit')
     );
 
     if (editButton) {
@@ -205,14 +204,15 @@ describe('RolePermissionMatrix', () => {
 
     // Find delete buttons
     const deleteButtons = screen.getAllByRole('button');
-    const deleteButton = deleteButtons.find(button => 
-      button.querySelector('svg') && 
-      button.querySelector('svg')?.classList.contains('tabler-icon-trash')
+    const deleteButton = deleteButtons.find(
+      button =>
+        button.querySelector('svg') &&
+        button.querySelector('svg')?.classList.contains('tabler-icon-trash')
     );
 
     if (deleteButton) {
       fireEvent.click(deleteButton);
-      
+
       await waitFor(() => {
         expect(mockDeleteRole).toHaveBeenCalled();
       });
@@ -242,19 +242,25 @@ describe('RolePermissionMatrix', () => {
     render(<RolePermissionMatrix />, { wrapper: createWrapper() });
 
     expect(screen.getByText('No roles found')).toBeInTheDocument();
-    expect(screen.getByText('Create your first role to start managing permissions.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Create your first role to start managing permissions.')
+    ).toBeInTheDocument();
   });
 
   it('should handle role selection callback', () => {
     const mockOnRoleSelect = vi.fn();
-    render(<RolePermissionMatrix onRoleSelect={mockOnRoleSelect} />, { wrapper: createWrapper() });
+    render(<RolePermissionMatrix onRoleSelect={mockOnRoleSelect} />, {
+      wrapper: createWrapper(),
+    });
 
     // The role selection would be triggered by clicking on a role
     expect(screen.getByText('Role-Permission Matrix')).toBeInTheDocument();
   });
 
   it('should highlight selected role', () => {
-    render(<RolePermissionMatrix selectedRoleId={1} />, { wrapper: createWrapper() });
+    render(<RolePermissionMatrix selectedRoleId={1} />, {
+      wrapper: createWrapper(),
+    });
 
     // The selected role should be highlighted (implementation would depend on styling)
     expect(screen.getByText('Role-Permission Matrix')).toBeInTheDocument();

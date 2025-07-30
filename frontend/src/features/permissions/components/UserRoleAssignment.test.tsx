@@ -41,9 +41,7 @@ const mockUsers: User[] = [
     enabled: true,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
-    roles: [
-      { id: 2, name: 'User', permissions: [] },
-    ],
+    roles: [{ id: 2, name: 'User', permissions: [] }],
   },
 ];
 
@@ -63,9 +61,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -138,19 +134,19 @@ describe('UserRoleAssignment', () => {
     // John should have Admin and User roles
     const adminBadges = screen.getAllByText('Admin');
     const userBadges = screen.getAllByText('User');
-    
+
     expect(adminBadges.length).toBeGreaterThan(0);
     expect(userBadges.length).toBeGreaterThan(0);
   });
 
   it('should handle user selection', () => {
     const mockOnUserSelect = vi.fn();
-    render(<UserRoleAssignment onUserSelect={mockOnUserSelect} />, { 
-      wrapper: createWrapper() 
+    render(<UserRoleAssignment onUserSelect={mockOnUserSelect} />, {
+      wrapper: createWrapper(),
     });
 
     const checkboxes = screen.getAllByRole('checkbox');
-    const userCheckbox = checkboxes.find(checkbox => 
+    const userCheckbox = checkboxes.find(checkbox =>
       checkbox.closest('tr')?.textContent?.includes('john.doe')
     );
 
@@ -183,14 +179,17 @@ describe('UserRoleAssignment', () => {
     });
 
     expect(editButton).toBeTruthy();
-    
+
     if (editButton) {
       fireEvent.click(editButton);
 
-      await waitFor(() => {
-        // Look for the modal title or modal content
-        expect(screen.getByText(/Assign Roles/)).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          // Look for the modal title or modal content
+          expect(screen.getByText(/Assign Roles/)).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     }
   });
 
@@ -209,9 +208,9 @@ describe('UserRoleAssignment', () => {
 
     // Find remove button in a role badge
     const removeButtons = screen.getAllByRole('button');
-    const removeButton = removeButtons.find(button => 
-      button.querySelector('svg') && 
-      button.closest('.mantine-Badge-root')
+    const removeButton = removeButtons.find(
+      button =>
+        button.querySelector('svg') && button.closest('.mantine-Badge-root')
     );
 
     if (removeButton) {
@@ -258,7 +257,7 @@ describe('UserRoleAssignment', () => {
     // Select users and open bulk modal
     const checkboxes = screen.getAllByRole('checkbox');
     fireEvent.click(checkboxes[1]); // Select first user
-    
+
     const bulkButton = screen.getByText(/Bulk Actions/);
     fireEvent.click(bulkButton);
 
@@ -284,7 +283,9 @@ describe('UserRoleAssignment', () => {
 
     render(<UserRoleAssignment />, { wrapper: createWrapper() });
 
-    expect(document.querySelector('.mantine-LoadingOverlay-root')).toBeInTheDocument();
+    expect(
+      document.querySelector('.mantine-LoadingOverlay-root')
+    ).toBeInTheDocument();
   });
 
   it('should display empty state when no users found', () => {
@@ -344,6 +345,8 @@ describe('UserRoleAssignment', () => {
     render(<UserRoleAssignment />, { wrapper: createWrapper() });
 
     // Pagination should be visible
-    expect(document.querySelector('.mantine-Pagination-root')).toBeInTheDocument();
+    expect(
+      document.querySelector('.mantine-Pagination-root')
+    ).toBeInTheDocument();
   });
 });

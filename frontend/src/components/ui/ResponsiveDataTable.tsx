@@ -61,7 +61,8 @@ export function ResponsiveDataTable<T extends Record<string, any>>({
   const isTablet = useMediaQuery('(max-width: 62em)');
 
   // Automatically switch to card view on mobile if no custom renderer provided
-  const effectiveViewMode = isMobile && !mobileCardRenderer ? 'cards' : viewMode;
+  const effectiveViewMode =
+    isMobile && !mobileCardRenderer ? 'cards' : viewMode;
 
   // Responsive page size options
   const pageSizeOptions = useResponsiveValue({
@@ -388,7 +389,9 @@ export function ResponsiveDataTable<T extends Record<string, any>>({
                       )}
                       {columns.map(column => (
                         <Table.Td key={String(column.key)}>
-                          <Box style={{ fontSize: isTablet ? '0.875rem' : '1rem' }}>
+                          <Box
+                            style={{ fontSize: isTablet ? '0.875rem' : '1rem' }}
+                          >
                             {column.render
                               ? column.render(row[column.key], row)
                               : row[column.key]?.toString() || '-'}

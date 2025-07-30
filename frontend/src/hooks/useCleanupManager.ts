@@ -143,42 +143,63 @@ export function useCleanupManager() {
     };
   }, [manager]);
 
-  const addCleanup = useCallback((cleanup: CleanupFunction) => {
-    manager.add(cleanup);
-  }, [manager]);
+  const addCleanup = useCallback(
+    (cleanup: CleanupFunction) => {
+      manager.add(cleanup);
+    },
+    [manager]
+  );
 
-  const removeCleanup = useCallback((cleanup: CleanupFunction) => {
-    manager.remove(cleanup);
-  }, [manager]);
+  const removeCleanup = useCallback(
+    (cleanup: CleanupFunction) => {
+      manager.remove(cleanup);
+    },
+    [manager]
+  );
 
-  const addTimer = useCallback((timer: NodeJS.Timeout) => {
-    manager.addTimer(timer);
-  }, [manager]);
+  const addTimer = useCallback(
+    (timer: NodeJS.Timeout) => {
+      manager.addTimer(timer);
+    },
+    [manager]
+  );
 
-  const addInterval = useCallback((interval: NodeJS.Timeout) => {
-    manager.addInterval(interval);
-  }, [manager]);
+  const addInterval = useCallback(
+    (interval: NodeJS.Timeout) => {
+      manager.addInterval(interval);
+    },
+    [manager]
+  );
 
-  const addEventListener = useCallback((
-    element: EventTarget,
-    event: string,
-    handler: EventListener,
-    options?: boolean | AddEventListenerOptions
-  ) => {
-    manager.addEventListener(element, event, handler, options);
-  }, [manager]);
+  const addEventListener = useCallback(
+    (
+      element: EventTarget,
+      event: string,
+      handler: EventListener,
+      options?: boolean | AddEventListenerOptions
+    ) => {
+      manager.addEventListener(element, event, handler, options);
+    },
+    [manager]
+  );
 
   const createAbortController = useCallback(() => {
     return manager.createAbortController();
   }, [manager]);
 
-  const setTimeout = useCallback((callback: () => void, delay: number) => {
-    return manager.setTimeout(callback, delay);
-  }, [manager]);
+  const setTimeout = useCallback(
+    (callback: () => void, delay: number) => {
+      return manager.setTimeout(callback, delay);
+    },
+    [manager]
+  );
 
-  const setInterval = useCallback((callback: () => void, delay: number) => {
-    return manager.setInterval(callback, delay);
-  }, [manager]);
+  const setInterval = useCallback(
+    (callback: () => void, delay: number) => {
+      return manager.setInterval(callback, delay);
+    },
+    [manager]
+  );
 
   const cleanup = useCallback(() => {
     manager.cleanup();
@@ -208,7 +229,7 @@ export function useSubscriptionCleanup() {
 
   const addSubscription = useCallback((unsubscribe: () => void) => {
     subscriptions.current.add(unsubscribe);
-    
+
     // Return a function to manually unsubscribe
     return () => {
       unsubscribe();
@@ -243,16 +264,22 @@ export function useSubscriptionCleanup() {
 
 // Hook for WebSocket subscription cleanup
 export function useWebSocketSubscriptions() {
-  const { addSubscription, clearSubscriptions, getSubscriptionCount } = useSubscriptionCleanup();
+  const { addSubscription, clearSubscriptions, getSubscriptionCount } =
+    useSubscriptionCleanup();
 
-  const subscribeToWebSocket = useCallback(<T>(
-    service: { subscribe: (event: string, callback: (data: T) => void) => () => void },
-    event: string,
-    callback: (data: T) => void
-  ) => {
-    const unsubscribe = service.subscribe(event, callback);
-    return addSubscription(unsubscribe);
-  }, [addSubscription]);
+  const subscribeToWebSocket = useCallback(
+    <T>(
+      service: {
+        subscribe: (event: string, callback: (data: T) => void) => () => void;
+      },
+      event: string,
+      callback: (data: T) => void
+    ) => {
+      const unsubscribe = service.subscribe(event, callback);
+      return addSubscription(unsubscribe);
+    },
+    [addSubscription]
+  );
 
   return {
     subscribeToWebSocket,
@@ -265,30 +292,39 @@ export function useWebSocketSubscriptions() {
 export function useDOMEventListeners() {
   const { addEventListener, cleanup, getStats } = useCleanupManager();
 
-  const addDOMEventListener = useCallback((
-    element: EventTarget,
-    event: string,
-    handler: EventListener,
-    options?: boolean | AddEventListenerOptions
-  ) => {
-    addEventListener(element, event, handler, options);
-  }, [addEventListener]);
+  const addDOMEventListener = useCallback(
+    (
+      element: EventTarget,
+      event: string,
+      handler: EventListener,
+      options?: boolean | AddEventListenerOptions
+    ) => {
+      addEventListener(element, event, handler, options);
+    },
+    [addEventListener]
+  );
 
-  const addWindowEventListener = useCallback((
-    event: string,
-    handler: EventListener,
-    options?: boolean | AddEventListenerOptions
-  ) => {
-    addDOMEventListener(window, event, handler, options);
-  }, [addDOMEventListener]);
+  const addWindowEventListener = useCallback(
+    (
+      event: string,
+      handler: EventListener,
+      options?: boolean | AddEventListenerOptions
+    ) => {
+      addDOMEventListener(window, event, handler, options);
+    },
+    [addDOMEventListener]
+  );
 
-  const addDocumentEventListener = useCallback((
-    event: string,
-    handler: EventListener,
-    options?: boolean | AddEventListenerOptions
-  ) => {
-    addDOMEventListener(document, event, handler, options);
-  }, [addDOMEventListener]);
+  const addDocumentEventListener = useCallback(
+    (
+      event: string,
+      handler: EventListener,
+      options?: boolean | AddEventListenerOptions
+    ) => {
+      addDOMEventListener(document, event, handler, options);
+    },
+    [addDOMEventListener]
+  );
 
   return {
     addDOMEventListener,
@@ -303,28 +339,29 @@ export function useDOMEventListeners() {
 export function useAsyncCleanup() {
   const { createAbortController, addCleanup } = useCleanupManager();
 
-  const createCancellablePromise = useCallback(<T>(
-    promiseFactory: (signal: AbortSignal) => Promise<T>
-  ): Promise<T> => {
-    const controller = createAbortController();
-    
-    return promiseFactory(controller.signal).catch(error => {
-      if (error.name === 'AbortError') {
-        console.log('Promise was cancelled');
-        throw error;
-      }
-      throw error;
-    });
-  }, [createAbortController]);
+  const createCancellablePromise = useCallback(
+    <T>(promiseFactory: (signal: AbortSignal) => Promise<T>): Promise<T> => {
+      const controller = createAbortController();
 
-  const createCancellableFetch = useCallback((
-    url: string,
-    options?: RequestInit
-  ): Promise<Response> => {
-    return createCancellablePromise(signal => 
-      fetch(url, { ...options, signal })
-    );
-  }, [createCancellablePromise]);
+      return promiseFactory(controller.signal).catch(error => {
+        if (error.name === 'AbortError') {
+          console.log('Promise was cancelled');
+          throw error;
+        }
+        throw error;
+      });
+    },
+    [createAbortController]
+  );
+
+  const createCancellableFetch = useCallback(
+    (url: string, options?: RequestInit): Promise<Response> => {
+      return createCancellablePromise(signal =>
+        fetch(url, { ...options, signal })
+      );
+    },
+    [createCancellablePromise]
+  );
 
   return {
     createCancellablePromise,

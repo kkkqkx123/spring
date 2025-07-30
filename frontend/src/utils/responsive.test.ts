@@ -1,12 +1,12 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi } from 'vitest';
-import { 
-  useScreenSize, 
-  useIsMobile, 
-  useIsTablet, 
-  useIsDesktop, 
+import {
+  useScreenSize,
+  useIsMobile,
+  useIsTablet,
+  useIsDesktop,
   useResponsiveValue,
-  useTouchGestures 
+  useTouchGestures,
 } from './responsive';
 
 // Mock window.innerWidth
@@ -21,24 +21,26 @@ const mockInnerWidth = (width: number) => {
 // Mock window.addEventListener and removeEventListener
 const mockEventListener = () => {
   const listeners: { [key: string]: EventListener[] } = {};
-  
+
   window.addEventListener = vi.fn((event: string, listener: EventListener) => {
     if (!listeners[event]) listeners[event] = [];
     listeners[event].push(listener);
   });
-  
-  window.removeEventListener = vi.fn((event: string, listener: EventListener) => {
-    if (listeners[event]) {
-      listeners[event] = listeners[event].filter(l => l !== listener);
+
+  window.removeEventListener = vi.fn(
+    (event: string, listener: EventListener) => {
+      if (listeners[event]) {
+        listeners[event] = listeners[event].filter(l => l !== listener);
+      }
     }
-  });
-  
+  );
+
   return {
     trigger: (event: string) => {
       if (listeners[event]) {
         listeners[event].forEach(listener => listener(new Event(event)));
       }
-    }
+    },
   };
 };
 
@@ -51,7 +53,7 @@ describe('Responsive Utilities', () => {
     it('should return xs for screen width < 576px', () => {
       mockInnerWidth(500);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('xs');
     });
@@ -59,7 +61,7 @@ describe('Responsive Utilities', () => {
     it('should return sm for screen width 576-767px', () => {
       mockInnerWidth(700);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('sm');
     });
@@ -67,7 +69,7 @@ describe('Responsive Utilities', () => {
     it('should return md for screen width 768-991px', () => {
       mockInnerWidth(900);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('md');
     });
@@ -75,7 +77,7 @@ describe('Responsive Utilities', () => {
     it('should return lg for screen width 992-1199px', () => {
       mockInnerWidth(1100);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('lg');
     });
@@ -83,7 +85,7 @@ describe('Responsive Utilities', () => {
     it('should return xl for screen width >= 1200px', () => {
       mockInnerWidth(1300);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('xl');
     });
@@ -91,7 +93,7 @@ describe('Responsive Utilities', () => {
     it('should update screen size on window resize', () => {
       mockInnerWidth(500);
       const { trigger } = mockEventListener();
-      
+
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('xs');
 
@@ -108,7 +110,7 @@ describe('Responsive Utilities', () => {
     it('should return true for xs screen size', () => {
       mockInnerWidth(500);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsMobile());
       expect(result.current).toBe(true);
     });
@@ -116,7 +118,7 @@ describe('Responsive Utilities', () => {
     it('should return true for sm screen size', () => {
       mockInnerWidth(700);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsMobile());
       expect(result.current).toBe(true);
     });
@@ -124,7 +126,7 @@ describe('Responsive Utilities', () => {
     it('should return false for md and larger screen sizes', () => {
       mockInnerWidth(900);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsMobile());
       expect(result.current).toBe(false);
     });
@@ -134,7 +136,7 @@ describe('Responsive Utilities', () => {
     it('should return true for md screen size', () => {
       mockInnerWidth(900);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsTablet());
       expect(result.current).toBe(true);
     });
@@ -142,7 +144,7 @@ describe('Responsive Utilities', () => {
     it('should return false for non-md screen sizes', () => {
       mockInnerWidth(700);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsTablet());
       expect(result.current).toBe(false);
     });
@@ -152,7 +154,7 @@ describe('Responsive Utilities', () => {
     it('should return true for lg screen size', () => {
       mockInnerWidth(1100);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsDesktop());
       expect(result.current).toBe(true);
     });
@@ -160,7 +162,7 @@ describe('Responsive Utilities', () => {
     it('should return true for xl screen size', () => {
       mockInnerWidth(1300);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsDesktop());
       expect(result.current).toBe(true);
     });
@@ -168,7 +170,7 @@ describe('Responsive Utilities', () => {
     it('should return false for smaller screen sizes', () => {
       mockInnerWidth(900);
       mockEventListener();
-      
+
       const { result } = renderHook(() => useIsDesktop());
       expect(result.current).toBe(false);
     });
@@ -178,7 +180,7 @@ describe('Responsive Utilities', () => {
     it('should return appropriate value for current screen size', () => {
       mockInnerWidth(900); // md
       mockEventListener();
-      
+
       const values = {
         xs: 'mobile',
         sm: 'mobile',
@@ -186,7 +188,7 @@ describe('Responsive Utilities', () => {
         lg: 'desktop',
         xl: 'desktop',
       };
-      
+
       const { result } = renderHook(() => useResponsiveValue(values));
       expect(result.current).toBe('tablet');
     });
@@ -194,12 +196,12 @@ describe('Responsive Utilities', () => {
     it('should fallback to smaller breakpoint if current not defined', () => {
       mockInnerWidth(900); // md
       mockEventListener();
-      
+
       const values = {
         xs: 'mobile',
         lg: 'desktop',
       };
-      
+
       const { result } = renderHook(() => useResponsiveValue(values));
       expect(result.current).toBe('mobile');
     });
@@ -207,12 +209,12 @@ describe('Responsive Utilities', () => {
     it('should return first available value if no match found', () => {
       mockInnerWidth(500); // xs
       mockEventListener();
-      
+
       const values = {
         lg: 'desktop',
         xl: 'large-desktop',
       };
-      
+
       const { result } = renderHook(() => useResponsiveValue(values));
       expect(result.current).toBe('desktop');
     });

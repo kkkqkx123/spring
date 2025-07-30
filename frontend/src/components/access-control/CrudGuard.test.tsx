@@ -9,8 +9,12 @@ vi.mock('../../hooks/useAccessControl');
 
 const mockUseAccessControl = useAccessControl as any;
 
-const TestComponent = () => <div data-testid="protected-content">Protected Content</div>;
-const FallbackComponent = () => <div data-testid="fallback-content">Access Denied</div>;
+const TestComponent = () => (
+  <div data-testid="protected-content">Protected Content</div>
+);
+const FallbackComponent = () => (
+  <div data-testid="fallback-content">Access Denied</div>
+);
 
 describe('CrudGuard', () => {
   beforeEach(() => {
@@ -218,7 +222,11 @@ describe('CrudGuard', () => {
       });
 
       render(
-        <CrudGuard resource="employee" action="read" fallback={<FallbackComponent />}>
+        <CrudGuard
+          resource="employee"
+          action="read"
+          fallback={<FallbackComponent />}
+        >
           <TestComponent />
         </CrudGuard>
       );

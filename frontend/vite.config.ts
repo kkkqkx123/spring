@@ -8,13 +8,13 @@ export default defineConfig({
   plugins: [
     react(),
     // Bundle analyzer plugin (only in analyze mode)
-    process.env.ANALYZE && visualizer({
+    ...(process.env.ANALYZE ? [visualizer({
       filename: 'dist/stats.html',
       open: true,
       gzipSize: true,
       brotliSize: true,
-    }),
-  ].filter(Boolean),
+    })] : []),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -117,13 +117,8 @@ export default defineConfig({
     },
     
     // Minification options
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: 'esbuild',
+    target: 'es2020',
   },
   
   // Performance optimizations

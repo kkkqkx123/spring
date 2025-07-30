@@ -36,8 +36,9 @@ const EmailPage: React.FC = () => {
 
   // Permission checks
   const canSendEmail =
-    user?.roles.some(role => ['ADMIN', 'HR_MANAGER', 'HR_STAFF'].includes(role.name)) ??
-    false;
+    user?.roles.some(role =>
+      ['ADMIN', 'HR_MANAGER', 'HR_STAFF'].includes(role.name)
+    ) ?? false;
   const canManageTemplates =
     user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ??
     false;
@@ -75,9 +76,7 @@ const EmailPage: React.FC = () => {
             <Text size="xl" fw={700} mb="xs">
               Email Management
             </Text>
-            <Text c="dimmed">
-              Send emails and manage templates
-            </Text>
+            <Text c="dimmed">Send emails and manage templates</Text>
           </div>
 
           <Button
@@ -95,7 +94,10 @@ const EmailPage: React.FC = () => {
               <Tabs.Tab value="compose" leftSection={<IconMail size={16} />}>
                 Compose
               </Tabs.Tab>
-              <Tabs.Tab value="templates" leftSection={<IconTemplate size={16} />}>
+              <Tabs.Tab
+                value="templates"
+                leftSection={<IconTemplate size={16} />}
+              >
                 Templates
               </Tabs.Tab>
               <Tabs.Tab value="history" leftSection={<IconHistory size={16} />}>
@@ -124,7 +126,7 @@ const EmailPage: React.FC = () => {
           title="Compose Email"
           size="xl"
         >
-          <EmailComposer 
+          <EmailComposer
             onEmailSent={handleEmailSent}
             onCancel={closeComposeModal}
           />

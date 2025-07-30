@@ -25,6 +25,7 @@ import {
   IconCheck,
   IconX,
   IconAlertCircle,
+  IconBuilding,
 } from '@tabler/icons-react';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEmailHistory, useEmailDetails } from '../hooks/useEmail';
@@ -252,6 +253,7 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                               variant="light"
                               size="sm"
                               onClick={() => handleViewDetails(email.id)}
+                              data-testid={`view-email-${email.id}`}
                             >
                               <IconEye size={14} />
                             </ActionIcon>
@@ -263,6 +265,7 @@ export const EmailHistory: React.FC<EmailHistoryProps> = ({ onResend }) => {
                                 color="blue"
                                 size="sm"
                                 onClick={() => onResend(email.id)}
+                                data-testid={`resend-email-${email.id}`}
                               >
                                 <IconMail size={14} />
                               </ActionIcon>

@@ -53,7 +53,7 @@ export function useWebSocketSubscription(
     };
 
     websocket.on(eventType, wrappedHandler);
-    
+
     addCleanup(() => {
       websocket.off(eventType, wrappedHandler);
     });
@@ -84,7 +84,7 @@ export function useEventListener<T extends keyof WindowEventMap>(
     };
 
     element.addEventListener(eventType, wrappedHandler, options);
-    
+
     addCleanup(() => {
       element.removeEventListener(eventType, wrappedHandler, options);
     });
@@ -148,32 +148,35 @@ export function useAsyncOperation() {
 
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     addCleanup(() => {
       isMountedRef.current = false;
     });
   }, [addCleanup]);
 
-  const executeAsync = useCallback(async <T>(
-    asyncFn: () => Promise<T>,
-    onSuccess?: (result: T) => void,
-    onError?: (error: Error) => void
-  ) => {
-    try {
-      const result = await asyncFn();
-      
-      if (isMountedRef.current && onSuccess) {
-        onSuccess(result);
+  const executeAsync = useCallback(
+    async <T>(
+      asyncFn: () => Promise<T>,
+      onSuccess?: (result: T) => void,
+      onError?: (error: Error) => void
+    ) => {
+      try {
+        const result = await asyncFn();
+
+        if (isMountedRef.current && onSuccess) {
+          onSuccess(result);
+        }
+
+        return result;
+      } catch (error) {
+        if (isMountedRef.current && onError) {
+          onError(error as Error);
+        }
+        throw error;
       }
-      
-      return result;
-    } catch (error) {
-      if (isMountedRef.current && onError) {
-        onError(error as Error);
-      }
-      throw error;
-    }
-  }, []);
+    },
+    []
+  );
 
   return { executeAsync, isMounted: () => isMountedRef.current };
 }
@@ -195,7 +198,7 @@ export function useResizeObserver(
   useEffect(() => {
     if (!element || !window.ResizeObserver) return;
 
-    const observer = new ResizeObserver((entries) => {
+    const observer = new ResizeObserver(entries => {
       callbackRef.current(entries);
     });
 
@@ -225,7 +228,7 @@ export function useIntersectionObserver(
   useEffect(() => {
     if (!element || !window.IntersectionObserver) return;
 
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       callbackRef.current(entries);
     }, options);
 

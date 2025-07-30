@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Grid, Paper, Group, Text, Stack, Center, ActionIcon, Drawer } from '@mantine/core';
+import {
+  Box,
+  Grid,
+  Paper,
+  Group,
+  Text,
+  Stack,
+  Center,
+  ActionIcon,
+  Drawer,
+} from '@mantine/core';
 import { IconWifiOff, IconArrowLeft, IconUsers } from '@tabler/icons-react';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { ConversationList } from './ConversationList';
@@ -22,7 +32,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     defaultSelectedUserId
   );
   const [selectedUserName, setSelectedUserName] = useState<string>('');
-  const [conversationDrawerOpened, { open: openConversationDrawer, close: closeConversationDrawer }] = useDisclosure(false);
+  const [
+    conversationDrawerOpened,
+    { open: openConversationDrawer, close: closeConversationDrawer },
+  ] = useDisclosure(false);
 
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
@@ -99,10 +112,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 {/* Connection status */}
                 {connectionState !== 'connected' && (
                   <Group gap="xs">
-                    <IconWifiOff
-                      size={16}
-                      color="var(--mantine-color-red-6)"
-                    />
+                    <IconWifiOff size={16} color="var(--mantine-color-red-6)" />
                     <Text size="xs" c="red">
                       {connectionState === 'connecting'
                         ? 'Connecting...'
@@ -181,7 +191,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       size="sm"
                     />
                     <Box>
-                      <Text fw={500} size={isTablet ? 'sm' : 'md'} lineClamp={1}>
+                      <Text
+                        fw={500}
+                        size={isTablet ? 'sm' : 'md'}
+                        lineClamp={1}
+                      >
                         {selectedUserName}
                       </Text>
                       <Text size="xs" c="dimmed">

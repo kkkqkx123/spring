@@ -12,7 +12,11 @@ import { useDisclosure, useMediaQuery, useViewportSize } from '@mantine/hooks';
 import { Navigation } from './Navigation';
 import { Header } from './Header';
 import { User } from '../../types';
-import { useIsMobile, useIsTablet, useTouchGestures } from '../../utils/responsive';
+import {
+  useIsMobile,
+  useIsTablet,
+  useTouchGestures,
+} from '../../utils/responsive';
 
 export interface AppShellProps {
   user: User;
@@ -106,8 +110,8 @@ export function AppShell({ user, children }: AppShellProps) {
             }),
           }}
         >
-          <Navigation 
-            user={user} 
+          <Navigation
+            user={user}
             onNavigate={isMobile ? close : undefined}
             isMobile={isMobile}
             isTablet={isTablet}
@@ -134,7 +138,9 @@ export function AppShell({ user, children }: AppShellProps) {
         <MantineAppShell.Main
           style={{
             // Ensure proper scrolling on mobile
-            height: isMobile ? `calc(100vh - ${getHeaderHeight()}px)` : undefined,
+            height: isMobile
+              ? `calc(100vh - ${getHeaderHeight()}px)`
+              : undefined,
             overflowY: 'auto',
             overflowX: 'hidden',
             // Add safe area padding for mobile devices
@@ -156,16 +162,16 @@ export function AppShell({ user, children }: AppShellProps) {
               borderRadius: 4,
               zIndex: 1000,
             }}
-            onFocus={(e) => {
+            onFocus={e => {
               e.currentTarget.style.top = '6px';
             }}
-            onBlur={(e) => {
+            onBlur={e => {
               e.currentTarget.style.top = '-40px';
             }}
           >
             Skip to main content
           </a>
-          
+
           <Box id="main-content" tabIndex={-1}>
             {children}
           </Box>

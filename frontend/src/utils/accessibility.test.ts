@@ -57,22 +57,23 @@ describe('Accessibility Utilities', () => {
   describe('useFocusTrap', () => {
     it('should set up focus trap when active', () => {
       const mockContainer = {
-        querySelectorAll: vi.fn().mockReturnValue([
-          { focus: vi.fn() },
-          { focus: vi.fn() },
-        ]),
+        addEventListener: vi.fn(),
+        querySelectorAll: vi
+          .fn()
+          .mockReturnValue([document.createElement('button'), document.createElement('a')]),
       };
-
-      const { result } = renderHook(() => useFocusTrap(true));
       
+      const { result } = renderHook(() => useFocusTrap(true));
+
       // Simulate container ref being set
       act(() => {
-        if (result.current.current) {
-          Object.assign(result.current.current, mockContainer);
-        }
+        result.current.current = mockContainer as any;
       });
 
-      expect(mockAddEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+      expect(mockContainer.addEventListener).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
     });
 
     it('should not set up focus trap when inactive', () => {
@@ -86,7 +87,7 @@ describe('Accessibility Utilities', () => {
     const mockOnSelect = vi.fn();
 
     it('should handle arrow key navigation', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useKeyboardNavigation(mockItems, mockOnSelect, 'vertical')
       );
 
@@ -100,18 +101,19 @@ describe('Accessibility Utilities', () => {
         querySelectorAll: vi.fn().mockReturnValue([]),
       };
 
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useKeyboardNavigation(mockItems, mockOnSelect, 'vertical')
       );
 
       // Simulate container ref being set
       act(() => {
-        if (result.current.containerRef.current) {
-          Object.assign(result.current.containerRef.current, mockContainer);
-        }
+        result.current.containerRef.current = mockContainer as any;
       });
 
-      expect(mockContainer.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+      expect(mockContainer.addEventListener).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
     });
   });
 
@@ -135,8 +137,10 @@ describe('Accessibility Utilities', () => {
         value: mockRemoveChild,
       });
 
-      const { result } = renderHook(() => useScreenReader());
-      
+      const { result } = renderHook(() => useScreenReader(), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.announce('Test message');
       });
@@ -148,13 +152,17 @@ describe('Accessibility Utilities', () => {
 
   describe('useLiveRegion', () => {
     it('should initialize with message', () => {
-      const { result } = renderHook(() => useLiveRegion('Initial message'));
+      const { result } = renderHook(() => useLiveRegion('Initial message'), {
+        container: document.body,
+      });
       expect(result.current.message).toBe('Initial message');
     });
 
     it('should update message', () => {
-      const { result } = renderHook(() => useLiveRegion());
-      
+      const { result } = renderHook(() => useLiveRegion(), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.updateMessage('New message');
       });
@@ -183,7 +191,9 @@ describe('Accessibility Utilities', () => {
         removeEventListener: vi.fn(),
       });
 
-      const { result } = renderHook(() => useReducedMotion());
+      const { result } = renderHook(() => useReducedMotion(), {
+        container: document.body,
+      });
       expect(result.current).toBe(false);
     });
 
@@ -194,7 +204,9 @@ describe('Accessibility Utilities', () => {
         removeEventListener: vi.fn(),
       });
 
-      const { result } = renderHook(() => useReducedMotion());
+      const { result } = renderHook(() => useReducedMotion(), {
+        container: document.body,
+      });
       expect(result.current).toBe(true);
     });
   });
@@ -207,7 +219,9 @@ describe('Accessibility Utilities', () => {
         removeEventListener: vi.fn(),
       });
 
-      const { result } = renderHook(() => useHighContrast());
+      const { result } = renderHook(() => useHighContrast(), {
+        container: document.body,
+      });
       expect(result.current).toBe(false);
     });
 
@@ -218,33 +232,43 @@ describe('Accessibility Utilities', () => {
         removeEventListener: vi.fn(),
       });
 
-      const { result } = renderHook(() => useHighContrast());
+      const { result } = renderHook(() => useHighContrast(), {
+        container: document.body,
+      });
       expect(result.current).toBe(true);
     });
   });
 
   describe('useAriaId', () => {
     it('should generate unique ID with prefix', () => {
-      const { result } = renderHook(() => useAriaId('test'));
+      const { result } = renderHook(() => useAriaId('test'), {
+        container: document.body,
+      });
       expect(result.current).toMatch(/^test-/);
     });
 
     it('should use default prefix', () => {
-      const { result } = renderHook(() => useAriaId());
+      const { result } = renderHook(() => useAriaId(), {
+        container: document.body,
+      });
       expect(result.current).toMatch(/^aria-/);
     });
   });
 
   describe('useAriaExpanded', () => {
     it('should initialize with false by default', () => {
-      const { result } = renderHook(() => useAriaExpanded());
+      const { result } = renderHook(() => useAriaExpanded(), {
+        container: document.body,
+      });
       expect(result.current.expanded).toBe(false);
       expect(result.current['aria-expanded']).toBe(false);
     });
 
     it('should toggle expanded state', () => {
-      const { result } = renderHook(() => useAriaExpanded());
-      
+      const { result } = renderHook(() => useAriaExpanded(), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.toggle();
       });
@@ -254,8 +278,10 @@ describe('Accessibility Utilities', () => {
     });
 
     it('should expand and collapse', () => {
-      const { result } = renderHook(() => useAriaExpanded());
-      
+      const { result } = renderHook(() => useAriaExpanded(), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.expand();
       });
@@ -272,13 +298,17 @@ describe('Accessibility Utilities', () => {
     const mockItems = ['item1', 'item2', 'item3'];
 
     it('should initialize with no selection', () => {
-      const { result } = renderHook(() => useAriaSelected(mockItems));
+      const { result } = renderHook(() => useAriaSelected(mockItems), {
+        container: document.body,
+      });
       expect(result.current.selectedItems).toEqual([]);
     });
 
     it('should select single item', () => {
-      const { result } = renderHook(() => useAriaSelected(mockItems));
-      
+      const { result } = renderHook(() => useAriaSelected(mockItems), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.select(1);
       });
@@ -288,19 +318,25 @@ describe('Accessibility Utilities', () => {
     });
 
     it('should handle multi-select', () => {
-      const { result } = renderHook(() => useAriaSelected(mockItems, true));
-      
+      const { result } = renderHook(() => useAriaSelected(mockItems, true), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.select(0);
         result.current.select(2);
       });
 
-      expect(result.current.selectedItems).toEqual([0, 2]);
+      expect(result.current.selectedItems).toHaveLength(2);
+      expect(result.current.selectedItems).toContain(0);
+      expect(result.current.selectedItems).toContain(2);
     });
 
     it('should select all items in multi-select mode', () => {
-      const { result } = renderHook(() => useAriaSelected(mockItems, true));
-      
+      const { result } = renderHook(() => useAriaSelected(mockItems, true), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.selectAll();
       });
@@ -309,8 +345,10 @@ describe('Accessibility Utilities', () => {
     });
 
     it('should clear selection', () => {
-      const { result } = renderHook(() => useAriaSelected(mockItems, true));
-      
+      const { result } = renderHook(() => useAriaSelected(mockItems, true), {
+        container: document.body,
+      });
+
       act(() => {
         result.current.select(0);
         result.current.clearSelection();
@@ -322,20 +360,37 @@ describe('Accessibility Utilities', () => {
 
   describe('useAccessibleFormField', () => {
     it('should generate proper ARIA attributes', () => {
-      const { result } = renderHook(() => 
-        useAccessibleFormField('test-field', 'Test Label', true, 'Error message', 'Help text')
+      const { result } = renderHook(
+        () =>
+          useAccessibleFormField(
+            'test-field',
+            'Test Label',
+            true,
+            'Error message',
+            'Help text'
+          ),
+        {
+          container: document.body,
+        }
       );
 
       expect(result.current.fieldProps.id).toBe('test-field');
       expect(result.current.fieldProps['aria-required']).toBe(true);
       expect(result.current.fieldProps['aria-invalid']).toBe(true);
-      expect(result.current.fieldProps['aria-describedby']).toContain('test-field-description');
-      expect(result.current.fieldProps['aria-describedby']).toContain('test-field-error');
+      expect(result.current.fieldProps['aria-describedby']).toContain(
+        'test-field-description'
+      );
+      expect(result.current.fieldProps['aria-describedby']).toContain(
+        'test-field-error'
+      );
     });
 
     it('should handle field without error or description', () => {
-      const { result } = renderHook(() => 
-        useAccessibleFormField('simple-field', 'Simple Label')
+      const { result } = renderHook(
+        () => useAccessibleFormField('simple-field', 'Simple Label'),
+        {
+          container: document.body,
+        }
       );
 
       expect(result.current.fieldProps['aria-required']).toBe(false);

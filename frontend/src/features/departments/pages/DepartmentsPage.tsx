@@ -13,13 +13,14 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import {
-  IconPlus,
-  IconAlertCircle,
-  IconCheck,
-} from '@tabler/icons-react';
+import { IconPlus, IconAlertCircle, IconCheck } from '@tabler/icons-react';
 import { DepartmentTree, DepartmentForm } from '../components';
-import { useDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment } from '../hooks/useDepartments';
+import {
+  useDepartments,
+  useCreateDepartment,
+  useUpdateDepartment,
+  useDeleteDepartment,
+} from '../hooks/useDepartments';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
 import type { Department } from '../../../types/entities';
@@ -28,28 +29,24 @@ const DepartmentsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
-  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(null);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(
+    null
+  );
   const [
     createModalOpened,
     { open: openCreateModal, close: closeCreateModal },
   ] = useDisclosure(false);
-  const [
-    editModalOpened,
-    { open: openEditModal, close: closeEditModal },
-  ] = useDisclosure(false);
+  const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
+    useDisclosure(false);
   const [
     deleteModalOpened,
     { open: openDeleteModal, close: closeDeleteModal },
   ] = useDisclosure(false);
 
   // Queries and mutations
-  const {
-    data: departments,
-    isLoading,
-    error,
-    refetch,
-  } = useDepartments();
+  const { data: departments, isLoading, error, refetch } = useDepartments();
 
   const createDepartment = useCreateDepartment();
   const updateDepartment = useUpdateDepartment();
@@ -205,7 +202,9 @@ const DepartmentsPage: React.FC = () => {
                 selectedDepartment={selectedDepartment}
                 onDepartmentSelect={handleDepartmentSelect}
                 onDepartmentEdit={canEdit ? handleEditDepartment : undefined}
-                onDepartmentDelete={canDelete ? handleDeleteDepartment : undefined}
+                onDepartmentDelete={
+                  canDelete ? handleDeleteDepartment : undefined
+                }
               />
             </Card>
           </Grid.Col>
@@ -251,7 +250,9 @@ const DepartmentsPage: React.FC = () => {
                     </Text>
                     <Text>
                       {selectedDepartment.createdAt
-                        ? new Date(selectedDepartment.createdAt).toLocaleDateString()
+                        ? new Date(
+                            selectedDepartment.createdAt
+                          ).toLocaleDateString()
                         : 'Unknown'}
                     </Text>
                   </div>
@@ -271,7 +272,9 @@ const DepartmentsPage: React.FC = () => {
                       <Button
                         variant="light"
                         color="red"
-                        onClick={() => handleDeleteDepartment(selectedDepartment)}
+                        onClick={() =>
+                          handleDeleteDepartment(selectedDepartment)
+                        }
                       >
                         Delete
                       </Button>
@@ -339,12 +342,14 @@ const DepartmentsPage: React.FC = () => {
             <Text>
               Are you sure you want to delete the department{' '}
               <strong>{selectedDepartment?.name}</strong>?
-              {selectedDepartment?.employeeCount && selectedDepartment.employeeCount > 0 && (
-                <Text c="red" size="sm" mt="xs">
-                  This department has {selectedDepartment.employeeCount} employees.
-                  They will need to be reassigned to another department.
-                </Text>
-              )}
+              {selectedDepartment?.employeeCount &&
+                selectedDepartment.employeeCount > 0 && (
+                  <Text c="red" size="sm" mt="xs">
+                    This department has {selectedDepartment.employeeCount}{' '}
+                    employees. They will need to be reassigned to another
+                    department.
+                  </Text>
+                )}
             </Text>
 
             <Group justify="flex-end" gap="md">

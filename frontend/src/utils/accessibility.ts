@@ -21,7 +21,9 @@ export const useFocusTrap = (isActive: boolean) => {
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     const firstElement = focusableElements[0] as HTMLElement;
-    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+    const lastElement = focusableElements[
+      focusableElements.length - 1
+    ] as HTMLElement;
 
     // Store the previously focused element
     previousActiveElement.current = document.activeElement as HTMLElement;
@@ -62,7 +64,7 @@ export const useFocusTrap = (isActive: boolean) => {
     return () => {
       document.removeEventListener('keydown', handleTabKey);
       document.removeEventListener('keydown', handleEscapeKey);
-      
+
       // Restore focus to the previously focused element
       if (previousActiveElement.current) {
         previousActiveElement.current.focus();
@@ -133,9 +135,11 @@ export const useKeyboardNavigation = <T>(
 
       if (newIndex !== focusedIndex) {
         setFocusedIndex(newIndex);
-        
+
         // Focus the corresponding element
-        const focusableElements = container.querySelectorAll('[role="option"], [role="gridcell"], [role="button"]');
+        const focusableElements = container.querySelectorAll(
+          '[role="option"], [role="gridcell"], [role="button"]'
+        );
         const targetElement = focusableElements[newIndex] as HTMLElement;
         if (targetElement) {
           targetElement.focus();
@@ -160,15 +164,18 @@ export const useKeyboardNavigation = <T>(
 
 // Announce messages to screen readers
 export const useScreenReader = () => {
-  const announce = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const announce = (
+    message: string,
+    priority: 'polite' | 'assertive' = 'polite'
+  ) => {
     const announcement = document.createElement('div');
     announcement.setAttribute('aria-live', priority);
     announcement.setAttribute('aria-atomic', 'true');
     announcement.className = 'sr-only';
     announcement.textContent = message;
-    
+
     document.body.appendChild(announcement);
-    
+
     // Remove after announcement
     setTimeout(() => {
       document.body.removeChild(announcement);
@@ -183,7 +190,10 @@ export const useLiveRegion = (initialMessage = '') => {
   const [message, setMessage] = useState(initialMessage);
   const liveRegionRef = useRef<HTMLDivElement>(null);
 
-  const updateMessage = (newMessage: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const updateMessage = (
+    newMessage: string,
+    priority: 'polite' | 'assertive' = 'polite'
+  ) => {
     setMessage(newMessage);
     if (liveRegionRef.current) {
       liveRegionRef.current.setAttribute('aria-live', priority);
@@ -202,7 +212,10 @@ export const useLiveRegion = (initialMessage = '') => {
  */
 
 // Check if color contrast meets WCAG AA standards
-export const checkColorContrast = (foreground: string, background: string): boolean => {
+export const checkColorContrast = (
+  foreground: string,
+  background: string
+): boolean => {
   const getLuminance = (color: string): number => {
     // Convert hex to RGB
     const hex = color.replace('#', '');
@@ -277,14 +290,16 @@ export const useHighContrast = () => {
 
 // Generate unique IDs for ARIA relationships
 export const useAriaId = (prefix = 'aria') => {
-  const [id] = useState(() => `${prefix}-${Math.random().toString(36).substr(2, 9)}`);
+  const [id] = useState(
+    () => `${prefix}-${Math.random().toString(36).substr(2, 9)}`
+  );
   return id;
 };
 
 // Manage ARIA expanded state
 export const useAriaExpanded = (initialExpanded = false) => {
   const [expanded, setExpanded] = useState(initialExpanded);
-  
+
   const toggle = () => setExpanded(!expanded);
   const expand = () => setExpanded(true);
   const collapse = () => setExpanded(false);

@@ -42,7 +42,8 @@ export const RoleForm: React.FC<RoleFormProps> = ({
       name: (value: string) => {
         if (!value.trim()) return 'Role name is required';
         if (value.length < 2) return 'Role name must be at least 2 characters';
-        if (value.length > 50) return 'Role name must be less than 50 characters';
+        if (value.length > 50)
+          return 'Role name must be less than 50 characters';
         return null;
       },
       description: (value: string | any[]) => {
@@ -64,14 +65,17 @@ export const RoleForm: React.FC<RoleFormProps> = ({
 
   // Group permissions by category for better UX
   const permissionOptions = React.useMemo(() => {
-    const groups: Record<string, { value: string; label: string; group: string }[]> = {};
-    
+    const groups: Record<
+      string,
+      { value: string; label: string; group: string }[]
+    > = {};
+
     permissions.forEach(permission => {
       const category = permission.name.split(':')[0] || 'General';
       if (!groups[category]) {
         groups[category] = [];
       }
-      
+
       groups[category].push({
         value: permission.id.toString(),
         label: `${permission.name.split(':').pop()} ${permission.description ? `- ${permission.description}` : ''}`,
@@ -82,9 +86,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
     // Flatten and sort by group
     return Object.entries(groups)
       .sort(([a], [b]) => a.localeCompare(b))
-      .flatMap(([group, items]) => 
-        items.map(item => ({ ...item, group }))
-      );
+      .flatMap(([group, items]) => items.map(item => ({ ...item, group })));
   }, [permissions]);
 
   return (
@@ -115,8 +117,11 @@ export const RoleForm: React.FC<RoleFormProps> = ({
           <MultiSelect
             data={permissionOptions}
             value={form.values.permissionIds.map(id => id.toString())}
-            onChange={(values) => 
-              form.setFieldValue('permissionIds', values.map(v => parseInt(v, 10)))
+            onChange={values =>
+              form.setFieldValue(
+                'permissionIds',
+                values.map(v => parseInt(v, 10))
+              )
             }
             placeholder="Select permissions for this role"
             searchable

@@ -121,9 +121,10 @@ describe('useRealTimeNotifications', () => {
     renderHook(() => useRealTimeNotifications());
 
     // Get the callback function passed to subscribe
-    const newNotificationCallback = mockWebSocketService.subscribe.mock.calls.find(
-      call => call[0] === 'notification:new'
-    )[1];
+    const newNotificationCallback =
+      mockWebSocketService.subscribe.mock.calls.find(
+        call => call[0] === 'notification:new'
+      )[1];
 
     // Simulate receiving a new notification
     act(() => {
@@ -133,9 +134,9 @@ describe('useRealTimeNotifications', () => {
     expect(mockNotificationStore.addNotification).toHaveBeenCalledWith(
       mockNotification
     );
-    expect(mockBrowserNotifications.showBrowserNotification).toHaveBeenCalledWith(
-      mockNotification
-    );
+    expect(
+      mockBrowserNotifications.showBrowserNotification
+    ).toHaveBeenCalledWith(mockNotification);
   });
 
   it('does not show browser notification when permission is denied', () => {
@@ -146,9 +147,10 @@ describe('useRealTimeNotifications', () => {
 
     renderHook(() => useRealTimeNotifications());
 
-    const newNotificationCallback = mockWebSocketService.subscribe.mock.calls.find(
-      call => call[0] === 'notification:new'
-    )[1];
+    const newNotificationCallback =
+      mockWebSocketService.subscribe.mock.calls.find(
+        call => call[0] === 'notification:new'
+      )[1];
 
     act(() => {
       newNotificationCallback(mockNotification);
@@ -167,9 +169,10 @@ describe('useRealTimeNotifications', () => {
 
     renderHook(() => useRealTimeNotifications());
 
-    const newNotificationCallback = mockWebSocketService.subscribe.mock.calls.find(
-      call => call[0] === 'notification:new'
-    )[1];
+    const newNotificationCallback =
+      mockWebSocketService.subscribe.mock.calls.find(
+        call => call[0] === 'notification:new'
+      )[1];
 
     act(() => {
       newNotificationCallback(mockNotification);
@@ -188,9 +191,10 @@ describe('useRealTimeNotifications', () => {
 
     renderHook(() => useRealTimeNotifications());
 
-    const newNotificationCallback = mockWebSocketService.subscribe.mock.calls.find(
-      call => call[0] === 'notification:new'
-    )[1];
+    const newNotificationCallback =
+      mockWebSocketService.subscribe.mock.calls.find(
+        call => call[0] === 'notification:new'
+      )[1];
 
     act(() => {
       newNotificationCallback(mockNotification);
@@ -207,9 +211,10 @@ describe('useRealTimeNotifications', () => {
   it('handles notification read updates from WebSocket', () => {
     renderHook(() => useRealTimeNotifications());
 
-    const notificationReadCallback = mockWebSocketService.subscribe.mock.calls.find(
-      call => call[0] === 'notification:read'
-    )[1];
+    const notificationReadCallback =
+      mockWebSocketService.subscribe.mock.calls.find(
+        call => call[0] === 'notification:read'
+      )[1];
 
     act(() => {
       notificationReadCallback({ notificationId: 1 });
@@ -336,8 +341,12 @@ describe('useRealTimeNotifications', () => {
 
     // Should only remove old read notifications
     expect(mockNotificationStore.removeNotification).toHaveBeenCalledWith(1);
-    expect(mockNotificationStore.removeNotification).not.toHaveBeenCalledWith(2);
-    expect(mockNotificationStore.removeNotification).not.toHaveBeenCalledWith(3);
+    expect(mockNotificationStore.removeNotification).not.toHaveBeenCalledWith(
+      2
+    );
+    expect(mockNotificationStore.removeNotification).not.toHaveBeenCalledWith(
+      3
+    );
     expect(mockNotificationApi.deleteAllRead).toHaveBeenCalled();
   });
 

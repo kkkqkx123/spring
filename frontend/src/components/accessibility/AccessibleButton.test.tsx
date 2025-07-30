@@ -10,19 +10,13 @@ vi.mock('../../utils/accessibility', () => ({
 }));
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('AccessibleButton', () => {
   it('should render with proper ARIA attributes', () => {
     renderWithProvider(
-      <AccessibleButton ariaLabel="Test button">
-        Click me
-      </AccessibleButton>
+      <AccessibleButton ariaLabel="Test button">Click me</AccessibleButton>
     );
 
     const button = screen.getByRole('button');
@@ -46,9 +40,7 @@ describe('AccessibleButton', () => {
 
   it('should handle disabled state', () => {
     renderWithProvider(
-      <AccessibleButton disabled>
-        Disabled button
-      </AccessibleButton>
+      <AccessibleButton disabled>Disabled button</AccessibleButton>
     );
 
     const button = screen.getByRole('button');
@@ -59,9 +51,7 @@ describe('AccessibleButton', () => {
   it('should handle click events', () => {
     const handleClick = vi.fn();
     renderWithProvider(
-      <AccessibleButton onClick={handleClick}>
-        Click me
-      </AccessibleButton>
+      <AccessibleButton onClick={handleClick}>Click me</AccessibleButton>
     );
 
     const button = screen.getByRole('button');
@@ -72,13 +62,11 @@ describe('AccessibleButton', () => {
   it('should handle keyboard events', () => {
     const handleClick = vi.fn();
     renderWithProvider(
-      <AccessibleButton onClick={handleClick}>
-        Click me
-      </AccessibleButton>
+      <AccessibleButton onClick={handleClick}>Click me</AccessibleButton>
     );
 
     const button = screen.getByRole('button');
-    
+
     fireEvent.keyDown(button, { key: 'Enter' });
     expect(handleClick).toHaveBeenCalledTimes(1);
 
@@ -113,15 +101,11 @@ describe('AccessibleButton', () => {
   });
 
   it('should have minimum touch target size', () => {
-    renderWithProvider(
-      <AccessibleButton>
-        Small
-      </AccessibleButton>
-    );
+    renderWithProvider(<AccessibleButton>Small</AccessibleButton>);
 
     const button = screen.getByRole('button');
     const styles = window.getComputedStyle(button);
-    
+
     // Note: In a real test environment, you'd check the computed styles
     // Here we're just ensuring the style prop is set correctly
     expect(button).toHaveStyle({ minHeight: '44px', minWidth: '44px' });
@@ -130,9 +114,7 @@ describe('AccessibleButton', () => {
   it('should support aria-describedby', () => {
     renderWithProvider(
       <div>
-        <AccessibleButton ariaDescribedBy="help-text">
-          Submit
-        </AccessibleButton>
+        <AccessibleButton ariaDescribedBy="help-text">Submit</AccessibleButton>
         <div id="help-text">This will submit the form</div>
       </div>
     );

@@ -52,10 +52,12 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
     selectedPermissions: new Set<number>(),
   });
 
-  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [modalOpened, { open: openModal, close: closeModal }] =
+    useDisclosure(false);
 
   const { data: roles = [], isLoading: rolesLoading } = useAllRoles();
-  const { data: permissions = [], isLoading: permissionsLoading } = useAllPermissions();
+  const { data: permissions = [], isLoading: permissionsLoading } =
+    useAllPermissions();
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const deleteRole = useDeleteRole();
@@ -106,7 +108,11 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
   };
 
   const handleDeleteRole = async (roleId: number) => {
-    if (window.confirm('Are you sure you want to delete this role? This action cannot be undone and may affect users with this role.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to delete this role? This action cannot be undone and may affect users with this role.'
+      )
+    ) {
       await deleteRole.mutateAsync(roleId);
     }
   };
@@ -121,7 +127,10 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
     setFormData(prev => ({ ...prev, selectedPermissions: newSelected }));
   };
 
-  const handleCategoryToggle = (categoryPermissions: Permission[], checked: boolean) => {
+  const handleCategoryToggle = (
+    categoryPermissions: Permission[],
+    checked: boolean
+  ) => {
     const newSelected = new Set(formData.selectedPermissions);
     categoryPermissions.forEach(permission => {
       if (checked) {
@@ -159,7 +168,8 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
     }
   };
 
-  const isFormValid = formData.name.trim().length > 0 && formData.selectedPermissions.size > 0;
+  const isFormValid =
+    formData.name.trim().length > 0 && formData.selectedPermissions.size > 0;
 
   return (
     <Stack gap="md">
@@ -173,10 +183,14 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
       <Card>
         <div style={{ position: 'relative' }}>
           <LoadingOverlay visible={isLoading} />
-          
+
           {roles.length === 0 ? (
-            <Alert icon={<IconInfoCircle size={16} />} title="No custom roles found">
-              Create your first custom role to get started with advanced permission management.
+            <Alert
+              icon={<IconInfoCircle size={16} />}
+              title="No custom roles found"
+            >
+              Create your first custom role to get started with advanced
+              permission management.
             </Alert>
           ) : (
             <Table striped highlightOnHover>
@@ -206,7 +220,11 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
                           {role.permissions?.length || 0} permissions
                         </Badge>
                         {role.permissions?.slice(0, 3).map(permission => (
-                          <Badge key={permission.id} variant="outline" size="xs">
+                          <Badge
+                            key={permission.id}
+                            variant="outline"
+                            size="xs"
+                          >
                             {permission.name.split(':').pop()}
                           </Badge>
                         ))}
@@ -273,18 +291,26 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
             placeholder="Enter role name"
             required
             value={formData.name}
-            onChange={(event) =>
-              setFormData(prev => ({ ...prev, name: event.currentTarget.value }))
+            onChange={event =>
+              setFormData(prev => ({
+                ...prev,
+                name: event.currentTarget.value,
+              }))
             }
-            error={formData.name.trim().length === 0 ? 'Role name is required' : null}
+            error={
+              formData.name.trim().length === 0 ? 'Role name is required' : null
+            }
           />
 
           <TextInput
             label="Description"
             placeholder="Enter role description (optional)"
             value={formData.description}
-            onChange={(event) =>
-              setFormData(prev => ({ ...prev, description: event.currentTarget.value }))
+            onChange={event =>
+              setFormData(prev => ({
+                ...prev,
+                description: event.currentTarget.value,
+              }))
             }
           />
 
@@ -292,67 +318,85 @@ export const CustomRoleCreation: React.FC<CustomRoleCreationProps> = ({
 
           <div>
             <Group justify="space-between" mb="md">
-              <Text fw={500}>Permissions ({formData.selectedPermissions.size} selected)</Text>
+              <Text fw={500}>
+                Permissions ({formData.selectedPermissions.size} selected)
+              </Text>
               <Text size="sm" c="dimmed">
                 Select permissions for this role
               </Text>
             </Group>
 
             <Accordion variant="contained">
-              {Object.entries(groupedPermissions).map(([category, categoryPermissions]) => {
-                const selectedInCategory = categoryPermissions.filter(p => 
-                  formData.selectedPermissions.has(p.id)
-                ).length;
-                const allSelected = selectedInCategory === categoryPermissions.length;
-                const someSelected = selectedInCategory > 0 && selectedInCategory < categoryPermissions.length;
+              {Object.entries(groupedPermissions).map(
+                ([category, categoryPermissions]) => {
+                  const selectedInCategory = categoryPermissions.filter(p =>
+                    formData.selectedPermissions.has(p.id)
+                  ).length;
+                  const allSelected =
+                    selectedInCategory === categoryPermissions.length;
+                  const someSelected =
+                    selectedInCategory > 0 &&
+                    selectedInCategory < categoryPermissions.length;
 
-                return (
-                  <Accordion.Item key={category} value={category}>
-                    <Accordion.Control>
-                      <Group justify="space-between" style={{ width: '100%' }}>
-                        <Group>
-                          <Checkbox
-                            checked={allSelected}
-                            indeterminate={someSelected}
-                            onChange={(event) =>
-                              handleCategoryToggle(categoryPermissions, event.currentTarget.checked)
-                            }
-                            onClick={(event) => event.stopPropagation()}
-                          />
-                          <Text fw={500}>{category}</Text>
-                        </Group>
-                        <Badge variant="light" size="sm">
-                          {selectedInCategory}/{categoryPermissions.length}
-                        </Badge>
-                      </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                      <Stack gap="xs">
-                        {categoryPermissions.map(permission => (
-                          <Group key={permission.id} gap="xs">
+                  return (
+                    <Accordion.Item key={category} value={category}>
+                      <Accordion.Control>
+                        <Group
+                          justify="space-between"
+                          style={{ width: '100%' }}
+                        >
+                          <Group>
                             <Checkbox
-                              checked={formData.selectedPermissions.has(permission.id)}
-                              onChange={(event) =>
-                                handlePermissionToggle(permission.id, event.currentTarget.checked)
+                              checked={allSelected}
+                              indeterminate={someSelected}
+                              onChange={event =>
+                                handleCategoryToggle(
+                                  categoryPermissions,
+                                  event.currentTarget.checked
+                                )
                               }
+                              onClick={event => event.stopPropagation()}
                             />
-                            <div style={{ flex: 1 }}>
-                              <Text size="sm" fw={500}>
-                                {permission.name.split(':').pop()}
-                              </Text>
-                              {permission.description && (
-                                <Text size="xs" c="dimmed">
-                                  {permission.description}
-                                </Text>
-                              )}
-                            </div>
+                            <Text fw={500}>{category}</Text>
                           </Group>
-                        ))}
-                      </Stack>
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                );
-              })}
+                          <Badge variant="light" size="sm">
+                            {selectedInCategory}/{categoryPermissions.length}
+                          </Badge>
+                        </Group>
+                      </Accordion.Control>
+                      <Accordion.Panel>
+                        <Stack gap="xs">
+                          {categoryPermissions.map(permission => (
+                            <Group key={permission.id} gap="xs">
+                              <Checkbox
+                                checked={formData.selectedPermissions.has(
+                                  permission.id
+                                )}
+                                onChange={event =>
+                                  handlePermissionToggle(
+                                    permission.id,
+                                    event.currentTarget.checked
+                                  )
+                                }
+                              />
+                              <div style={{ flex: 1 }}>
+                                <Text size="sm" fw={500}>
+                                  {permission.name.split(':').pop()}
+                                </Text>
+                                {permission.description && (
+                                  <Text size="xs" c="dimmed">
+                                    {permission.description}
+                                  </Text>
+                                )}
+                              </div>
+                            </Group>
+                          ))}
+                        </Stack>
+                      </Accordion.Panel>
+                    </Accordion.Item>
+                  );
+                }
+              )}
             </Accordion>
           </div>
 

@@ -41,7 +41,9 @@ class MockWebSocket {
   // Helper method to simulate receiving messages
   simulateMessage(data: any) {
     if (this.onmessage) {
-      this.onmessage(new MessageEvent('message', { data: JSON.stringify(data) }));
+      this.onmessage(
+        new MessageEvent('message', { data: JSON.stringify(data) })
+      );
     }
   }
 }
@@ -121,7 +123,7 @@ describe('WebSocket Optimization Performance', () => {
 
       // High priority message should be sent immediately
       expect(mockWebSocket.sentMessages.length).toBeGreaterThan(0);
-      
+
       const firstMessage = JSON.parse(mockWebSocket.sentMessages[0]);
       expect(firstMessage.type).toBe('high-priority');
     });
@@ -158,7 +160,7 @@ describe('WebSocket Optimization Performance', () => {
 
       const messagesSent = [];
       const originalSend = mockWebSocket.send.bind(mockWebSocket);
-      mockWebSocket.send = vi.fn((data) => {
+      mockWebSocket.send = vi.fn(data => {
         messagesSent.push(data);
         originalSend(data);
       });
@@ -182,7 +184,7 @@ describe('WebSocket Optimization Performance', () => {
 
       // Simulate connection failure
       const failingManager = new OptimizedWebSocketManager('ws://invalid-url');
-      
+
       try {
         await failingManager.connect();
       } catch (error) {
@@ -214,11 +216,11 @@ describe('WebSocket Optimization Performance', () => {
   describe('Memory Management', () => {
     it('should clean up resources properly', async () => {
       await manager.connect();
-      
+
       // Add listeners
       const listener1 = vi.fn();
       const listener2 = vi.fn();
-      
+
       manager.on('test', listener1);
       manager.on('test', listener2);
       manager.on('other', listener1);

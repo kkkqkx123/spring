@@ -7,14 +7,17 @@ import { LoadingSkeleton } from './LoadingSkeleton';
 interface LazyComponentWrapperProps {
   children: React.ReactNode;
   fallback?: React.ComponentType;
-  errorFallback?: React.ComponentType<{ error: Error; resetErrorBoundary: () => void }>;
+  errorFallback?: React.ComponentType<{
+    error: Error;
+    resetErrorBoundary: () => void;
+  }>;
   skeletonVariant?: 'page' | 'list' | 'form' | 'card' | 'table';
 }
 
-const DefaultErrorFallback: React.FC<{ error: Error; resetErrorBoundary: () => void }> = ({
-  error,
-  resetErrorBoundary,
-}) => (
+const DefaultErrorFallback: React.FC<{
+  error: Error;
+  resetErrorBoundary: () => void;
+}> = ({ error, resetErrorBoundary }) => (
   <Center h="50vh">
     <Stack align="center" gap="md">
       <Alert
@@ -23,7 +26,8 @@ const DefaultErrorFallback: React.FC<{ error: Error; resetErrorBoundary: () => v
         color="red"
         variant="light"
       >
-        {error.message || 'An unexpected error occurred while loading this component.'}
+        {error.message ||
+          'An unexpected error occurred while loading this component.'}
       </Alert>
       <Button
         leftSection={<IconRefresh size={16} />}
@@ -36,9 +40,9 @@ const DefaultErrorFallback: React.FC<{ error: Error; resetErrorBoundary: () => v
   </Center>
 );
 
-const DefaultLoadingFallback: React.FC<{ skeletonVariant?: string }> = ({ skeletonVariant }) => (
-  <LoadingSkeleton variant={skeletonVariant as any} />
-);
+const DefaultLoadingFallback: React.FC<{ skeletonVariant?: string }> = ({
+  skeletonVariant,
+}) => <LoadingSkeleton variant={skeletonVariant as any} />;
 
 export const LazyComponentWrapper: React.FC<LazyComponentWrapperProps> = ({
   children,
@@ -46,7 +50,9 @@ export const LazyComponentWrapper: React.FC<LazyComponentWrapperProps> = ({
   errorFallback: CustomErrorFallback,
   skeletonVariant = 'page',
 }) => {
-  const LoadingComponent = CustomFallback || (() => <DefaultLoadingFallback skeletonVariant={skeletonVariant} />);
+  const LoadingComponent =
+    CustomFallback ||
+    (() => <DefaultLoadingFallback skeletonVariant={skeletonVariant} />);
   const ErrorComponent = CustomErrorFallback || DefaultErrorFallback;
 
   return (
@@ -57,9 +63,7 @@ export const LazyComponentWrapper: React.FC<LazyComponentWrapperProps> = ({
         console.error('Lazy component error:', error, errorInfo);
       }}
     >
-      <Suspense fallback={<LoadingComponent />}>
-        {children}
-      </Suspense>
+      <Suspense fallback={<LoadingComponent />}>{children}</Suspense>
     </ErrorBoundary>
   );
 };

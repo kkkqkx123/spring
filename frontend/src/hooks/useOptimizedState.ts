@@ -57,7 +57,7 @@ export function useOptimizedMemo<T>(
 
   if (hasChanged) {
     const newValue = factory();
-    
+
     if (compare && valueRef.current !== undefined) {
       if (!compare(valueRef.current, newValue)) {
         valueRef.current = newValue;
@@ -83,17 +83,20 @@ export function useDebouncedState<T>(
   const [debouncedValue, setDebouncedValue] = React.useState(initialValue);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  const setValue = useCallback((value: T) => {
-    setImmediateValue(value);
-    
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    
-    timeoutRef.current = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-  }, [delay]);
+  const setValue = useCallback(
+    (value: T) => {
+      setImmediateValue(value);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+    },
+    [delay]
+  );
 
   useEffect(() => {
     return () => {
@@ -118,24 +121,30 @@ export function useThrottledState<T>(
   const pendingValueRef = useRef<T>(initialValue);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  const setThrottledValue = useCallback((newValue: T) => {
-    pendingValueRef.current = newValue;
-    const now = Date.now();
-    
-    if (now - lastUpdateRef.current >= delay) {
-      setValue(newValue);
-      lastUpdateRef.current = now;
-    } else {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+  const setThrottledValue = useCallback(
+    (newValue: T) => {
+      pendingValueRef.current = newValue;
+      const now = Date.now();
+
+      if (now - lastUpdateRef.current >= delay) {
+        setValue(newValue);
+        lastUpdateRef.current = now;
+      } else {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(
+          () => {
+            setValue(pendingValueRef.current);
+            lastUpdateRef.current = Date.now();
+          },
+          delay - (now - lastUpdateRef.current)
+        );
       }
-      
-      timeoutRef.current = setTimeout(() => {
-        setValue(pendingValueRef.current);
-        lastUpdateRef.current = Date.now();
-      }, delay - (now - lastUpdateRef.current));
-    }
-  }, [delay]);
+    },
+    [delay]
+  );
 
   useEffect(() => {
     return () => {
@@ -157,11 +166,11 @@ export function useBatchedUpdates() {
 
   const batchUpdate = useCallback((updateFn: () => void) => {
     updatesRef.current.push(updateFn);
-    
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     timeoutRef.current = setTimeout(() => {
       React.startTransition(() => {
         updatesRef.current.forEach(fn => fn());
@@ -186,7 +195,7 @@ export function useBatchedUpdates() {
  */
 export function useStableReference<T>(value: T): T {
   const ref = useRef<T>(value);
-  
+
   // Only update if the value has actually changed (deep comparison for objects)
   if (typeof value === 'object' && value !== null) {
     if (JSON.stringify(ref.current) !== JSON.stringify(value)) {
@@ -195,6 +204,6 @@ export function useStableReference<T>(value: T): T {
   } else if (ref.current !== value) {
     ref.current = value;
   }
-  
+
   return ref.current;
 }

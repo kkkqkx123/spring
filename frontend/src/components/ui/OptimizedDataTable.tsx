@@ -20,7 +20,11 @@ import {
   IconSortDescending,
 } from '@tabler/icons-react';
 import { DataTableProps, DataTableColumn } from '../../types';
-import { useDeepMemo, useDebouncedValue, useThrottledCallback } from '../../utils/memoization';
+import {
+  useDeepMemo,
+  useDebouncedValue,
+  useThrottledCallback,
+} from '../../utils/memoization';
 
 interface SortState {
   key: string | null;
@@ -36,48 +40,61 @@ const TableHeader = memo<{
   isAllSelected: boolean;
   isIndeterminate: boolean;
   onSelectAll: (checked: boolean) => void;
-}>(({ columns, sortState, onSort, hasRowSelection, isAllSelected, isIndeterminate, onSelectAll }) => {
-  const getSortIcon = useCallback((columnKey: string) => {
-    if (sortState.key !== columnKey) return null;
-    return sortState.direction === 'asc' ? (
-      <IconSortAscending size={14} />
-    ) : (
-      <IconSortDescending size={14} />
+}>(
+  ({
+    columns,
+    sortState,
+    onSort,
+    hasRowSelection,
+    isAllSelected,
+    isIndeterminate,
+    onSelectAll,
+  }) => {
+    const getSortIcon = useCallback(
+      (columnKey: string) => {
+        if (sortState.key !== columnKey) return null;
+        return sortState.direction === 'asc' ? (
+          <IconSortAscending size={14} />
+        ) : (
+          <IconSortDescending size={14} />
+        );
+      },
+      [sortState]
     );
-  }, [sortState]);
 
-  return (
-    <Table.Thead>
-      <Table.Tr>
-        {hasRowSelection && (
-          <Table.Th w={40}>
-            <Checkbox
-              checked={isAllSelected}
-              indeterminate={isIndeterminate}
-              onChange={event => onSelectAll(event.currentTarget.checked)}
-              aria-label="Select all rows"
-            />
-          </Table.Th>
-        )}
-        {columns.map(column => (
-          <Table.Th
-            key={String(column.key)}
-            style={{
-              cursor: column.sortable ? 'pointer' : 'default',
-              userSelect: 'none',
-            }}
-            onClick={() => column.sortable && onSort(String(column.key))}
-          >
-            <Group gap="xs" justify="space-between">
-              <Text fw={600}>{column.title}</Text>
-              {column.sortable && getSortIcon(String(column.key))}
-            </Group>
-          </Table.Th>
-        ))}
-      </Table.Tr>
-    </Table.Thead>
-  );
-});
+    return (
+      <Table.Thead>
+        <Table.Tr>
+          {hasRowSelection && (
+            <Table.Th w={40}>
+              <Checkbox
+                checked={isAllSelected}
+                indeterminate={isIndeterminate}
+                onChange={event => onSelectAll(event.currentTarget.checked)}
+                aria-label="Select all rows"
+              />
+            </Table.Th>
+          )}
+          {columns.map(column => (
+            <Table.Th
+              key={String(column.key)}
+              style={{
+                cursor: column.sortable ? 'pointer' : 'default',
+                userSelect: 'none',
+              }}
+              onClick={() => column.sortable && onSort(String(column.key))}
+            >
+              <Group gap="xs" justify="space-between">
+                <Text fw={600}>{column.title}</Text>
+                {column.sortable && getSortIcon(String(column.key))}
+              </Group>
+            </Table.Th>
+          ))}
+        </Table.Tr>
+      </Table.Thead>
+    );
+  }
+);
 
 TableHeader.displayName = 'TableHeader';
 
@@ -90,9 +107,12 @@ const TableRow = memo<{
   isSelected: boolean;
   onSelectRow: (index: number, checked: boolean) => void;
 }>(({ row, index, columns, hasRowSelection, isSelected, onSelectRow }) => {
-  const handleSelectChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    onSelectRow(index, event.currentTarget.checked);
-  }, [index, onSelectRow]);
+  const handleSelectChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onSelectRow(index, event.currentTarget.checked);
+    },
+    [index, onSelectRow]
+  );
 
   return (
     <Table.Tr key={index}>
@@ -125,42 +145,56 @@ const SearchControls = memo<{
   pageSize: number;
   onPageSizeChange: (size: number) => void;
   hasPagination: boolean;
-}>(({ searchTerm, onSearchChange, pageSize, onPageSizeChange, hasPagination }) => {
-  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(event.currentTarget.value);
-  }, [onSearchChange]);
+}>(
+  ({
+    searchTerm,
+    onSearchChange,
+    pageSize,
+    onPageSizeChange,
+    hasPagination,
+  }) => {
+    const handleSearchChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        onSearchChange(event.currentTarget.value);
+      },
+      [onSearchChange]
+    );
 
-  const handlePageSizeChange = useCallback((value: string | null) => {
-    const newSize = parseInt(value || '10');
-    onPageSizeChange(newSize);
-  }, [onPageSizeChange]);
+    const handlePageSizeChange = useCallback(
+      (value: string | null) => {
+        const newSize = parseInt(value || '10');
+        onPageSizeChange(newSize);
+      },
+      [onPageSizeChange]
+    );
 
-  return (
-    <Group justify="space-between">
-      <TextInput
-        placeholder="Search..."
-        leftSection={<IconSearch size={16} />}
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ flex: 1, maxWidth: 300 }}
-      />
-
-      {hasPagination && (
-        <Select
-          value={pageSize.toString()}
-          onChange={handlePageSizeChange}
-          data={[
-            { value: '10', label: '10 per page' },
-            { value: '25', label: '25 per page' },
-            { value: '50', label: '50 per page' },
-            { value: '100', label: '100 per page' },
-          ]}
-          w={150}
+    return (
+      <Group justify="space-between">
+        <TextInput
+          placeholder="Search..."
+          leftSection={<IconSearch size={16} />}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{ flex: 1, maxWidth: 300 }}
         />
-      )}
-    </Group>
-  );
-});
+
+        {hasPagination && (
+          <Select
+            value={pageSize.toString()}
+            onChange={handlePageSizeChange}
+            data={[
+              { value: '10', label: '10 per page' },
+              { value: '25', label: '25 per page' },
+              { value: '50', label: '50 per page' },
+              { value: '100', label: '100 per page' },
+            ]}
+            w={150}
+          />
+        )}
+      </Group>
+    );
+  }
+);
 
 SearchControls.displayName = 'SearchControls';
 
@@ -226,42 +260,53 @@ export function OptimizedDataTable<T extends Record<string, any>>({
     });
   }, 100);
 
-  const handleSelectAll = useCallback((checked: boolean) => {
-    if (!rowSelection) return;
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      if (!rowSelection) return;
 
-    if (checked) {
-      const allKeys = sortedData.map((_, index) => index);
-      rowSelection.onChange(allKeys, sortedData);
-    } else {
-      rowSelection.onChange([], []);
-    }
-  }, [rowSelection, sortedData]);
+      if (checked) {
+        const allKeys = sortedData.map((_, index) => index);
+        rowSelection.onChange(allKeys, sortedData);
+      } else {
+        rowSelection.onChange([], []);
+      }
+    },
+    [rowSelection, sortedData]
+  );
 
-  const handleSelectRow = useCallback((index: number, checked: boolean) => {
-    if (!rowSelection) return;
+  const handleSelectRow = useCallback(
+    (index: number, checked: boolean) => {
+      if (!rowSelection) return;
 
-    const newSelectedKeys = checked
-      ? [...rowSelection.selectedRowKeys, index]
-      : rowSelection.selectedRowKeys.filter(key => key !== index);
+      const newSelectedKeys = checked
+        ? [...rowSelection.selectedRowKeys, index]
+        : rowSelection.selectedRowKeys.filter(key => key !== index);
 
-    const newSelectedRows = newSelectedKeys.map(
-      key => sortedData[key as number]
-    );
-    rowSelection.onChange(newSelectedKeys, newSelectedRows);
-  }, [rowSelection, sortedData]);
+      const newSelectedRows = newSelectedKeys.map(
+        key => sortedData[key as number]
+      );
+      rowSelection.onChange(newSelectedKeys, newSelectedRows);
+    },
+    [rowSelection, sortedData]
+  );
 
-  const handlePageSizeChange = useCallback((newSize: number) => {
-    setPageSize(newSize);
-    pagination?.onChange(1, newSize);
-  }, [pagination]);
+  const handlePageSizeChange = useCallback(
+    (newSize: number) => {
+      setPageSize(newSize);
+      pagination?.onChange(1, newSize);
+    },
+    [pagination]
+  );
 
   // Memoized selection state
   const selectionState = useMemo(() => {
     if (!rowSelection) return { isAllSelected: false, isIndeterminate: false };
 
-    const isAllSelected = sortedData.length > 0 && 
+    const isAllSelected =
+      sortedData.length > 0 &&
       rowSelection.selectedRowKeys.length === sortedData.length;
-    const isIndeterminate = rowSelection.selectedRowKeys.length > 0 && 
+    const isIndeterminate =
+      rowSelection.selectedRowKeys.length > 0 &&
       rowSelection.selectedRowKeys.length < sortedData.length;
 
     return { isAllSelected, isIndeterminate };
@@ -323,7 +368,9 @@ export function OptimizedDataTable<T extends Record<string, any>>({
                     index={index}
                     columns={columns}
                     hasRowSelection={!!rowSelection}
-                    isSelected={rowSelection?.selectedRowKeys.includes(index) || false}
+                    isSelected={
+                      rowSelection?.selectedRowKeys.includes(index) || false
+                    }
                     onSelectRow={handleSelectRow}
                   />
                 ))

@@ -1,5 +1,8 @@
 import React from 'react';
-import { useAccessControl, type AccessControlOptions } from '../../hooks/useAccessControl';
+import {
+  useAccessControl,
+  type AccessControlOptions,
+} from '../../hooks/useAccessControl';
 
 export interface CrudGuardProps {
   children: React.ReactNode;
@@ -19,7 +22,8 @@ export const CrudGuard: React.FC<CrudGuardProps> = ({
   fallback = null,
   options = {},
 }) => {
-  const { canCreate, canRead, canUpdate, canDelete, canAccessResource } = useAccessControl();
+  const { canCreate, canRead, canUpdate, canDelete, canAccessResource } =
+    useAccessControl();
 
   // Check permission based on action
   const hasPermission = (() => {

@@ -29,7 +29,7 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
             <Skeleton height={16} width="100%" />
             <Skeleton height={16} width="80%" />
             <Skeleton height={16} width="90%" />
-            
+
             <Group gap="md" mt="md">
               <Skeleton height={20} width={80} />
               <Skeleton height={20} width={100} />
@@ -67,14 +67,14 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
     <Card padding="lg">
       <Stack gap="md">
         <Skeleton height={24} width={200} />
-        
+
         {Array.from({ length: count || 5 }).map((_, index) => (
           <Stack key={index} gap={4}>
             <Skeleton height={16} width={100} />
             <Skeleton height={36} width="100%" />
           </Stack>
         ))}
-        
+
         <Group justify="flex-end" gap="sm" mt="lg">
           <Skeleton height={36} width={80} />
           <Skeleton height={36} width={100} />
@@ -112,7 +112,7 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
         </Group>
         <Skeleton height={32} width={32} />
       </Group>
-      
+
       {/* Table rows */}
       <Stack gap="sm">
         {Array.from({ length: count || 10 }).map((_, index) => (
@@ -130,7 +130,7 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
           </Group>
         ))}
       </Stack>
-      
+
       {/* Pagination */}
       <Group justify="center" mt="lg">
         <Group gap="xs">

@@ -23,9 +23,7 @@ const mockRole: Role = {
 
 const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
-    <MantineProvider>
-      {children}
-    </MantineProvider>
+    <MantineProvider>{children}</MantineProvider>
   );
 };
 
@@ -50,7 +48,9 @@ describe('RoleForm', () => {
     expect(screen.getByLabelText('Role Name')).toBeInTheDocument();
     expect(screen.getByLabelText('Description')).toBeInTheDocument();
     expect(screen.getByText('Permissions')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create role/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create role/i })
+    ).toBeInTheDocument();
   });
 
   it('should render role form for editing existing role', () => {
@@ -65,7 +65,9 @@ describe('RoleForm', () => {
     );
 
     expect(screen.getByDisplayValue('Test Role')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /update role/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /update role/i })
+    ).toBeInTheDocument();
   });
 
   it('should pre-populate form with existing role data', () => {
@@ -124,7 +126,9 @@ describe('RoleForm', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Role name must be at least 2 characters')).toBeInTheDocument();
+      expect(
+        screen.getByText('Role name must be at least 2 characters')
+      ).toBeInTheDocument();
     });
   });
 
@@ -146,7 +150,9 @@ describe('RoleForm', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Role name must be less than 50 characters')).toBeInTheDocument();
+      expect(
+        screen.getByText('Role name must be less than 50 characters')
+      ).toBeInTheDocument();
     });
   });
 
@@ -171,7 +177,9 @@ describe('RoleForm', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Description must be less than 255 characters')).toBeInTheDocument();
+      expect(
+        screen.getByText('Description must be less than 255 characters')
+      ).toBeInTheDocument();
     });
   });
 
@@ -189,7 +197,9 @@ describe('RoleForm', () => {
     fireEvent.change(nameInput, { target: { value: 'New Role' } });
 
     const descriptionInput = screen.getByLabelText('Description');
-    fireEvent.change(descriptionInput, { target: { value: 'Role description' } });
+    fireEvent.change(descriptionInput, {
+      target: { value: 'Role description' },
+    });
 
     const submitButton = screen.getByText('Create Role');
     fireEvent.click(submitButton);
@@ -340,7 +350,9 @@ describe('RoleForm', () => {
     fireEvent.change(nameInput, { target: { value: '  Test Role  ' } });
 
     const descriptionInput = screen.getByLabelText('Description');
-    fireEvent.change(descriptionInput, { target: { value: '  Test Description  ' } });
+    fireEvent.change(descriptionInput, {
+      target: { value: '  Test Description  ' },
+    });
 
     const submitButton = screen.getByText('Create Role');
     fireEvent.click(submitButton);

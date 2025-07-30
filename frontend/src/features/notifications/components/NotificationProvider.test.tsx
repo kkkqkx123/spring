@@ -2,7 +2,11 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { vi, beforeEach, afterEach } from 'vitest';
-import { NotificationProvider, useNotificationContext, ConnectionStatus } from './NotificationProvider';
+import {
+  NotificationProvider,
+  useNotificationContext,
+  ConnectionStatus,
+} from './NotificationProvider';
 import { useRealTimeNotifications } from '../hooks/useRealTimeNotifications';
 import { webSocketService } from '../../../services/websocket';
 import { useNotificationStore } from '../../../stores/notificationStore';
@@ -57,9 +61,7 @@ const TestComponent = () => {
 const renderWithProvider = (component: React.ReactElement, props = {}) => {
   return render(
     <MantineProvider>
-      <NotificationProvider {...props}>
-        {component}
-      </NotificationProvider>
+      <NotificationProvider {...props}>{component}</NotificationProvider>
     </MantineProvider>
   );
 };
@@ -68,12 +70,15 @@ describe('NotificationProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useRealTimeNotifications as any).mockReturnValue(mockRealTimeNotifications);
+    (useRealTimeNotifications as any).mockReturnValue(
+      mockRealTimeNotifications
+    );
     (useNotificationStore as any).mockReturnValue(mockNotificationStore);
     (webSocketService as any).connect = mockWebSocketService.connect;
     (webSocketService as any).disconnect = mockWebSocketService.disconnect;
     (webSocketService as any).subscribe = mockWebSocketService.subscribe;
-    (notificationApi as any).getNotifications = mockNotificationApi.getNotifications;
+    (notificationApi as any).getNotifications =
+      mockNotificationApi.getNotifications;
     (notifications as any).show = mockNotifications.show;
 
     // Mock successful API response
@@ -94,7 +99,9 @@ describe('NotificationProvider', () => {
   it('provides notification context to children', () => {
     renderWithProvider(<TestComponent />);
 
-    expect(screen.getByTestId('connection-state')).toHaveTextContent('connected');
+    expect(screen.getByTestId('connection-state')).toHaveTextContent(
+      'connected'
+    );
     expect(screen.getByTestId('is-connected')).toHaveTextContent('true');
   });
 
@@ -108,7 +115,9 @@ describe('NotificationProvider', () => {
           <TestComponent />
         </MantineProvider>
       );
-    }).toThrow('useNotificationContext must be used within a NotificationProvider');
+    }).toThrow(
+      'useNotificationContext must be used within a NotificationProvider'
+    );
 
     consoleSpy.mockRestore();
   });
@@ -134,7 +143,15 @@ describe('NotificationProvider', () => {
 
   it('loads initial notifications on connection', async () => {
     const mockNotifications = [
-      { id: 1, title: 'Test', message: 'Test message', type: 'info', userId: 1, read: false, createdAt: new Date().toISOString() },
+      {
+        id: 1,
+        title: 'Test',
+        message: 'Test message',
+        type: 'info',
+        userId: 1,
+        read: false,
+        createdAt: new Date().toISOString(),
+      },
     ];
 
     mockNotificationApi.getNotifications.mockResolvedValue({
@@ -145,12 +162,16 @@ describe('NotificationProvider', () => {
     renderWithProvider(<TestComponent />);
 
     await waitFor(() => {
-      expect(mockNotificationStore.setNotifications).toHaveBeenCalledWith(mockNotifications);
+      expect(mockNotificationStore.setNotifications).toHaveBeenCalledWith(
+        mockNotifications
+      );
     });
   });
 
   it('handles connection errors gracefully', async () => {
-    mockWebSocketService.connect.mockRejectedValue(new Error('Connection failed'));
+    mockWebSocketService.connect.mockRejectedValue(
+      new Error('Connection failed')
+    );
 
     renderWithProvider(<TestComponent />, { showConnectionStatus: true });
 
@@ -178,10 +199,22 @@ describe('NotificationProvider', () => {
   it('subscribes to WebSocket events when showConnectionStatus is true', () => {
     renderWithProvider(<TestComponent />, { showConnectionStatus: true });
 
-    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith('connect', expect.any(Function));
-    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith('disconnect', expect.any(Function));
-    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith('reconnect', expect.any(Function));
-    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith('reconnect_failed', expect.any(Function));
+    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith(
+      'connect',
+      expect.any(Function)
+    );
+    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith(
+      'disconnect',
+      expect.any(Function)
+    );
+    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith(
+      'reconnect',
+      expect.any(Function)
+    );
+    expect(mockWebSocketService.subscribe).toHaveBeenCalledWith(
+      'reconnect_failed',
+      expect.any(Function)
+    );
   });
 
   it('does not subscribe to connection events when showConnectionStatus is false', () => {
@@ -206,12 +239,15 @@ describe('NotificationProvider', () => {
 describe('ConnectionStatus', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useRealTimeNotifications as any).mockReturnValue(mockRealTimeNotifications);
+    (useRealTimeNotifications as any).mockReturnValue(
+      mockRealTimeNotifications
+    );
     (useNotificationStore as any).mockReturnValue(mockNotificationStore);
     (webSocketService as any).connect = mockWebSocketService.connect;
     (webSocketService as any).disconnect = mockWebSocketService.disconnect;
     (webSocketService as any).subscribe = mockWebSocketService.subscribe;
-    (notificationApi as any).getNotifications = mockNotificationApi.getNotifications;
+    (notificationApi as any).getNotifications =
+      mockNotificationApi.getNotifications;
 
     mockNotificationApi.getNotifications.mockResolvedValue({ content: [] });
     mockWebSocketService.connect.mockResolvedValue(undefined);
@@ -248,7 +284,9 @@ describe('ConnectionStatus', () => {
   });
 
   it('applies custom className', () => {
-    const { container } = renderWithProvider(<ConnectionStatus className="custom-class" />);
+    const { container } = renderWithProvider(
+      <ConnectionStatus className="custom-class" />
+    );
 
     expect(container.querySelector('.custom-class')).toBeInTheDocument();
   });

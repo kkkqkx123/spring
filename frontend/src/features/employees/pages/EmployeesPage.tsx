@@ -72,8 +72,9 @@ const EmployeesPage: React.FC = () => {
   const canDelete =
     user?.roles.some(role => ['ADMIN'].includes(role.name)) ?? false;
   const canExport =
-    user?.roles.some(role => ['ADMIN', 'HR_MANAGER', 'HR_STAFF'].includes(role.name)) ??
-    false;
+    user?.roles.some(role =>
+      ['ADMIN', 'HR_MANAGER', 'HR_STAFF'].includes(role.name)
+    ) ?? false;
 
   const handleSearch = (criteria: any) => {
     setSearchCriteria(criteria);
@@ -109,7 +110,8 @@ const EmployeesPage: React.FC = () => {
   const handleExport = async () => {
     try {
       await exportEmployees.mutateAsync({
-        employeeIds: selectedEmployees.length > 0 ? selectedEmployees : undefined,
+        employeeIds:
+          selectedEmployees.length > 0 ? selectedEmployees : undefined,
         format: 'xlsx',
       });
       notifications.show({
@@ -155,9 +157,7 @@ const EmployeesPage: React.FC = () => {
             <Text size="xl" fw={700} mb="xs">
               Employees
             </Text>
-            <Text c="dimmed">
-              Manage your organization's employees
-            </Text>
+            <Text c="dimmed">Manage your organization's employees</Text>
           </div>
 
           <Group gap="sm">
@@ -183,10 +183,7 @@ const EmployeesPage: React.FC = () => {
             {selectedEmployees.length > 0 && (
               <Menu shadow="md" width={200}>
                 <Menu.Target>
-                  <Button
-                    leftSection={<IconDots size={16} />}
-                    variant="light"
-                  >
+                  <Button leftSection={<IconDots size={16} />} variant="light">
                     Actions ({selectedEmployees.length})
                   </Button>
                 </Menu.Target>
@@ -258,7 +255,7 @@ const EmployeesPage: React.FC = () => {
             viewMode={viewMode}
             selectedIds={selectedEmployees}
             onSelectionChange={handleSelectionChange}
-            onEmployeeClick={(employee) => navigate(`/employees/${employee.id}`)}
+            onEmployeeClick={employee => navigate(`/employees/${employee.id}`)}
             loading={isLoading}
           />
         </Card>

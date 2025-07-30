@@ -1,5 +1,8 @@
 import React from 'react';
-import { useAccessControl, type AccessControlOptions } from '../../hooks/useAccessControl';
+import {
+  useAccessControl,
+  type AccessControlOptions,
+} from '../../hooks/useAccessControl';
 
 export interface RoleGuardProps {
   children: React.ReactNode;
@@ -24,10 +27,7 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
   const { hasRole, hasAnyRole, hasAllRoles } = useAccessControl();
 
   // Combine single and array requirements
-  const allRoles = [
-    ...(role ? [role] : []),
-    ...roles,
-  ];
+  const allRoles = [...(role ? [role] : []), ...roles];
 
   // Check roles
   const hasRequiredRoles = (() => {

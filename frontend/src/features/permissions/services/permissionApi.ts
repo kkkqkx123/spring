@@ -1,5 +1,11 @@
 import { apiClient } from '../../../services/api';
-import type { Role, Permission, User, PaginatedResponse, Pageable } from '../../../types';
+import type {
+  Role,
+  Permission,
+  User,
+  PaginatedResponse,
+  Pageable,
+} from '../../../types';
 
 export interface RoleCreateRequest {
   name: string;
@@ -29,13 +35,13 @@ export interface PermissionImpactAnalysis {
 export const permissionApi = {
   // Role management
   getRoles: (params?: Pageable) =>
-    apiClient.get<PaginatedResponse<Role>>('/api/permissions/roles', { params }),
+    apiClient.get<PaginatedResponse<Role>>('/api/permissions/roles', {
+      params,
+    }),
 
-  getAllRoles: () =>
-    apiClient.get<Role[]>('/api/permissions/roles/all'),
+  getAllRoles: () => apiClient.get<Role[]>('/api/permissions/roles/all'),
 
-  getRole: (id: number) =>
-    apiClient.get<Role>(`/api/permissions/roles/${id}`),
+  getRole: (id: number) => apiClient.get<Role>(`/api/permissions/roles/${id}`),
 
   createRole: (role: RoleCreateRequest) =>
     apiClient.post<Role>('/api/permissions/roles', role),
@@ -43,12 +49,10 @@ export const permissionApi = {
   updateRole: (role: RoleUpdateRequest) =>
     apiClient.put<Role>(`/api/permissions/roles/${role.id}`, role),
 
-  deleteRole: (id: number) =>
-    apiClient.delete(`/api/permissions/roles/${id}`),
+  deleteRole: (id: number) => apiClient.delete(`/api/permissions/roles/${id}`),
 
   // Permission management
-  getAllPermissions: () =>
-    apiClient.get<Permission[]>('/api/permissions'),
+  getAllPermissions: () => apiClient.get<Permission[]>('/api/permissions'),
 
   getPermission: (id: number) =>
     apiClient.get<Permission>(`/api/permissions/${id}`),
@@ -81,7 +85,9 @@ export const permissionApi = {
 
   // Users with roles
   getUsersWithRoles: (params?: Pageable) =>
-    apiClient.get<PaginatedResponse<User>>('/api/permissions/users', { params }),
+    apiClient.get<PaginatedResponse<User>>('/api/permissions/users', {
+      params,
+    }),
 
   // Bulk operations
   bulkAssignRoles: (userIds: number[], roleIds: number[]) =>

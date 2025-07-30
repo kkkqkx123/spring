@@ -2,11 +2,11 @@ export { PermissionGuard } from './PermissionGuard';
 export { RoleGuard } from './RoleGuard';
 export { CrudGuard } from './CrudGuard';
 export { AdminGuard } from './AdminGuard';
-export { 
-  withPermission, 
-  withAdminPermission, 
-  withManagerPermission, 
-  withCrudPermission 
+export {
+  withPermission,
+  withAdminPermission,
+  withManagerPermission,
+  withCrudPermission,
 } from './withPermission';
 
 export type { PermissionGuardProps } from './PermissionGuard';

@@ -64,7 +64,9 @@ const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingSecurity, setIsEditingSecurity] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile');
+  const [activeTab, setActiveTab] = useState<
+    'profile' | 'security' | 'preferences'
+  >('profile');
 
   const profileForm = useForm<ProfileFormData>({
     initialValues: {
@@ -75,9 +77,11 @@ const ProfilePage: React.FC = () => {
       bio: user?.bio || '',
     },
     validate: {
-      firstName: (value) => (value.length < 2 ? 'First name must be at least 2 characters' : null),
-      lastName: (value) => (value.length < 2 ? 'Last name must be at least 2 characters' : null),
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      firstName: value =>
+        value.length < 2 ? 'First name must be at least 2 characters' : null,
+      lastName: value =>
+        value.length < 2 ? 'Last name must be at least 2 characters' : null,
+      email: value => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
     },
   });
 
@@ -88,8 +92,10 @@ const ProfilePage: React.FC = () => {
       confirmPassword: '',
     },
     validate: {
-      currentPassword: (value) => (value.length < 1 ? 'Current password is required' : null),
-      newPassword: (value) => (value.length < 8 ? 'Password must be at least 8 characters' : null),
+      currentPassword: value =>
+        value.length < 1 ? 'Current password is required' : null,
+      newPassword: value =>
+        value.length < 8 ? 'Password must be at least 8 characters' : null,
       confirmPassword: (value, values) =>
         value !== values.newPassword ? 'Passwords do not match' : null,
     },
@@ -275,7 +281,9 @@ const ProfilePage: React.FC = () => {
               Joined:
             </Text>
             <Text size="sm">
-              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString()
+                : 'Unknown'}
             </Text>
           </Group>
           <Group gap="md">
@@ -284,7 +292,7 @@ const ProfilePage: React.FC = () => {
               Roles:
             </Text>
             <Group gap="xs">
-              {user?.roles?.map((role) => (
+              {user?.roles?.map(role => (
                 <Badge key={role.id} variant="light" size="sm">
                   {role.name}
                 </Badge>
@@ -360,11 +368,11 @@ const ProfilePage: React.FC = () => {
           <Alert color="blue" variant="light">
             <Text size="sm">
               Your password was last updated on{' '}
-              {new Date().toLocaleDateString()}. For security reasons, we recommend
-              changing your password regularly.
+              {new Date().toLocaleDateString()}. For security reasons, we
+              recommend changing your password regularly.
             </Text>
           </Alert>
-          
+
           <Stack gap="sm">
             <Text size="sm" fw={500}>
               Password Requirements:
@@ -449,17 +457,23 @@ const ProfilePage: React.FC = () => {
               <Switch
                 label="Email Notifications"
                 description="Receive notifications via email"
-                {...preferencesForm.getInputProps('emailNotifications', { type: 'checkbox' })}
+                {...preferencesForm.getInputProps('emailNotifications', {
+                  type: 'checkbox',
+                })}
               />
               <Switch
                 label="Push Notifications"
                 description="Receive browser push notifications"
-                {...preferencesForm.getInputProps('pushNotifications', { type: 'checkbox' })}
+                {...preferencesForm.getInputProps('pushNotifications', {
+                  type: 'checkbox',
+                })}
               />
               <Switch
                 label="Chat Notifications"
                 description="Get notified about new chat messages"
-                {...preferencesForm.getInputProps('chatNotifications', { type: 'checkbox' })}
+                {...preferencesForm.getInputProps('chatNotifications', {
+                  type: 'checkbox',
+                })}
               />
             </Stack>
           </div>
@@ -476,9 +490,7 @@ const ProfilePage: React.FC = () => {
           <Text size="xl" fw={700} mb="xs">
             Profile Settings
           </Text>
-          <Text c="dimmed">
-            Manage your account settings and preferences.
-          </Text>
+          <Text c="dimmed">Manage your account settings and preferences.</Text>
         </div>
 
         {/* Tab Navigation */}

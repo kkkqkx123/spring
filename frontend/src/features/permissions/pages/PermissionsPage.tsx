@@ -23,7 +23,11 @@ import {
 import { RolePermissionMatrix } from '../components/RolePermissionMatrix';
 import { UserRoleAssignment } from '../components/UserRoleAssignment';
 import { RoleForm } from '../components/RoleForm';
-import { useRoles, usePermissions, useCreateRole } from '../hooks/usePermissions';
+import {
+  useRoles,
+  usePermissions,
+  useCreateRole,
+} from '../hooks/usePermissions';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
 
@@ -120,9 +124,7 @@ const PermissionsPage: React.FC = () => {
             <Text size="xl" fw={700} mb="xs">
               Permissions & Roles
             </Text>
-            <Text c="dimmed">
-              Manage user roles and system permissions
-            </Text>
+            <Text c="dimmed">Manage user roles and system permissions</Text>
           </div>
 
           <Button
@@ -149,7 +151,7 @@ const PermissionsPage: React.FC = () => {
             </Tabs.List>
 
             <Tabs.Panel value="matrix" pt="lg">
-              <RolePermissionMatrix 
+              <RolePermissionMatrix
                 roles={roles || []}
                 permissions={permissions || []}
                 onUpdate={refetchRoles}
@@ -157,10 +159,7 @@ const PermissionsPage: React.FC = () => {
             </Tabs.Panel>
 
             <Tabs.Panel value="users" pt="lg">
-              <UserRoleAssignment 
-                roles={roles || []}
-                onUpdate={refetchRoles}
-              />
+              <UserRoleAssignment roles={roles || []} onUpdate={refetchRoles} />
             </Tabs.Panel>
 
             <Tabs.Panel value="roles" pt="lg">
@@ -169,7 +168,8 @@ const PermissionsPage: React.FC = () => {
                   Role Management features will be implemented here
                 </Text>
                 <Text size="sm" c="dimmed">
-                  This section will include role creation, editing, and deletion functionality.
+                  This section will include role creation, editing, and deletion
+                  functionality.
                 </Text>
               </Stack>
             </Tabs.Panel>

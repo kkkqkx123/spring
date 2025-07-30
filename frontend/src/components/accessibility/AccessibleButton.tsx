@@ -57,7 +57,9 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
         minHeight: '44px',
         minWidth: '44px',
         // Respect reduced motion preference
-        transition: prefersReducedMotion ? 'none' : buttonProps.style?.transition,
+        transition: prefersReducedMotion
+          ? 'none'
+          : buttonProps.style?.transition,
       }}
       styles={{
         ...buttonProps.styles,

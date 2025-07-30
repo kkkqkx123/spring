@@ -7,7 +7,9 @@ import { DataTableColumn } from '../../types';
 
 // Mock the responsive utilities
 vi.mock('../../utils/responsive', () => ({
-  useResponsiveValue: vi.fn((values) => values.md || values.sm || values.xs || Object.values(values)[0]),
+  useResponsiveValue: vi.fn(
+    values => values.md || values.sm || values.xs || Object.values(values)[0]
+  ),
   useTouchGestures: vi.fn(() => ({
     onTouchStart: vi.fn(),
     onTouchEnd: vi.fn(),
@@ -72,7 +74,7 @@ const mockColumns: DataTableColumn<TestData>[] = [
     key: 'status',
     title: 'Status',
     sortable: true,
-    render: (value) => (
+    render: value => (
       <span style={{ color: value === 'active' ? 'green' : 'red' }}>
         {value}
       </span>
@@ -88,11 +90,7 @@ const mockColumns: DataTableColumn<TestData>[] = [
 ];
 
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <MantineProvider>
-      {component}
-    </MantineProvider>
-  );
+  return render(<MantineProvider>{component}</MantineProvider>);
 };
 
 describe('ResponsiveDataTable', () => {
@@ -102,10 +100,7 @@ describe('ResponsiveDataTable', () => {
 
   it('should render table with data', () => {
     renderWithProvider(
-      <ResponsiveDataTable
-        data={mockData}
-        columns={mockColumns}
-      />
+      <ResponsiveDataTable data={mockData} columns={mockColumns} />
     );
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -115,33 +110,21 @@ describe('ResponsiveDataTable', () => {
 
   it('should render loading state', () => {
     renderWithProvider(
-      <ResponsiveDataTable
-        data={[]}
-        columns={mockColumns}
-        loading={true}
-      />
+      <ResponsiveDataTable data={[]} columns={mockColumns} loading={true} />
     );
 
     expect(screen.getByText('Loading data...')).toBeInTheDocument();
   });
 
   it('should render empty state when no data', () => {
-    renderWithProvider(
-      <ResponsiveDataTable
-        data={[]}
-        columns={mockColumns}
-      />
-    );
+    renderWithProvider(<ResponsiveDataTable data={[]} columns={mockColumns} />);
 
     expect(screen.getByText('No data available')).toBeInTheDocument();
   });
 
   it('should handle search functionality', async () => {
     renderWithProvider(
-      <ResponsiveDataTable
-        data={mockData}
-        columns={mockColumns}
-      />
+      <ResponsiveDataTable data={mockData} columns={mockColumns} />
     );
 
     const searchInput = screen.getByPlaceholderText('Search...');
@@ -155,10 +138,7 @@ describe('ResponsiveDataTable', () => {
 
   it('should handle sorting', () => {
     renderWithProvider(
-      <ResponsiveDataTable
-        data={mockData}
-        columns={mockColumns}
-      />
+      <ResponsiveDataTable data={mockData} columns={mockColumns} />
     );
 
     const nameHeader = screen.getByText('Name');
@@ -225,7 +205,9 @@ describe('ResponsiveDataTable', () => {
       />
     );
 
-    expect(screen.getByText('Showing 1 to 3 of 100 entries')).toBeInTheDocument();
+    expect(
+      screen.getByText('Showing 1 to 3 of 100 entries')
+    ).toBeInTheDocument();
   });
 
   it('should render custom mobile card renderer', () => {
@@ -233,9 +215,7 @@ describe('ResponsiveDataTable', () => {
     useMediaQuery.mockReturnValue(true); // Mock mobile
 
     const customRenderer = (item: TestData) => (
-      <div data-testid={`custom-card-${item.id}`}>
-        Custom: {item.name}
-      </div>
+      <div data-testid={`custom-card-${item.id}`}>Custom: {item.name}</div>
     );
 
     renderWithProvider(
@@ -255,10 +235,7 @@ describe('ResponsiveDataTable', () => {
     useMediaQuery.mockReturnValue(true); // Mock mobile
 
     renderWithProvider(
-      <ResponsiveDataTable
-        data={mockData}
-        columns={mockColumns}
-      />
+      <ResponsiveDataTable data={mockData} columns={mockColumns} />
     );
 
     // Should render cards instead of table
@@ -271,19 +248,17 @@ describe('ResponsiveDataTable', () => {
     useMediaQuery.mockReturnValue(false); // Mock desktop
 
     renderWithProvider(
-      <ResponsiveDataTable
-        data={mockData}
-        columns={mockColumns}
-      />
+      <ResponsiveDataTable data={mockData} columns={mockColumns} />
     );
 
     // Should have view mode toggle buttons
     const toggleButtons = screen.getAllByRole('button');
-    const viewToggleButtons = toggleButtons.filter(button => 
-      button.getAttribute('aria-label') === null && 
-      button.querySelector('svg')
+    const viewToggleButtons = toggleButtons.filter(
+      button =>
+        button.getAttribute('aria-label') === null &&
+        button.querySelector('svg')
     );
-    
+
     expect(viewToggleButtons.length).toBeGreaterThan(0);
   });
 
@@ -305,7 +280,7 @@ describe('ResponsiveDataTable', () => {
 
     const pageSizeSelect = screen.getByDisplayValue('10 per page');
     fireEvent.click(pageSizeSelect);
-    
+
     // This would open the dropdown, but we can't easily test the selection
     // in this test environment without more complex mocking
     expect(pageSizeSelect).toBeInTheDocument();
@@ -313,10 +288,7 @@ describe('ResponsiveDataTable', () => {
 
   it('should render column content correctly', () => {
     renderWithProvider(
-      <ResponsiveDataTable
-        data={mockData}
-        columns={mockColumns}
-      />
+      <ResponsiveDataTable data={mockData} columns={mockColumns} />
     );
 
     // Check if custom render function works

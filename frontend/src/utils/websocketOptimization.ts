@@ -103,7 +103,10 @@ export function useMessageBatcher<T>(
 
 // Throttled event emitter
 export class ThrottledEventEmitter {
-  private events: Map<string, { callback: Function; lastCall: number; delay: number }> = new Map();
+  private events: Map<
+    string,
+    { callback: Function; lastCall: number; delay: number }
+  > = new Map();
 
   on(event: string, callback: Function, delay: number = 100): void {
     this.events.set(event, { callback, lastCall: 0, delay });
@@ -170,7 +173,9 @@ export class MessageQueue {
 
   private cleanup(): void {
     const now = Date.now();
-    this.queue = this.queue.filter(message => now - message.timestamp <= this.maxAge);
+    this.queue = this.queue.filter(
+      message => now - message.timestamp <= this.maxAge
+    );
   }
 
   size(): number {
@@ -183,7 +188,10 @@ export class MessageQueue {
 }
 
 // Hook for WebSocket message queue
-export function useMessageQueue(maxSize: number = 100, maxAge: number = 5 * 60 * 1000) {
+export function useMessageQueue(
+  maxSize: number = 100,
+  maxAge: number = 5 * 60 * 1000
+) {
   const queueRef = useRef<MessageQueue>();
 
   if (!queueRef.current) {
@@ -222,14 +230,14 @@ export function useOptimizedWebSocketHandler<T>(
     throttleDelay?: number;
   } = {}
 ) {
-  const {
-    batchSize = 10,
-    batchDelay = 100,
-    throttleDelay = 50,
-  } = options;
+  const { batchSize = 10, batchDelay = 100, throttleDelay = 50 } = options;
 
   const throttledHandler = useRef<Function>();
-  const { addMessage, flush } = useMessageBatcher(onMessage, batchSize, batchDelay);
+  const { addMessage, flush } = useMessageBatcher(
+    onMessage,
+    batchSize,
+    batchDelay
+  );
 
   // Create throttled handler
   if (!throttledHandler.current) {
@@ -274,20 +282,24 @@ export class ConnectionManager {
     }
 
     const delay = Math.min(
-      this.baseDelay * Math.pow(2, this.reconnectAttempts) + Math.random() * 1000,
+      this.baseDelay * Math.pow(2, this.reconnectAttempts) +
+        Math.random() * 1000,
       this.maxDelay
     );
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.reconnectTimeout = setTimeout(async () => {
         this.reconnectAttempts++;
-        
+
         try {
           await connectFn();
           this.reset();
           resolve(true);
         } catch (error) {
-          console.error(`Reconnection attempt ${this.reconnectAttempts} failed:`, error);
+          console.error(
+            `Reconnection attempt ${this.reconnectAttempts} failed:`,
+            error
+          );
           const success = await this.attemptReconnect(connectFn);
           resolve(success);
         }
@@ -329,7 +341,11 @@ export function useConnectionManager(
   const managerRef = useRef<ConnectionManager>();
 
   if (!managerRef.current) {
-    managerRef.current = new ConnectionManager(maxReconnectAttempts, baseDelay, maxDelay);
+    managerRef.current = new ConnectionManager(
+      maxReconnectAttempts,
+      baseDelay,
+      maxDelay
+    );
   }
 
   const attemptReconnect = useCallback(async () => {

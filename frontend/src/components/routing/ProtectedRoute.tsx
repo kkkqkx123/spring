@@ -3,7 +3,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { Center, Loader, Alert, Button, Stack, Text } from '@mantine/core';
 import { IconAlertCircle, IconLock } from '@tabler/icons-react';
 import { useAuth } from '../../hooks/useAuth';
-import { useAccessControl, type AccessControlOptions } from '../../hooks/useAccessControl';
+import {
+  useAccessControl,
+  type AccessControlOptions,
+} from '../../hooks/useAccessControl';
 import { ROUTES } from '../../constants';
 
 export interface ProtectedRouteProps {
@@ -73,9 +76,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (allRequiredPermissions.length === 0) return true;
 
     if (requireAll) {
-      return accessControl.hasAllPermissions(allRequiredPermissions, accessControlOptions);
+      return accessControl.hasAllPermissions(
+        allRequiredPermissions,
+        accessControlOptions
+      );
     } else {
-      return accessControl.hasAnyPermission(allRequiredPermissions, accessControlOptions);
+      return accessControl.hasAnyPermission(
+        allRequiredPermissions,
+        accessControlOptions
+      );
     }
   })();
 

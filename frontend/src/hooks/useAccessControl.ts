@@ -15,7 +15,7 @@ export const useAccessControl = () => {
   const hasPermission = useCallback(
     (permission: string, options: AccessControlOptions = {}) => {
       const { fallbackValue = false, strict = false } = options;
-      
+
       if (!auth.isAuthenticated || !auth.user) {
         return fallbackValue;
       }
@@ -34,7 +34,7 @@ export const useAccessControl = () => {
   const hasRole = useCallback(
     (role: string, options: AccessControlOptions = {}) => {
       const { fallbackValue = false } = options;
-      
+
       if (!auth.isAuthenticated || !auth.user) {
         return fallbackValue;
       }
@@ -48,7 +48,7 @@ export const useAccessControl = () => {
   const hasAnyPermission = useCallback(
     (permissions: string[], options: AccessControlOptions = {}) => {
       const { fallbackValue = false, strict = false } = options;
-      
+
       if (!auth.isAuthenticated || !auth.user) {
         return fallbackValue;
       }
@@ -67,7 +67,7 @@ export const useAccessControl = () => {
   const hasAllPermissions = useCallback(
     (permissions: string[], options: AccessControlOptions = {}) => {
       const { fallbackValue = false, strict = false } = options;
-      
+
       if (!auth.isAuthenticated || !auth.user) {
         return fallbackValue;
       }
@@ -86,7 +86,7 @@ export const useAccessControl = () => {
   const hasAnyRole = useCallback(
     (roles: string[], options: AccessControlOptions = {}) => {
       const { fallbackValue = false } = options;
-      
+
       if (!auth.isAuthenticated || !auth.user) {
         return fallbackValue;
       }
@@ -100,7 +100,7 @@ export const useAccessControl = () => {
   const hasAllRoles = useCallback(
     (roles: string[], options: AccessControlOptions = {}) => {
       const { fallbackValue = false } = options;
-      
+
       if (!auth.isAuthenticated || !auth.user) {
         return fallbackValue;
       }
@@ -143,12 +143,15 @@ export const useAccessControl = () => {
   const canAccessResource = useCallback(
     (resource: string, options: AccessControlOptions = {}) => {
       const resourceUpper = resource.toUpperCase();
-      return hasAnyPermission([
-        `${resourceUpper}_CREATE`,
-        `${resourceUpper}_READ`,
-        `${resourceUpper}_UPDATE`,
-        `${resourceUpper}_DELETE`,
-      ], options);
+      return hasAnyPermission(
+        [
+          `${resourceUpper}_CREATE`,
+          `${resourceUpper}_READ`,
+          `${resourceUpper}_UPDATE`,
+          `${resourceUpper}_DELETE`,
+        ],
+        options
+      );
     },
     [hasAnyPermission]
   );
@@ -180,7 +183,7 @@ export const useAccessControl = () => {
   // Get all user permissions
   const userPermissions = useMemo(() => {
     if (!auth.user) return [];
-    
+
     const permissions: string[] = [];
     auth.user.roles.forEach((role: Role) => {
       role.permissions.forEach((permission: Permission) => {
@@ -189,7 +192,7 @@ export const useAccessControl = () => {
         }
       });
     });
-    
+
     return permissions;
   }, [auth.user]);
 
@@ -207,7 +210,7 @@ export const useAccessControl = () => {
     hasAllPermissions,
     hasAnyRole,
     hasAllRoles,
-    
+
     // CRUD operations
     canCreate,
     canRead,
@@ -215,15 +218,15 @@ export const useAccessControl = () => {
     canDelete,
     canAccessResource,
     getResourcePermissions,
-    
+
     // Convenience checks
     isAdmin,
     isManager,
-    
+
     // User data
     userPermissions,
     userRoles,
-    
+
     // Auth state
     isAuthenticated: auth.isAuthenticated,
     user: auth.user,

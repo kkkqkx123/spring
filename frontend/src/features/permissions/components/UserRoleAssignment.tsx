@@ -57,8 +57,12 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   const [bulkRoleIds, setBulkRoleIds] = useState<number[]>([]);
 
   const [debouncedSearch] = useDebouncedValue(searchTerm, 300);
-  const [assignModalOpened, { open: openAssignModal, close: closeAssignModal }] = useDisclosure(false);
-  const [bulkModalOpened, { open: openBulkModal, close: closeBulkModal }] = useDisclosure(false);
+  const [
+    assignModalOpened,
+    { open: openAssignModal, close: closeAssignModal },
+  ] = useDisclosure(false);
+  const [bulkModalOpened, { open: openBulkModal, close: closeBulkModal }] =
+    useDisclosure(false);
 
   const { data: usersData, isLoading: usersLoading } = useUsersWithRoles({
     page: page - 1,
@@ -110,7 +114,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
   };
 
   const handleRemoveRole = async (userId: number, roleId: number) => {
-    if (window.confirm('Are you sure you want to remove this role from the user?')) {
+    if (
+      window.confirm('Are you sure you want to remove this role from the user?')
+    ) {
       await removeUserRole.mutateAsync({ userId, roleId });
     }
   };
@@ -129,7 +135,11 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
 
   const handleBulkRemove = async () => {
     if (selectedUserIds.length > 0 && bulkRoleIds.length > 0) {
-      if (window.confirm(`Are you sure you want to remove the selected roles from ${selectedUserIds.length} user(s)?`)) {
+      if (
+        window.confirm(
+          `Are you sure you want to remove the selected roles from ${selectedUserIds.length} user(s)?`
+        )
+      ) {
         await bulkRemoveRoles.mutateAsync({
           userIds: selectedUserIds,
           roleIds: bulkRoleIds,
@@ -170,17 +180,19 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
               placeholder="Search users..."
               leftSection={<IconSearch size={16} />}
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.currentTarget.value)}
+              onChange={event => setSearchTerm(event.currentTarget.value)}
               style={{ flex: 1 }}
             />
           </Group>
 
           <div style={{ position: 'relative' }}>
             <LoadingOverlay visible={usersLoading} />
-            
+
             {users.length === 0 ? (
               <Alert icon={<IconInfoCircle size={16} />} title="No users found">
-                {debouncedSearch ? 'No users match your search criteria.' : 'No users available.'}
+                {debouncedSearch
+                  ? 'No users match your search criteria.'
+                  : 'No users available.'}
               </Alert>
             ) : (
               <Table striped highlightOnHover>
@@ -189,8 +201,13 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                     <Table.Th>
                       <Checkbox
                         checked={selectedUserIds.length === users.length}
-                        indeterminate={selectedUserIds.length > 0 && selectedUserIds.length < users.length}
-                        onChange={(event) => handleSelectAll(event.currentTarget.checked)}
+                        indeterminate={
+                          selectedUserIds.length > 0 &&
+                          selectedUserIds.length < users.length
+                        }
+                        onChange={event =>
+                          handleSelectAll(event.currentTarget.checked)
+                        }
                       />
                     </Table.Th>
                     <Table.Th>User</Table.Th>
@@ -206,8 +223,11 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                       <Table.Td>
                         <Checkbox
                           checked={selectedUserIds.includes(user.id)}
-                          onChange={(event) => 
-                            handleUserSelection(user.id, event.currentTarget.checked)
+                          onChange={event =>
+                            handleUserSelection(
+                              user.id,
+                              event.currentTarget.checked
+                            )
                           }
                         />
                       </Table.Td>
@@ -216,7 +236,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                           <Text fw={500}>{user.username}</Text>
                           {(user.firstName || user.lastName) && (
                             <Text size="sm" c="dimmed">
-                              {[user.firstName, user.lastName].filter(Boolean).join(' ')}
+                              {[user.firstName, user.lastName]
+                                .filter(Boolean)
+                                .join(' ')}
                             </Text>
                           )}
                         </Stack>
@@ -236,7 +258,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                                   size="xs"
                                   color="red"
                                   variant="transparent"
-                                  onClick={() => handleRemoveRole(user.id, role.id)}
+                                  onClick={() =>
+                                    handleRemoveRole(user.id, role.id)
+                                  }
                                 >
                                   <IconTrash size={10} />
                                 </ActionIcon>
@@ -246,12 +270,17 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                             </Badge>
                           ))}
                           {user.roles.length === 0 && (
-                            <Text size="sm" c="dimmed">No roles assigned</Text>
+                            <Text size="sm" c="dimmed">
+                              No roles assigned
+                            </Text>
                           )}
                         </Group>
                       </Table.Td>
                       <Table.Td>
-                        <Badge color={user.enabled ? 'green' : 'red'} variant="light">
+                        <Badge
+                          color={user.enabled ? 'green' : 'red'}
+                          variant="light"
+                        >
                           {user.enabled ? 'Active' : 'Inactive'}
                         </Badge>
                       </Table.Td>
@@ -299,11 +328,13 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
             <Text size="sm" c="dimmed">
               Select roles to assign to {editingUser.username}
             </Text>
-            
+
             <MultiSelect
               data={roleOptions}
               value={editingUser.roles.map(role => role.id.toString())}
-              onChange={(values) => handleAssignRoles(values.map(v => parseInt(v, 10)))}
+              onChange={values =>
+                handleAssignRoles(values.map(v => parseInt(v, 10)))
+              }
               placeholder="Select roles"
               searchable
               clearable
@@ -314,7 +345,9 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
                 Cancel
               </Button>
               <Button
-                onClick={() => handleAssignRoles(editingUser.roles.map(r => r.id))}
+                onClick={() =>
+                  handleAssignRoles(editingUser.roles.map(r => r.id))
+                }
                 loading={assignUserRoles.isPending}
               >
                 Update Roles
@@ -333,14 +366,17 @@ export const UserRoleAssignment: React.FC<UserRoleAssignmentProps> = ({
       >
         <Stack gap="md">
           <Alert icon={<IconInfoCircle size={16} />}>
-            You have selected {selectedUserIds.length} user(s) for bulk role management.
+            You have selected {selectedUserIds.length} user(s) for bulk role
+            management.
           </Alert>
 
           <MultiSelect
             label="Select Roles"
             data={roleOptions}
             value={bulkRoleIds.map(id => id.toString())}
-            onChange={(values) => setBulkRoleIds(values.map(v => parseInt(v, 10)))}
+            onChange={values =>
+              setBulkRoleIds(values.map(v => parseInt(v, 10)))
+            }
             placeholder="Select roles to assign or remove"
             searchable
             clearable

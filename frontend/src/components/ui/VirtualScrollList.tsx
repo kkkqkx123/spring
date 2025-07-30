@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Box, ScrollArea } from '@mantine/core';
 
 interface VirtualScrollListProps<T> {
@@ -25,7 +31,10 @@ export function VirtualScrollList<T>({
 
   // Calculate visible range
   const visibleRange = useMemo(() => {
-    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
+    const startIndex = Math.max(
+      0,
+      Math.floor(scrollTop / itemHeight) - overscan
+    );
     const endIndex = Math.min(
       items.length - 1,
       Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
@@ -40,11 +49,14 @@ export function VirtualScrollList<T>({
   }, [items, visibleRange]);
 
   // Handle scroll
-  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
-    const newScrollTop = event.currentTarget.scrollTop;
-    setScrollTop(newScrollTop);
-    onScroll?.(newScrollTop);
-  }, [onScroll]);
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement>) => {
+      const newScrollTop = event.currentTarget.scrollTop;
+      setScrollTop(newScrollTop);
+      onScroll?.(newScrollTop);
+    },
+    [onScroll]
+  );
 
   // Total height of all items
   const totalHeight = items.length * itemHeight;
@@ -59,12 +71,7 @@ export function VirtualScrollList<T>({
       className={className}
     >
       <Box h={totalHeight} pos="relative">
-        <Box
-          pos="absolute"
-          top={offsetY}
-          left={0}
-          right={0}
-        >
+        <Box pos="absolute" top={offsetY} left={0} right={0}>
           {visibleItems.map((item, index) => (
             <Box key={visibleRange.startIndex + index} h={itemHeight}>
               {renderItem(item, visibleRange.startIndex + index)}
@@ -105,12 +112,15 @@ export function useVirtualScroll<T>({
   }, [items.length, estimatedItemHeight]);
 
   // Update item height
-  const setItemHeight = useCallback((index: number, height: number) => {
-    if (itemHeights.current.get(index) !== height) {
-      itemHeights.current.set(index, height);
-      calculateOffsets();
-    }
-  }, [calculateOffsets]);
+  const setItemHeight = useCallback(
+    (index: number, height: number) => {
+      if (itemHeights.current.get(index) !== height) {
+        itemHeights.current.set(index, height);
+        calculateOffsets();
+      }
+    },
+    [calculateOffsets]
+  );
 
   // Calculate visible range
   const visibleRange = useMemo(() => {
@@ -142,8 +152,10 @@ export function useVirtualScroll<T>({
   // Total height
   const totalHeight = useMemo(() => {
     const lastIndex = items.length - 1;
-    const lastOffset = itemOffsets.current.get(lastIndex) || lastIndex * estimatedItemHeight;
-    const lastHeight = itemHeights.current.get(lastIndex) || estimatedItemHeight;
+    const lastOffset =
+      itemOffsets.current.get(lastIndex) || lastIndex * estimatedItemHeight;
+    const lastHeight =
+      itemHeights.current.get(lastIndex) || estimatedItemHeight;
     return lastOffset + lastHeight;
   }, [items.length, estimatedItemHeight]);
 
@@ -156,7 +168,8 @@ export function useVirtualScroll<T>({
     totalHeight,
     setScrollTop,
     setItemHeight,
-    getItemOffset: (index: number) => itemOffsets.current.get(index) || index * estimatedItemHeight,
+    getItemOffset: (index: number) =>
+      itemOffsets.current.get(index) || index * estimatedItemHeight,
   };
 }
 
@@ -173,7 +186,11 @@ export function DynamicVirtualList<T>({
   items: T[];
   estimatedItemHeight: number;
   containerHeight: number;
-  renderItem: (item: T, index: number, setHeight: (height: number) => void) => React.ReactNode;
+  renderItem: (
+    item: T,
+    index: number,
+    setHeight: (height: number) => void
+  ) => React.ReactNode;
   overscan?: number;
   onScroll?: (scrollTop: number) => void;
   className?: string;
@@ -191,11 +208,14 @@ export function DynamicVirtualList<T>({
     overscan,
   });
 
-  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
-    const newScrollTop = event.currentTarget.scrollTop;
-    setScrollTop(newScrollTop);
-    onScroll?.(newScrollTop);
-  }, [setScrollTop, onScroll]);
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement>) => {
+      const newScrollTop = event.currentTarget.scrollTop;
+      setScrollTop(newScrollTop);
+      onScroll?.(newScrollTop);
+    },
+    [setScrollTop, onScroll]
+  );
 
   const visibleItems = useMemo(() => {
     return items.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
@@ -220,7 +240,9 @@ export function DynamicVirtualList<T>({
               left={0}
               right={0}
             >
-              {renderItem(item, actualIndex, (height) => setItemHeight(actualIndex, height))}
+              {renderItem(item, actualIndex, height =>
+                setItemHeight(actualIndex, height)
+              )}
             </Box>
           );
         })}
@@ -254,14 +276,24 @@ export function VirtualTable<T>({
 
   const visibleRange = useMemo(() => {
     const contentHeight = containerHeight - headerHeight;
-    const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+    const startIndex = Math.max(
+      0,
+      Math.floor(scrollTop / rowHeight) - overscan
+    );
     const endIndex = Math.min(
       data.length - 1,
       Math.ceil((scrollTop + contentHeight) / rowHeight) + overscan
     );
 
     return { startIndex, endIndex };
-  }, [scrollTop, rowHeight, containerHeight, headerHeight, data.length, overscan]);
+  }, [
+    scrollTop,
+    rowHeight,
+    containerHeight,
+    headerHeight,
+    data.length,
+    overscan,
+  ]);
 
   const visibleData = useMemo(() => {
     return data.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
@@ -271,7 +303,10 @@ export function VirtualTable<T>({
   const offsetY = visibleRange.startIndex * rowHeight;
 
   return (
-    <Box h={containerHeight} style={{ border: '1px solid var(--mantine-color-gray-3)' }}>
+    <Box
+      h={containerHeight}
+      style={{ border: '1px solid var(--mantine-color-gray-3)' }}
+    >
       {/* Header */}
       <Box
         h={headerHeight}
@@ -289,7 +324,10 @@ export function VirtualTable<T>({
             px="md"
             style={{
               flex: column.width ? `0 0 ${column.width}px` : 1,
-              borderRight: index < columns.length - 1 ? '1px solid var(--mantine-color-gray-3)' : 'none',
+              borderRight:
+                index < columns.length - 1
+                  ? '1px solid var(--mantine-color-gray-3)'
+                  : 'none',
             }}
           >
             {column.title}
@@ -303,12 +341,7 @@ export function VirtualTable<T>({
         onScrollPositionChange={({ y }) => setScrollTop(y)}
       >
         <Box h={totalHeight} pos="relative">
-          <Box
-            pos="absolute"
-            top={offsetY}
-            left={0}
-            right={0}
-          >
+          <Box pos="absolute" top={offsetY} left={0} right={0}>
             {visibleData.map((row, index) => (
               <Box
                 key={visibleRange.startIndex + index}
@@ -325,7 +358,10 @@ export function VirtualTable<T>({
                     px="md"
                     style={{
                       flex: column.width ? `0 0 ${column.width}px` : 1,
-                      borderRight: colIndex < columns.length - 1 ? '1px solid var(--mantine-color-gray-2)' : 'none',
+                      borderRight:
+                        colIndex < columns.length - 1
+                          ? '1px solid var(--mantine-color-gray-2)'
+                          : 'none',
                     }}
                   >
                     {column.render

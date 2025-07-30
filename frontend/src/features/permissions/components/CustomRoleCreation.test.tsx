@@ -18,20 +18,18 @@ vi.mock('../hooks/usePermissions');
 const mockHooks = permissionHooks as any;
 
 const mockRoles: Role[] = [
-  { 
-    id: 1, 
-    name: 'Custom Admin', 
+  {
+    id: 1,
+    name: 'Custom Admin',
     permissions: [
       { id: 1, name: 'user:read', description: 'Read user data' },
       { id: 2, name: 'user:write', description: 'Write user data' },
-    ]
+    ],
   },
-  { 
-    id: 2, 
-    name: 'Custom User', 
-    permissions: [
-      { id: 1, name: 'user:read', description: 'Read user data' },
-    ]
+  {
+    id: 2,
+    name: 'Custom User',
+    permissions: [{ id: 1, name: 'user:read', description: 'Read user data' }],
   },
 ];
 
@@ -52,9 +50,7 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -78,7 +74,9 @@ describe('CustomRoleCreation', () => {
     });
 
     mockHooks.useCreateRole.mockReturnValue({
-      mutateAsync: vi.fn().mockResolvedValue({ id: 3, name: 'New Role', permissions: [] }),
+      mutateAsync: vi
+        .fn()
+        .mockResolvedValue({ id: 3, name: 'New Role', permissions: [] }),
       isPending: false,
     });
 
@@ -125,7 +123,9 @@ describe('CustomRoleCreation', () => {
   });
 
   it('should handle role creation', async () => {
-    const mockCreateRole = vi.fn().mockResolvedValue({ id: 3, name: 'Test Role', permissions: [] });
+    const mockCreateRole = vi
+      .fn()
+      .mockResolvedValue({ id: 3, name: 'Test Role', permissions: [] });
     mockHooks.useCreateRole.mockReturnValue({
       mutateAsync: mockCreateRole,
       isPending: false,
@@ -147,10 +147,10 @@ describe('CustomRoleCreation', () => {
 
     // Find and click a permission checkbox
     const checkboxes = screen.getAllByRole('checkbox');
-    const permissionCheckbox = checkboxes.find(checkbox => 
+    const permissionCheckbox = checkboxes.find(checkbox =>
       checkbox.closest('div')?.textContent?.includes('read')
     );
-    
+
     if (permissionCheckbox) {
       fireEvent.click(permissionCheckbox);
     }
@@ -173,7 +173,7 @@ describe('CustomRoleCreation', () => {
 
     // Find edit button
     const editButtons = screen.getAllByRole('button');
-    const editButton = editButtons.find(button => 
+    const editButton = editButtons.find(button =>
       button.querySelector('svg')?.classList.contains('tabler-icon-edit')
     );
 
@@ -188,14 +188,16 @@ describe('CustomRoleCreation', () => {
 
     // Find clone button
     const cloneButtons = screen.getAllByRole('button');
-    const cloneButton = cloneButtons.find(button => 
+    const cloneButton = cloneButtons.find(button =>
       button.querySelector('svg')?.classList.contains('tabler-icon-copy')
     );
 
     if (cloneButton) {
       fireEvent.click(cloneButton);
       expect(screen.getByText('Create Custom Role')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('Custom Admin (Copy)')).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue('Custom Admin (Copy)')
+      ).toBeInTheDocument();
     }
   });
 
@@ -210,13 +212,13 @@ describe('CustomRoleCreation', () => {
 
     // Find delete button
     const deleteButtons = screen.getAllByRole('button');
-    const deleteButton = deleteButtons.find(button => 
+    const deleteButton = deleteButtons.find(button =>
       button.querySelector('svg')?.classList.contains('tabler-icon-trash')
     );
 
     if (deleteButton) {
       fireEvent.click(deleteButton);
-      
+
       await waitFor(() => {
         expect(mockDeleteRole).toHaveBeenCalled();
       });
@@ -245,9 +247,10 @@ describe('CustomRoleCreation', () => {
 
     // Find category checkbox
     const categoryCheckboxes = screen.getAllByRole('checkbox');
-    const userCategoryCheckbox = categoryCheckboxes.find(checkbox => 
-      checkbox.closest('div')?.textContent?.includes('user') &&
-      checkbox.closest('div')?.textContent?.includes('2')
+    const userCategoryCheckbox = categoryCheckboxes.find(
+      checkbox =>
+        checkbox.closest('div')?.textContent?.includes('user') &&
+        checkbox.closest('div')?.textContent?.includes('2')
     );
 
     if (userCategoryCheckbox) {
@@ -290,19 +293,27 @@ describe('CustomRoleCreation', () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
     expect(screen.getByText('No custom roles found')).toBeInTheDocument();
-    expect(screen.getByText('Create your first custom role to get started with advanced permission management.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Create your first custom role to get started with advanced permission management.'
+      )
+    ).toBeInTheDocument();
   });
 
   it('should call onRoleCreated callback', async () => {
     const mockOnRoleCreated = vi.fn();
-    const mockCreateRole = vi.fn().mockResolvedValue({ id: 3, name: 'Test Role', permissions: [] });
-    
+    const mockCreateRole = vi
+      .fn()
+      .mockResolvedValue({ id: 3, name: 'Test Role', permissions: [] });
+
     mockHooks.useCreateRole.mockReturnValue({
       mutateAsync: mockCreateRole,
       isPending: false,
     });
 
-    render(<CustomRoleCreation onRoleCreated={mockOnRoleCreated} />, { wrapper: createWrapper() });
+    render(<CustomRoleCreation onRoleCreated={mockOnRoleCreated} />, {
+      wrapper: createWrapper(),
+    });
 
     // Open create modal and create a role
     const createButton = screen.getByText('Create Custom Role');
@@ -320,7 +331,11 @@ describe('CustomRoleCreation', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockOnRoleCreated).toHaveBeenCalledWith({ id: 3, name: 'Test Role', permissions: [] });
+      expect(mockOnRoleCreated).toHaveBeenCalledWith({
+        id: 3,
+        name: 'Test Role',
+        permissions: [],
+      });
     });
   });
 });
