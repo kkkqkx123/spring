@@ -1,4 +1,36 @@
 ﻿// Permissions feature public API
-// Components, hooks, services, and types will be exported here when implemented
+export { PermissionManagement } from './components/PermissionManagement';
+export { RolePermissionMatrix } from './components/RolePermissionMatrix';
+export { UserRoleAssignment } from './components/UserRoleAssignment';
+export { CustomRoleCreation } from './components/CustomRoleCreation';
+export { RoleForm } from './components/RoleForm';
+export { PermissionImpactDialog } from './components/PermissionImpactDialog';
 
-export {}; // Temporary export to make this a valid module
+// Hooks
+export {
+  useRoles,
+  useAllRoles,
+  useRole,
+  useCreateRole,
+  useUpdateRole,
+  useDeleteRole,
+  useAllPermissions,
+  useUserRoles,
+  useAssignUserRoles,
+  useRemoveUserRole,
+  usePermissionImpactAnalysis,
+  useRolePermissionMatrix,
+  useUpdateRolePermissions,
+  useUsersWithRoles,
+  useBulkAssignRoles,
+  useBulkRemoveRoles,
+} from './hooks/usePermissions';
+
+// Services
+export { permissionApi } from './services/permissionApi';
+export type {
+  RoleCreateRequest,
+  RoleUpdateRequest,
+  UserRoleAssignment as UserRoleAssignmentRequest,
+  PermissionImpactAnalysis,
+} from './services/permissionApi';

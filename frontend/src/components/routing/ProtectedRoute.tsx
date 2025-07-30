@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { Center, Loader, Alert, Button, Stack, Text } from '@mantine/core';
 import { IconAlertCircle, IconLock } from '@tabler/icons-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useAccessControl, type AccessControlOptions } from '../../hooks/useAccessControl';
 import { ROUTES } from '../../constants';
 
 export interface ProtectedRouteProps {
@@ -13,6 +14,8 @@ export interface ProtectedRouteProps {
   requiredPermissions?: string[];
   requireAll?: boolean; // For multiple roles/permissions, require all or just one
   fallback?: React.ReactNode;
+  accessControlOptions?: AccessControlOptions;
+  redirectTo?: string; // Custom redirect path for unauthorized access
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
@@ -23,8 +26,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredPermissions = [],
   requireAll = false,
   fallback,
+  accessControlOptions = {},
+  redirectTo,
 }) => {
-  const { isAuthenticated, isLoading, hasRole, hasPermission } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  const accessControl = useAccessControl();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
@@ -51,34 +57,35 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     ...requiredPermissions,
   ];
 
-  // Check role requirements
+  // Check role requirements using enhanced access control
   const hasRequiredRoles = (() => {
     if (allRequiredRoles.length === 0) return true;
 
     if (requireAll) {
-      return allRequiredRoles.every(role => hasRole(role));
+      return accessControl.hasAllRoles(allRequiredRoles, accessControlOptions);
     } else {
-      return allRequiredRoles.some(role => hasRole(role));
+      return accessControl.hasAnyRole(allRequiredRoles, accessControlOptions);
     }
   })();
 
-  // Check permission requirements
+  // Check permission requirements using enhanced access control
   const hasRequiredPermissions = (() => {
     if (allRequiredPermissions.length === 0) return true;
 
     if (requireAll) {
-      return allRequiredPermissions.every(permission =>
-        hasPermission(permission)
-      );
+      return accessControl.hasAllPermissions(allRequiredPermissions, accessControlOptions);
     } else {
-      return allRequiredPermissions.some(permission =>
-        hasPermission(permission)
-      );
+      return accessControl.hasAnyPermission(allRequiredPermissions, accessControlOptions);
     }
   })();
 
   // Show access denied if requirements not met
   if (!hasRequiredRoles || !hasRequiredPermissions) {
+    // Redirect to custom path if specified
+    if (redirectTo) {
+      return <Navigate to={redirectTo} state={{ from: location }} replace />;
+    }
+
     if (fallback) {
       return <>{fallback}</>;
     }

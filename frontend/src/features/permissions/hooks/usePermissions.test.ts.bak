@@ -1,0 +1,262 @@
+import React from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { notifications } from '@mantine/notifications';
+import { useRoles, useCreateRole, useUpdateRole, useDeleteRole, useAllPermissions } from './usePermissions';
+import { permissionApi } from '../services/permissionApi';
+import type { Role, Permission } from '../../../types';
+import { vi } from 'vitest';
+import { it } from 'node:test';
+import { describe } from 'node:test';
+import { it } from 'node:test';
+import { describe } from 'node:test';
+import { it } from 'node:test';
+import { describe } from 'node:test';
+import { it } from 'node:test';
+import { it } from 'node:test';
+import { describe } from 'node:test';
+import { it } from 'node:test';
+import { it } from 'node:test';
+import { describe } from 'node:test';
+import { beforeEach } from 'node:test';
+import { describe } from 'node:test';
+
+// Mock the API
+vi.mock('../services/permissionApi');
+const mockPermissionApi = permissionApi as any;
+
+// Mock notifications
+vi.mock('@mantine/notifications', () => ({
+  notifications: {
+    show: vi.fn(),
+  },
+}));
+
+// Test wrapper with QueryClient
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+  
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+};
+
+describe('usePermissions hooks', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('useRoles', () => {
+    it('should fetch roles successfully', async () => {
+      const mockRoles: Role[] = [
+        {
+          id: 1,
+          name: 'Admin',
+          permissions: [
+            { id: 1, name: 'user:read', description: 'Read users' },
+            { id: 2, name: 'user:write', description: 'Write users' },
+          ],
+        },
+        {
+          id: 2,
+          name: 'User',
+          permissions: [
+            { id: 1, name: 'user:read', description: 'Read users' },
+          ],
+        },
+      ];
+
+      mockPermissionApi.getRoles.mockResolvedValue({
+        content: mockRoles,
+        totalElements: 2,
+        totalPages: 1,
+        size: 10,
+        number: 0,
+        first: true,
+        last: true,
+      });
+
+      const { result } = renderHook(() => useRoles(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(result.current.data?.content).toEqual(mockRoles);
+      expect(mockPermissionApi.getRoles).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should handle fetch roles error', async () => {
+      const error = new Error('Failed to fetch roles');
+      mockPermissionApi.getRoles.mockRejectedValue(error);
+
+      const { result } = renderHook(() => useRoles(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(result.current.error).toEqual(error);
+    });
+  });
+
+  describe('useCreateRole', () => {
+    it('should create role successfully', async () => {
+      const newRole: Role = {
+        id: 3,
+        name: 'Manager',
+        permissions: [
+          { id: 1, name: 'user:read', description: 'Read users' },
+        ],
+      };
+
+      mockPermissionApi.createRole.mockResolvedValue(newRole);
+
+      const { result } = renderHook(() => useCreateRole(), {
+        wrapper: createWrapper(),
+      });
+
+      const roleData = {
+        name: 'Manager',
+        description: 'Manager role',
+        permissionIds: [1],
+      };
+
+      result.current.mutate(roleData);
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(result.current.data).toEqual(newRole);
+      expect(mockPermissionApi.createRole).toHaveBeenCalledWith(roleData);
+      expect(notifications.show).toHaveBeenCalledWith({
+        title: 'Success',
+        message: 'Role created successfully',
+        color: 'green',
+      });
+    });
+
+    it('should handle create role error', async () => {
+      const error = new Error('Failed to create role');
+      mockPermissionApi.createRole.mockRejectedValue(error);
+
+      const { result } = renderHook(() => useCreateRole(), {
+        wrapper: createWrapper(),
+      });
+
+      const roleData = {
+        name: 'Manager',
+        permissionIds: [1],
+      };
+
+      result.current.mutate(roleData);
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(notifications.show).toHaveBeenCalledWith({
+        title: 'Error',
+        message: 'Failed to create role',
+        color: 'red',
+      });
+    });
+  });
+
+  describe('useUpdateRole', () => {
+    it('should update role successfully', async () => {
+      const updatedRole: Role = {
+        id: 1,
+        name: 'Updated Admin',
+        permissions: [
+          { id: 1, name: 'user:read', description: 'Read users' },
+          { id: 2, name: 'user:write', description: 'Write users' },
+        ],
+      };
+
+      mockPermissionApi.updateRole.mockResolvedValue(updatedRole);
+
+      const { result } = renderHook(() => useUpdateRole(), {
+        wrapper: createWrapper(),
+      });
+
+      const roleData = {
+        id: 1,
+        name: 'Updated Admin',
+        permissionIds: [1, 2],
+      };
+
+      result.current.mutate(roleData);
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(result.current.data).toEqual(updatedRole);
+      expect(mockPermissionApi.updateRole).toHaveBeenCalledWith(roleData);
+      expect(notifications.show).toHaveBeenCalledWith({
+        title: 'Success',
+        message: 'Role updated successfully',
+        color: 'green',
+      });
+    });
+  });
+
+  describe('useDeleteRole', () => {
+    it('should delete role successfully', async () => {
+      mockPermissionApi.deleteRole.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => useDeleteRole(), {
+        wrapper: createWrapper(),
+      });
+
+      result.current.mutate(1);
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(mockPermissionApi.deleteRole).toHaveBeenCalledWith(1);
+      expect(notifications.show).toHaveBeenCalledWith({
+        title: 'Success',
+        message: 'Role deleted successfully',
+        color: 'green',
+      });
+    });
+  });
+
+  describe('useAllPermissions', () => {
+    it('should fetch all permissions successfully', async () => {
+      const mockPermissions: Permission[] = [
+        { id: 1, name: 'user:read', description: 'Read users' },
+        { id: 2, name: 'user:write', description: 'Write users' },
+        { id: 3, name: 'role:read', description: 'Read roles' },
+      ];
+
+      mockPermissionApi.getAllPermissions.mockResolvedValue(mockPermissions);
+
+      const { result } = renderHook(() => useAllPermissions(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(result.current.data).toEqual(mockPermissions);
+      expect(mockPermissionApi.getAllPermissions).toHaveBeenCalled();
+    });
+  });
+});

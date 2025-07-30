@@ -1,0 +1,259 @@
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MantineProvider } from '@mantine/core';
+import { PermissionManagement } from './PermissionManagement';
+import * as permissionHooks from '../hooks/usePermissions';
+import type { Role, Permission } from '../../../types';
+import { vi } from 'vitest';
+
+// Mock the child components
+vi.mock('./RolePermissionMatrix', () => ({
+  RolePermissionMatrix: ({ onRoleSelect }: any) => (
+    <div data-testid="role-permission-matrix">
+      Role Permission Matrix
+      <button onClick={() => onRoleSelect?.({ id: 1, name: 'Admin' })}>
+        Select Role
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock('./UserRoleAssignment', () => ({
+  UserRoleAssignment: () => (
+    <div data-testid="user-role-assignment">User Role Assignment</div>
+  ),
+}));
+
+vi.mock('./CustomRoleCreation', () => ({
+  CustomRoleCreation: () => (
+    <div data-testid="custom-role-creation">Custom Role Creation</div>
+  ),
+}));
+
+// Mock the hooks
+vi.mock('../hooks/usePermissions');
+const mockHooks = permissionHooks as any;
+
+const mockRoles: Role[] = [
+  { id: 1, name: 'Admin', permissions: [] },
+  { id: 2, name: 'User', permissions: [] },
+  { id: 3, name: 'Manager', permissions: [] },
+];
+
+const mockPermissions: Permission[] = [
+  { id: 1, name: 'user:read', description: 'Read users' },
+  { id: 2, name: 'user:write', description: 'Write users' },
+  { id: 3, name: 'role:read', description: 'Read roles' },
+  { id: 4, name: 'role:write', description: 'Write roles' },
+  { id: 5, name: 'admin:read', description: 'Read admin' },
+];
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <MantineProvider>
+        {children}
+      </MantineProvider>
+    </QueryClientProvider>
+  );
+};
+
+describe('PermissionManagement', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    // Mock successful data fetching
+    mockHooks.useAllRoles.mockReturnValue({
+      data: mockRoles,
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as any);
+
+    mockHooks.useAllPermissions.mockReturnValue({
+      data: mockPermissions,
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as any);
+  });
+
+  it('should render permission management interface', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByText('Permission Management')).toBeInTheDocument();
+    expect(screen.getByText('Manage roles, permissions, and user access control')).toBeInTheDocument();
+  });
+
+  it('should display overview cards with correct counts', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByText('Total Roles')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument(); // 3 roles
+
+    expect(screen.getByText('Total Permissions')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument(); // 5 permissions
+
+    expect(screen.getByText('Active Users')).toBeInTheDocument();
+    expect(screen.getByText('-')).toBeInTheDocument(); // Placeholder for active users
+  });
+
+  it('should display badges with correct counts', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByText('3 Roles')).toBeInTheDocument();
+    expect(screen.getByText('5 Permissions')).toBeInTheDocument();
+  });
+
+  it('should render tabs correctly', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByText('Role-Permission Matrix')).toBeInTheDocument();
+    expect(screen.getByText('User Role Assignment')).toBeInTheDocument();
+    expect(screen.getByText('Custom Roles')).toBeInTheDocument();
+  });
+
+  it('should default to matrix tab', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByTestId('role-permission-matrix')).toBeInTheDocument();
+  });
+
+  it('should switch to users tab when clicked', async () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    const usersTab = screen.getByText('User Role Assignment');
+    fireEvent.click(usersTab);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('user-role-assignment')).toBeInTheDocument();
+    });
+  });
+
+  it('should switch to custom roles tab when clicked', async () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    const customTab = screen.getByText('Custom Roles');
+    fireEvent.click(customTab);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('custom-role-creation')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle role selection from matrix', async () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    const selectRoleButton = screen.getByText('Select Role');
+    fireEvent.click(selectRoleButton);
+
+    // The role selection should be handled internally
+    // This test verifies the callback is properly passed
+    expect(selectRoleButton).toBeInTheDocument();
+  });
+
+  it('should display help section', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByText('Permission Management Guide')).toBeInTheDocument();
+    expect(screen.getByText(/Use the.*Role-Permission Matrix.*to manage which permissions each role has/)).toBeInTheDocument();
+    expect(screen.getByText(/Use.*User Role Assignment.*to assign roles to users and manage user access/)).toBeInTheDocument();
+    expect(screen.getByText(/Use.*Custom Roles.*to create specialized roles with specific permission combinations/)).toBeInTheDocument();
+    expect(screen.getByText(/Changes to permissions may affect multiple users - review impact analysis before confirming/)).toBeInTheDocument();
+  });
+
+  it('should handle loading state', () => {
+    mockHooks.useAllRoles.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      error: null,
+    } as any);
+
+    mockHooks.useAllPermissions.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      error: null,
+    } as any);
+
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    // Should still render the interface but with loading states
+    expect(screen.getByText('Permission Management')).toBeInTheDocument();
+    expect(screen.getByText('0')).toBeInTheDocument(); // Should show 0 for roles
+  });
+
+  it('should handle empty data state', () => {
+    mockHooks.useAllRoles.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as any);
+
+    mockHooks.useAllPermissions.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as any);
+
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    expect(screen.getByText('0 Roles')).toBeInTheDocument();
+    expect(screen.getByText('0 Permissions')).toBeInTheDocument();
+  });
+
+  it('should accept defaultTab prop', () => {
+    render(<PermissionManagement defaultTab="users" />, { wrapper: createWrapper() });
+
+    expect(screen.getByTestId('user-role-assignment')).toBeInTheDocument();
+  });
+
+  it('should render with custom tab', () => {
+    render(<PermissionManagement defaultTab="custom" />, { wrapper: createWrapper() });
+
+    expect(screen.getByTestId('custom-role-creation')).toBeInTheDocument();
+  });
+
+  it('should have proper tab icons', () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    // Check that tabs have icons (they should be rendered as SVG elements)
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs).toHaveLength(3);
+
+    // Each tab should have an icon (SVG element)
+    tabs.forEach(tab => {
+      expect(tab.querySelector('svg')).toBeInTheDocument();
+    });
+  });
+
+  it('should maintain tab state when switching', async () => {
+    render(<PermissionManagement />, { wrapper: createWrapper() });
+
+    // Start with matrix tab
+    expect(screen.getByTestId('role-permission-matrix')).toBeInTheDocument();
+
+    // Switch to users tab
+    fireEvent.click(screen.getByText('User Role Assignment'));
+    await waitFor(() => {
+      expect(screen.getByTestId('user-role-assignment')).toBeInTheDocument();
+    });
+
+    // Switch back to matrix tab
+    fireEvent.click(screen.getByText('Role-Permission Matrix'));
+    await waitFor(() => {
+      expect(screen.getByTestId('role-permission-matrix')).toBeInTheDocument();
+    });
+  });
+});

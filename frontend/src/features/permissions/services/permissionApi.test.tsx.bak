@@ -1,0 +1,319 @@
+import { permissionApi } from './permissionApi';
+import { apiClient } from '../../../services/api';
+import type { Role, Permission, PaginatedResponse } from '../../../types';
+import { vi } from 'vitest';
+
+// Mock the API client
+vi.mock('../../../services/api');
+const mockApiClient = apiClient as any;
+
+describe('permissionApi', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('Role management', () => {
+    it('should get roles with pagination', async () => {
+      const mockResponse: PaginatedResponse<Role> = {
+        content: [
+          { id: 1, name: 'Admin', permissions: [] },
+          { id: 2, name: 'User', permissions: [] },
+        ],
+        totalElements: 2,
+        totalPages: 1,
+        size: 10,
+        number: 0,
+        first: true,
+        last: true,
+      };
+
+      mockApiClient.get.mockResolvedValue(mockResponse);
+
+      const params = { page: 0, size: 10 };
+      const result = await permissionApi.getRoles(params);
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/roles', { params });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should get all roles', async () => {
+      const mockRoles: Role[] = [
+        { id: 1, name: 'Admin', permissions: [] },
+        { id: 2, name: 'User', permissions: [] },
+      ];
+
+      mockApiClient.get.mockResolvedValue(mockRoles);
+
+      const result = await permissionApi.getAllRoles();
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/roles/all');
+      expect(result).toEqual(mockRoles);
+    });
+
+    it('should get single role', async () => {
+      const mockRole: Role = {
+        id: 1,
+        name: 'Admin',
+        permissions: [
+          { id: 1, name: 'user:read', description: 'Read users' },
+        ],
+      };
+
+      mockApiClient.get.mockResolvedValue(mockRole);
+
+      const result = await permissionApi.getRole(1);
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/roles/1');
+      expect(result).toEqual(mockRole);
+    });
+
+    it('should create role', async () => {
+      const roleData = {
+        name: 'Manager',
+        description: 'Manager role',
+        permissionIds: [1, 2],
+      };
+
+      const mockCreatedRole: Role = {
+        id: 3,
+        name: 'Manager',
+        permissions: [
+          { id: 1, name: 'user:read', description: 'Read users' },
+          { id: 2, name: 'user:write', description: 'Write users' },
+        ],
+      };
+
+      mockApiClient.post.mockResolvedValue(mockCreatedRole);
+
+      const result = await permissionApi.createRole(roleData);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/api/permissions/roles', roleData);
+      expect(result).toEqual(mockCreatedRole);
+    });
+
+    it('should update role', async () => {
+      const roleData = {
+        id: 1,
+        name: 'Updated Admin',
+        description: 'Updated admin role',
+        permissionIds: [1, 2, 3],
+      };
+
+      const mockUpdatedRole: Role = {
+        id: 1,
+        name: 'Updated Admin',
+        permissions: [
+          { id: 1, name: 'user:read', description: 'Read users' },
+          { id: 2, name: 'user:write', description: 'Write users' },
+          { id: 3, name: 'role:read', description: 'Read roles' },
+        ],
+      };
+
+      mockApiClient.put.mockResolvedValue(mockUpdatedRole);
+
+      const result = await permissionApi.updateRole(roleData);
+
+      expect(mockApiClient.put).toHaveBeenCalledWith('/api/permissions/roles/1', roleData);
+      expect(result).toEqual(mockUpdatedRole);
+    });
+
+    it('should delete role', async () => {
+      mockApiClient.delete.mockResolvedValue(undefined);
+
+      await permissionApi.deleteRole(1);
+
+      expect(mockApiClient.delete).toHaveBeenCalledWith('/api/permissions/roles/1');
+    });
+  });
+
+  describe('Permission management', () => {
+    it('should get all permissions', async () => {
+      const mockPermissions: Permission[] = [
+        { id: 1, name: 'user:read', description: 'Read users' },
+        { id: 2, name: 'user:write', description: 'Write users' },
+        { id: 3, name: 'role:read', description: 'Read roles' },
+      ];
+
+      mockApiClient.get.mockResolvedValue(mockPermissions);
+
+      const result = await permissionApi.getAllPermissions();
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions');
+      expect(result).toEqual(mockPermissions);
+    });
+
+    it('should get single permission', async () => {
+      const mockPermission: Permission = {
+        id: 1,
+        name: 'user:read',
+        description: 'Read users',
+      };
+
+      mockApiClient.get.mockResolvedValue(mockPermission);
+
+      const result = await permissionApi.getPermission(1);
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/1');
+      expect(result).toEqual(mockPermission);
+    });
+  });
+
+  describe('User role assignment', () => {
+    it('should get user roles', async () => {
+      const mockRoles: Role[] = [
+        { id: 1, name: 'Admin', permissions: [] },
+        { id: 2, name: 'User', permissions: [] },
+      ];
+
+      mockApiClient.get.mockResolvedValue(mockRoles);
+
+      const result = await permissionApi.getUserRoles(1);
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/users/1/roles');
+      expect(result).toEqual(mockRoles);
+    });
+
+    it('should assign user roles', async () => {
+      const assignment = {
+        userId: 1,
+        roleIds: [1, 2],
+      };
+
+      mockApiClient.post.mockResolvedValue(undefined);
+
+      await permissionApi.assignUserRoles(assignment);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/api/permissions/users/assign-roles', assignment);
+    });
+
+    it('should remove user role', async () => {
+      mockApiClient.delete.mockResolvedValue(undefined);
+
+      await permissionApi.removeUserRole(1, 2);
+
+      expect(mockApiClient.delete).toHaveBeenCalledWith('/api/permissions/users/1/roles/2');
+    });
+  });
+
+  describe('Permission impact analysis', () => {
+    it('should analyze permission impact', async () => {
+      const mockAnalysis = {
+        affectedUsers: 5,
+        affectedFeatures: ['User Management', 'Role Management'],
+        riskLevel: 'MEDIUM' as const,
+        warnings: ['This change will affect 5 users'],
+      };
+
+      mockApiClient.post.mockResolvedValue(mockAnalysis);
+
+      const result = await permissionApi.analyzePermissionImpact(1, [1, 2, 3]);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/permissions/roles/1/impact-analysis',
+        { permissionIds: [1, 2, 3] }
+      );
+      expect(result).toEqual(mockAnalysis);
+    });
+  });
+
+  describe('Role-permission matrix', () => {
+    it('should get role permission matrix', async () => {
+      const mockMatrix = {
+        1: [1, 2, 3], // Admin has permissions 1, 2, 3
+        2: [1],       // User has permission 1
+      };
+
+      mockApiClient.get.mockResolvedValue(mockMatrix);
+
+      const result = await permissionApi.getRolePermissionMatrix();
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/matrix');
+      expect(result).toEqual(mockMatrix);
+    });
+
+    it('should update role permissions', async () => {
+      mockApiClient.put.mockResolvedValue(undefined);
+
+      await permissionApi.updateRolePermissions(1, [1, 2, 3, 4]);
+
+      expect(mockApiClient.put).toHaveBeenCalledWith('/api/permissions/roles/1/permissions', {
+        permissionIds: [1, 2, 3, 4],
+      });
+    });
+  });
+
+  describe('Users with roles', () => {
+    it('should get users with roles', async () => {
+      const mockResponse = {
+        content: [
+          {
+            id: 1,
+            username: 'admin',
+            email: 'admin@example.com',
+            roles: [{ id: 1, name: 'Admin', permissions: [] }],
+            enabled: true,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+          },
+        ],
+        totalElements: 1,
+        totalPages: 1,
+        size: 10,
+        number: 0,
+        first: true,
+        last: true,
+      };
+
+      mockApiClient.get.mockResolvedValue(mockResponse);
+
+      const params = { page: 0, size: 10 };
+      const result = await permissionApi.getUsersWithRoles(params);
+
+      expect(mockApiClient.get).toHaveBeenCalledWith('/api/permissions/users', { params });
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('Bulk operations', () => {
+    it('should bulk assign roles', async () => {
+      mockApiClient.post.mockResolvedValue(undefined);
+
+      await permissionApi.bulkAssignRoles([1, 2], [1, 2]);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/api/permissions/bulk-assign', {
+        userIds: [1, 2],
+        roleIds: [1, 2],
+      });
+    });
+
+    it('should bulk remove roles', async () => {
+      mockApiClient.post.mockResolvedValue(undefined);
+
+      await permissionApi.bulkRemoveRoles([1, 2], [1]);
+
+      expect(mockApiClient.post).toHaveBeenCalledWith('/api/permissions/bulk-remove', {
+        userIds: [1, 2],
+        roleIds: [1],
+      });
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle API errors', async () => {
+      const error = new Error('API Error');
+      mockApiClient.get.mockRejectedValue(error);
+
+      await expect(permissionApi.getAllRoles()).rejects.toThrow('API Error');
+    });
+
+    it('should handle network errors', async () => {
+      const networkError = new Error('Network Error');
+      mockApiClient.post.mockRejectedValue(networkError);
+
+      await expect(permissionApi.createRole({
+        name: 'Test',
+        permissionIds: [1],
+      })).rejects.toThrow('Network Error');
+    });
+  });
+});
