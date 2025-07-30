@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { useForm, zodResolver } from '@mantine/form';
 import {
@@ -16,7 +17,16 @@ import {
   useCreateDepartment,
   useUpdateDepartment,
 } from '../hooks/useDepartmentTree';
-import { Department } from '../../../types';
+import type { Department } from '../../../types';
+
+// Helper to extract error message
+const getErrorMessage = (error: any): string | null => {
+  if (!error) return null;
+  if (typeof error.response?.data?.message === 'string') {
+    return error.response.data.message;
+  }
+  return 'An error occurred while saving the department';
+};
 
 const departmentSchema = z.object({
   name: z
@@ -83,21 +93,21 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
   };
 
   const isLoading = createDepartment.isPending || updateDepartment.isPending;
-  const error = createDepartment.error || updateDepartment.error;
+  const mutationError = createDepartment.error || updateDepartment.error;
+  const errorMessage = getErrorMessage(mutationError);
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
+    <form onSubmit={form.onSubmit(handleSubmit)} noValidate>
       <LoadingOverlay visible={isLoading} />
 
       <Stack gap="md">
-        {error && (
+        {errorMessage && (
           <Alert
             icon={<IconAlertCircle size={16} />}
             color="red"
             variant="light"
           >
-            {error.response?.data?.message ||
-              'An error occurred while saving the department'}
+            {errorMessage}
           </Alert>
         )}
 
@@ -107,6 +117,7 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
           required
           leftSection={<IconBuilding size={16} />}
           {...form.getInputProps('name')}
+          error={form.errors.name}
         />
 
         <Textarea
@@ -114,6 +125,7 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
           placeholder="Enter department description (optional)"
           rows={3}
           {...form.getInputProps('description')}
+          error={form.errors.description}
         />
 
         <DepartmentSelect

@@ -189,5 +189,4 @@ describe('ChatInterface', () => {
 
     expect(await screen.findByText('No messages yet')).toBeInTheDocument();
   });
-
 });

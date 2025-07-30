@@ -101,8 +101,16 @@ describe('DepartmentDetail', () => {
   it('renders department details correctly', () => {
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    expect(screen.getByText('Engineering')).toBeInTheDocument();
-    expect(screen.getByText('Software development team')).toBeInTheDocument();
+    const heading = screen.getByRole('heading', {
+      name: /engineering/i,
+      level: 1,
+    });
+    expect(heading).toBeInTheDocument();
+
+    // The description is a sibling of the heading's parent div
+    const description = screen.getAllByText('Software development team');
+    expect(description.length).toBeGreaterThan(0);
+
     expect(screen.getByText('15')).toBeInTheDocument(); // Employee count
     expect(screen.getByText('1')).toBeInTheDocument(); // Subdepartments count
   });
@@ -116,7 +124,7 @@ describe('DepartmentDetail', () => {
 
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
   });
 
   it('shows error state', () => {
@@ -136,18 +144,15 @@ describe('DepartmentDetail', () => {
   it('opens edit modal when edit button is clicked', async () => {
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    const editButton = screen.getAllByRole('button').find(
-      button => button.querySelector('svg') // Edit icon button
-    );
+    const editButton = screen.getByTestId('edit-action-button');
+    fireEvent.click(editButton);
 
-    if (editButton) {
-      fireEvent.click(editButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Edit Department')).toBeInTheDocument();
-        expect(screen.getByTestId('department-form')).toBeInTheDocument();
-      });
-    }
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: /edit department/i })
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('department-form')).toBeInTheDocument();
+    });
   });
 
   it('calls onEdit callback when provided', () => {
@@ -156,19 +161,13 @@ describe('DepartmentDetail', () => {
       wrapper: createWrapper(),
     });
 
-    const editButton = screen.getAllByRole('button').find(
-      button => button.querySelector('svg') // Edit icon button
-    );
-
-    if (editButton) {
-      fireEvent.click(editButton);
-      expect(mockOnEdit).toHaveBeenCalled();
-    }
+    const editButton = screen.getByTestId('edit-action-button');
+    fireEvent.click(editButton);
+    expect(mockOnEdit).toHaveBeenCalled();
   });
 
   it('shows delete confirmation dialog', async () => {
-    // Mock department with no employees or children to allow deletion
-    const emptyDepartment = {
+    const emptyDepartment: Department = {
       ...mockDepartment,
       employeeCount: 0,
       children: [],
@@ -181,42 +180,26 @@ describe('DepartmentDetail', () => {
 
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    const deleteButton = screen
-      .getAllByRole('button')
-      .find(
-        button =>
-          button.querySelector('svg') && !(button as HTMLButtonElement).disabled
-      );
+    const deleteButton = screen.getByTestId('delete-action-button');
+    fireEvent.click(deleteButton);
 
-    if (deleteButton) {
-      fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/are you sure you want to delete/i)
-        ).toBeInTheDocument();
-      });
-    }
+    await waitFor(() => {
+      expect(
+        screen.getByText(/are you sure you want to delete/i)
+      ).toBeInTheDocument();
+    });
   });
 
   it('disables delete button for departments with employees', () => {
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    const deleteButton = screen
-      .getAllByRole('button')
-      .find(
-        button =>
-          button.querySelector('svg') &&
-          button.getAttribute('data-disabled') === 'true'
-      );
-
-    expect(deleteButton).toBeInTheDocument();
+    const deleteButton = screen.getByTestId('delete-action-button');
+    expect(deleteButton).toBeDisabled();
   });
 
   it('switches between tabs correctly', async () => {
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    // Click on employees tab
     const employeesTab = screen.getByRole('tab', { name: /employees/i });
     fireEvent.click(employeesTab);
 
@@ -225,7 +208,6 @@ describe('DepartmentDetail', () => {
       expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     });
 
-    // Click on subdepartments tab
     const subdepartmentsTab = screen.getByRole('tab', {
       name: /subdepartments/i,
     });
@@ -236,7 +218,7 @@ describe('DepartmentDetail', () => {
     });
   });
 
-  it('shows empty state for employees when none exist', () => {
+  it('shows empty state for employees when none exist', async () => {
     vi.mocked(departmentHooks.useDepartmentEmployees).mockReturnValue({
       data: [],
       isLoading: false,
@@ -245,13 +227,14 @@ describe('DepartmentDetail', () => {
 
     render(<DepartmentDetail departmentId={1} />, { wrapper: createWrapper() });
 
-    // Click on employees tab
     const employeesTab = screen.getByRole('tab', { name: /employees/i });
     fireEvent.click(employeesTab);
 
-    expect(
-      screen.getByText(/no employees in this department/i)
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(/no employees in this department/i)
+      ).toBeInTheDocument();
+    });
   });
 
   it('calls onCreateChild when add subdepartment button is clicked', () => {
@@ -282,8 +265,7 @@ describe('DepartmentDetail', () => {
   });
 
   it('deletes department successfully', async () => {
-    // Mock department with no employees or children to allow deletion
-    const emptyDepartment = {
+    const emptyDepartment: Department = {
       ...mockDepartment,
       employeeCount: 0,
       children: [],
@@ -301,27 +283,17 @@ describe('DepartmentDetail', () => {
       wrapper: createWrapper(),
     });
 
-    // Click delete button
-    const deleteButton = screen
-      .getAllByRole('button')
-      .find(
-        button =>
-          button.querySelector('svg') && !(button as HTMLButtonElement).disabled
-      );
+    const deleteButton = screen.getByTestId('delete-action-button');
+    fireEvent.click(deleteButton);
 
-    if (deleteButton) {
-      fireEvent.click(deleteButton);
+    await waitFor(async () => {
+      const confirmButton = screen.getByRole('button', { name: /delete/i });
+      fireEvent.click(confirmButton);
+    });
 
-      // Confirm deletion
-      await waitFor(() => {
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
-        fireEvent.click(confirmButton);
-      });
-
-      await waitFor(() => {
-        expect(mockDeleteMutate).toHaveBeenCalledWith(1);
-        expect(mockOnDelete).toHaveBeenCalled();
-      });
-    }
+    await waitFor(() => {
+      expect(mockDeleteMutate).toHaveBeenCalledWith(1);
+      expect(mockOnDelete).toHaveBeenCalled();
+    });
   });
 });

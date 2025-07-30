@@ -61,7 +61,7 @@ export const MessageHistory: React.FC<MessageHistoryProps> = ({
         setAllMessages(prev => [...conversationData.content, ...prev]);
       }
     }
-  }, [conversationData]);
+  }, [conversationData, pageable.page]);
 
   // Reset when user changes
   useEffect(() => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -10,13 +11,21 @@ import { type Department } from '../../../types';
 // Mock the hooks
 vi.mock('../hooks/useDepartmentTree');
 vi.mock('./DepartmentSelect', () => ({
-  DepartmentSelect: (props: any) => (
-    <select data-testid="department-select" {...props}>
-      <option value="">No Parent Department</option>
-      <option value="1">Engineering</option>
-      <option value="2">Marketing</option>
-    </select>
-  ),
+  DepartmentSelect: ({ value, ...props }: any) => {
+    // Destructure to remove non-standard props from the <select> element
+    const { includeRoot, rootLabel, excludeId, ...rest } = props;
+    return (
+      <select data-testid="department-select" value={value} {...rest}>
+        <option value="">No Parent Department</option>
+        <option value="1">Engineering</option>
+        <option value="2">Marketing</option>
+        {/* Add the specific value for the test case if it doesn't exist */}
+        {value && !['', '1', '2'].includes(value.toString()) && (
+          <option value={value}>{`Department ${value}`}</option>
+        )}
+      </select>
+    );
+  },
 }));
 
 import * as departmentHooks from '../hooks/useDepartmentTree';

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import {
   Stack,
@@ -34,7 +36,7 @@ import {
 } from '../hooks/useDepartmentTree';
 import { DepartmentForm } from './DepartmentForm';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import { Department } from '../../../types';
+import type { Department } from '../../../types';
 
 interface DepartmentDetailProps {
   departmentId: number;
@@ -106,7 +108,7 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
       setDeleteDialogOpened(false);
       onDelete?.();
       onClose?.();
-    } catch (error) {
+    } catch {
       // Error handling is done in the hook
       setDeleteDialogOpened(false);
     }
@@ -119,7 +121,7 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
   if (isLoading) {
     return (
       <Center p="xl">
-        <Loader size="md" />
+        <Loader size="md" data-testid="loader" />
       </Center>
     );
   }
@@ -144,7 +146,7 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
           <Group gap="sm">
             <IconBuilding size={24} color="var(--mantine-color-blue-6)" />
             <div>
-              <Text size="xl" fw={600}>
+              <Text size="xl" fw={600} role="heading" aria-level={1}>
                 {department.name}
               </Text>
               {department.description && (
@@ -155,7 +157,11 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
             </div>
           </Group>
           <Group gap="xs">
-            <ActionIcon variant="light" onClick={handleEdit}>
+            <ActionIcon
+              variant="light"
+              onClick={handleEdit}
+              data-testid="edit-action-button"
+            >
               <IconEdit size={16} />
             </ActionIcon>
             {onCreateChild && (
@@ -168,6 +174,7 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
               color="red"
               onClick={handleDelete}
               disabled={!canDelete}
+              data-testid="delete-action-button"
             >
               <IconTrash size={16} />
             </ActionIcon>
@@ -375,8 +382,8 @@ export const DepartmentDetail: React.FC<DepartmentDetailProps> = ({
             : `Cannot delete "${department.name}" because it contains employees or subdepartments. Please move or remove them first.`
         }
         confirmLabel="Delete"
-        confirmColor="red"
-        confirmDisabled={!canDelete}
+        variant="danger"
+        loading={deleteDepartment.isPending || !canDelete}
       />
     </>
   );

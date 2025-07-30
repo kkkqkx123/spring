@@ -8,7 +8,6 @@ import {
   Stack,
   Center,
   ActionIcon,
-  Drawer,
 } from '@mantine/core';
 import { IconWifiOff, IconArrowLeft } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
