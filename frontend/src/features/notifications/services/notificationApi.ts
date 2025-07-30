@@ -1,4 +1,4 @@
-import { ApiClient } from '../../../services/api';
+import { apiClient } from '../../../services/api';
 import { Notification, PaginatedResponse, Pageable } from '../../../types';
 
 export interface NotificationRequest {
@@ -14,7 +14,7 @@ export interface NotificationUpdateRequest {
 }
 
 export class NotificationApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client: typeof apiClient) {}
 
   async getNotifications(
     pageable: Pageable
@@ -79,6 +79,4 @@ export class NotificationApi {
 }
 
 // Create singleton instance
-export const notificationApi = new NotificationApi(
-  new ApiClient(import.meta.env.VITE_API_BASE_URL || '/api')
-);
+export const notificationApi = new NotificationApi(apiClient);

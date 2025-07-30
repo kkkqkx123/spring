@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { vi } from 'vitest';
 import { NotificationItem } from './NotificationItem';
 import { Notification } from '../../../types';
 
@@ -51,11 +52,12 @@ describe('NotificationItem', () => {
 
     const button = screen.getByTestId('notification-item-1');
     expect(button).toHaveStyle('background-color: transparent');
+    // Should not have the unread badge
+    expect(screen.queryByRole('generic', { name: /badge/i })).not.toBeInTheDocument();
   });
 
-import { vi } from 'vitest';
-
-
+  it('calls onClick when clicked', () => {
+    const onClick = vi.fn();
     
     renderWithProvider(
       <NotificationItem notification={mockNotification} onClick={onClick} />
@@ -81,9 +83,9 @@ import { vi } from 'vitest';
         <NotificationItem notification={notification} />
       );
 
-      // The icon should be wrapped in a ThemeIcon with the correct color
-      const themeIcon = screen.getByRole('button').querySelector('[data-mantine-color]');
-      expect(themeIcon).toHaveAttribute('data-mantine-color', expectedColor);
+      // The icon should be wrapped in a ThemeIcon with the correct color attribute
+      const themeIcon = screen.getByRole('button').querySelector('.mantine-ThemeIcon-root');
+      expect(themeIcon).toHaveAttribute('color', expectedColor);
 
       unmount();
     });
@@ -130,7 +132,7 @@ import { vi } from 'vitest';
 
   it('applies correct font weight for read/unread notifications', () => {
     // Test unread notification
-    renderWithProvider(
+    const { rerender } = renderWithProvider(
       <NotificationItem notification={mockNotification} />
     );
 
@@ -139,7 +141,7 @@ import { vi } from 'vitest';
 
     // Test read notification
     const readNotification = { ...mockNotification, read: true };
-    const { rerender } = renderWithProvider(
+    rerender(
       <NotificationItem notification={readNotification} />
     );
 

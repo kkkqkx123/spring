@@ -5,6 +5,7 @@ interface NotificationState {
   notifications: Notification[];
   unreadCount: number;
   isLoading: boolean;
+  lastUpdated: string | null;
 }
 
 interface NotificationActions {
@@ -19,6 +20,8 @@ interface NotificationActions {
   setLoading: (loading: boolean) => void;
   getUnreadNotifications: () => Notification[];
   getNotificationById: (id: number) => Notification | undefined;
+  archiveReadNotifications: () => void;
+  getNotificationsByType: (type: string) => Notification[];
 }
 
 type NotificationStore = NotificationState & NotificationActions;
@@ -28,6 +31,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   notifications: [],
   unreadCount: 0,
   isLoading: false,
+  lastUpdated: null,
 
   // Actions
   setNotifications: notifications => {
@@ -35,17 +39,25 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     set({
       notifications,
       unreadCount,
+      lastUpdated: new Date().toISOString(),
     });
   },
 
   addNotification: notification => {
     set(state => {
+      // Avoid duplicates
+      const existingIndex = state.notifications.findIndex(n => n.id === notification.id);
+      if (existingIndex !== -1) {
+        return state;
+      }
+
       const newNotifications = [notification, ...state.notifications];
       const unreadCount = newNotifications.filter(n => !n.read).length;
 
       return {
         notifications: newNotifications,
         unreadCount,
+        lastUpdated: new Date().toISOString(),
       };
     });
   },
@@ -60,6 +72,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
       return {
         notifications,
         unreadCount,
+        lastUpdated: new Date().toISOString(),
       };
     });
   },
@@ -72,6 +85,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
       return {
         notifications,
         unreadCount,
+        lastUpdated: new Date().toISOString(),
       };
     });
   },
@@ -91,6 +105,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
       return {
         notifications,
         unreadCount: 0,
+        lastUpdated: new Date().toISOString(),
       };
     });
   },
@@ -99,12 +114,14 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     set({
       notifications: [],
       unreadCount: 0,
+      lastUpdated: new Date().toISOString(),
     });
   },
 
   setUnreadCount: count => {
     set({
       unreadCount: count,
+      lastUpdated: new Date().toISOString(),
     });
   },
 
@@ -122,5 +139,23 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   getNotificationById: id => {
     const { notifications } = get();
     return notifications.find(n => n.id === id);
+  },
+
+  archiveReadNotifications: () => {
+    set(state => {
+      const notifications = state.notifications.filter(n => !n.read);
+      const unreadCount = notifications.length;
+
+      return {
+        notifications,
+        unreadCount,
+        lastUpdated: new Date().toISOString(),
+      };
+    });
+  },
+
+  getNotificationsByType: type => {
+    const { notifications } = get();
+    return notifications.filter(n => n.type === type);
   },
 }));

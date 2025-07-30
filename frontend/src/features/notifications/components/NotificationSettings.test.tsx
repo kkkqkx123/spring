@@ -56,8 +56,10 @@ describe('NotificationSettings', () => {
   it('shows quiet hours controls when enabled', () => {
     renderWithProvider(<NotificationSettings preferences={mockPreferences} />);
 
-    expect(screen.getByLabelText('Start Time')).toBeInTheDocument();
-    expect(screen.getByLabelText('End Time')).toBeInTheDocument();
+    const startTimeInputs = screen.getAllByLabelText('Start Time');
+    const endTimeInputs = screen.getAllByLabelText('End Time');
+    expect(startTimeInputs[0]).toBeInTheDocument();
+    expect(endTimeInputs[0]).toBeInTheDocument();
     expect(
       screen.getByText(/quiet hours will suppress browser/i)
     ).toBeInTheDocument();
@@ -163,8 +165,9 @@ describe('NotificationSettings', () => {
       <NotificationSettings preferences={mockPreferences} onSave={onSave} />
     );
 
-    // Change start time
-    const startTimeSelect = screen.getByDisplayValue('22:00');
+    // Change start time - get the first input with value 22:00
+    const startTimeSelects = screen.getAllByDisplayValue('22:00');
+    const startTimeSelect = startTimeSelects[0];
     fireEvent.click(startTimeSelect);
 
     const newStartTime = screen.getByText('23:00');
