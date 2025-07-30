@@ -1,186 +1,373 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
-  Grid,
-  Paper,
   Stack,
   Group,
-  Text,
   Button,
+  Text,
+  Card,
+  Grid,
   Modal,
-  ActionIcon,
-  Tooltip,
+  Alert,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus, IconRefresh, IconBuilding } from '@tabler/icons-react';
-import { DepartmentTree } from '../components/DepartmentTree';
-import { DepartmentDetail } from '../components/DepartmentDetail';
-import { DepartmentForm } from '../components/DepartmentForm';
-import { DepartmentMoveDialog } from '../components/DepartmentMoveDialog';
-import { Department } from '../../../types';
+import { notifications } from '@mantine/notifications';
+import {
+  IconPlus,
+  IconAlertCircle,
+  IconCheck,
+} from '@tabler/icons-react';
+import { DepartmentTree, DepartmentForm } from '../components';
+import { useDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment } from '../hooks/useDepartments';
+import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
+import { useAuth } from '../../../hooks/useAuth';
+import type { Department } from '../../../types/entities';
 
-export const DepartmentsPage: React.FC = () => {
-  const [selectedDepartment, setSelectedDepartment] =
-    useState<Department | null>(null);
-  const [parentIdForNew, setParentIdForNew] = useState<number | undefined>();
-  const [departmentToMove, setDepartmentToMove] = useState<Department | null>(
-    null
-  );
+const DepartmentsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
   const [
     createModalOpened,
     { open: openCreateModal, close: closeCreateModal },
   ] = useDisclosure(false);
-  const [moveDialogOpened, { open: openMoveDialog, close: closeMoveDialog }] =
-    useDisclosure(false);
+  const [
+    editModalOpened,
+    { open: openEditModal, close: closeEditModal },
+  ] = useDisclosure(false);
+  const [
+    deleteModalOpened,
+    { open: openDeleteModal, close: closeDeleteModal },
+  ] = useDisclosure(false);
 
-  const handleSelectDepartment = (department: Department) => {
+  // Queries and mutations
+  const {
+    data: departments,
+    isLoading,
+    error,
+    refetch,
+  } = useDepartments();
+
+  const createDepartment = useCreateDepartment();
+  const updateDepartment = useUpdateDepartment();
+  const deleteDepartment = useDeleteDepartment();
+
+  // Permission checks
+  const canCreate =
+    user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ??
+    false;
+  const canEdit =
+    user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ??
+    false;
+  const canDelete =
+    user?.roles.some(role => ['ADMIN'].includes(role.name)) ?? false;
+
+  const handleDepartmentSelect = (department: Department) => {
     setSelectedDepartment(department);
   };
 
-  const handleCreateDepartment = (parentId?: number) => {
-    setParentIdForNew(parentId);
-    openCreateModal();
+  const handleCreateDepartment = async (data: any) => {
+    try {
+      await createDepartment.mutateAsync(data);
+      notifications.show({
+        title: 'Success',
+        message: 'Department created successfully',
+        color: 'green',
+        icon: <IconCheck size={16} />,
+      });
+      closeCreateModal();
+      refetch();
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to create department',
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+    }
   };
 
   const handleEditDepartment = (department: Department) => {
+    setEditingDepartment(department);
+    openEditModal();
+  };
+
+  const handleUpdateDepartment = async (data: any) => {
+    if (!editingDepartment) return;
+
+    try {
+      await updateDepartment.mutateAsync({
+        id: editingDepartment.id,
+        department: data,
+      });
+      notifications.show({
+        title: 'Success',
+        message: 'Department updated successfully',
+        color: 'green',
+        icon: <IconCheck size={16} />,
+      });
+      closeEditModal();
+      setEditingDepartment(null);
+      refetch();
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to update department',
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+    }
+  };
+
+  const handleDeleteDepartment = (department: Department) => {
     setSelectedDepartment(department);
-    // The DepartmentDetail component will handle the edit modal
+    openDeleteModal();
   };
 
-  const handleMoveDepartment = (department: Department) => {
-    setDepartmentToMove(department);
-    openMoveDialog();
+  const confirmDeleteDepartment = async () => {
+    if (!selectedDepartment) return;
+
+    try {
+      await deleteDepartment.mutateAsync(selectedDepartment.id);
+      notifications.show({
+        title: 'Success',
+        message: 'Department deleted successfully',
+        color: 'green',
+        icon: <IconCheck size={16} />,
+      });
+      closeDeleteModal();
+      setSelectedDepartment(null);
+      refetch();
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to delete department',
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+    }
   };
 
-  const handleCreateSuccess = () => {
-    closeCreateModal();
-    setParentIdForNew(undefined);
-  };
+  if (isLoading) {
+    return <LoadingSkeleton variant="page" />;
+  }
 
-  const handleCreateCancel = () => {
-    closeCreateModal();
-    setParentIdForNew(undefined);
-  };
-
-  const handleMoveSuccess = () => {
-    closeMoveDialog();
-    setDepartmentToMove(null);
-  };
-
-  const handleMoveCancel = () => {
-    closeMoveDialog();
-    setDepartmentToMove(null);
-  };
-
-  const handleDeleteDepartment = () => {
-    // Clear selection if the deleted department was selected
-    setSelectedDepartment(null);
-  };
-
-  const refreshData = () => {
-    // This would typically trigger a refetch of the department tree
-    window.location.reload();
-  };
+  if (error) {
+    return (
+      <Container size="lg" py="xl">
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="Error loading departments"
+          color="red"
+        >
+          {error.message || 'Failed to load department data'}
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
-    <Container size="xl" py="md">
-      <Stack gap="md">
-        {/* Page Header */}
+    <Container size="xl" py="xl">
+      <Stack gap="lg">
+        {/* Header */}
         <Group justify="space-between" align="center">
-          <Group gap="sm">
-            <IconBuilding size={32} color="var(--mantine-color-blue-6)" />
-            <div>
-              <Text size="xl" fw={700}>
-                Department Management
-              </Text>
-              <Text size="sm" c="dimmed">
-                Manage your organization's department structure
-              </Text>
-            </div>
-          </Group>
-          <Group gap="xs">
-            <Tooltip label="Refresh">
-              <ActionIcon variant="light" onClick={refreshData}>
-                <IconRefresh size={16} />
-              </ActionIcon>
-            </Tooltip>
+          <div>
+            <Text size="xl" fw={700} mb="xs">
+              Departments
+            </Text>
+            <Text c="dimmed">
+              Manage your organization's department structure
+            </Text>
+          </div>
+
+          {canCreate && (
             <Button
               leftSection={<IconPlus size={16} />}
-              onClick={() => handleCreateDepartment()}
+              onClick={openCreateModal}
             >
               Add Department
             </Button>
-          </Group>
+          )}
         </Group>
 
-        {/* Main Content */}
+        {/* Department Tree */}
         <Grid>
-          {/* Department Tree */}
-          <Grid.Col span={{ base: 12, md: selectedDepartment ? 6 : 12 }}>
-            <Paper
-              withBorder
-              p="md"
-              h="calc(100vh - 200px)"
-              style={{ overflow: 'auto' }}
-            >
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <Card padding="lg" radius="md" withBorder>
+              <Text fw={600} size="lg" mb="md">
+                Department Hierarchy
+              </Text>
               <DepartmentTree
-                onSelectDepartment={handleSelectDepartment}
-                onEditDepartment={handleEditDepartment}
-                onCreateDepartment={handleCreateDepartment}
-                selectedDepartmentId={selectedDepartment?.id}
-                allowDragDrop={true}
-                showEmployeeCount={true}
+                departments={departments || []}
+                selectedDepartment={selectedDepartment}
+                onDepartmentSelect={handleDepartmentSelect}
+                onDepartmentEdit={canEdit ? handleEditDepartment : undefined}
+                onDepartmentDelete={canDelete ? handleDeleteDepartment : undefined}
               />
-            </Paper>
+            </Card>
           </Grid.Col>
 
-          {/* Department Detail */}
-          {selectedDepartment && (
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <Paper
-                withBorder
-                p="md"
-                h="calc(100vh - 200px)"
-                style={{ overflow: 'auto' }}
-              >
-                <DepartmentDetail
-                  departmentId={selectedDepartment.id}
-                  onCreateChild={() =>
-                    handleCreateDepartment(selectedDepartment.id)
-                  }
-                  onDelete={handleDeleteDepartment}
-                  onClose={() => setSelectedDepartment(null)}
-                />
-              </Paper>
-            </Grid.Col>
-          )}
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            {selectedDepartment ? (
+              <Card padding="lg" radius="md" withBorder>
+                <Text fw={600} size="lg" mb="md">
+                  Department Details
+                </Text>
+                <Stack gap="sm">
+                  <div>
+                    <Text size="sm" fw={500} c="dimmed">
+                      Name
+                    </Text>
+                    <Text>{selectedDepartment.name}</Text>
+                  </div>
+                  {selectedDepartment.description && (
+                    <div>
+                      <Text size="sm" fw={500} c="dimmed">
+                        Description
+                      </Text>
+                      <Text>{selectedDepartment.description}</Text>
+                    </div>
+                  )}
+                  <div>
+                    <Text size="sm" fw={500} c="dimmed">
+                      Employee Count
+                    </Text>
+                    <Text>{selectedDepartment.employeeCount || 0}</Text>
+                  </div>
+                  {selectedDepartment.parentName && (
+                    <div>
+                      <Text size="sm" fw={500} c="dimmed">
+                        Parent Department
+                      </Text>
+                      <Text>{selectedDepartment.parentName}</Text>
+                    </div>
+                  )}
+                  <div>
+                    <Text size="sm" fw={500} c="dimmed">
+                      Created
+                    </Text>
+                    <Text>
+                      {selectedDepartment.createdAt
+                        ? new Date(selectedDepartment.createdAt).toLocaleDateString()
+                        : 'Unknown'}
+                    </Text>
+                  </div>
+                </Stack>
+
+                {(canEdit || canDelete) && (
+                  <Group gap="sm" mt="lg">
+                    {canEdit && (
+                      <Button
+                        variant="light"
+                        onClick={() => handleEditDepartment(selectedDepartment)}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                    {canDelete && (
+                      <Button
+                        variant="light"
+                        color="red"
+                        onClick={() => handleDeleteDepartment(selectedDepartment)}
+                      >
+                        Delete
+                      </Button>
+                    )}
+                  </Group>
+                )}
+              </Card>
+            ) : (
+              <Card padding="lg" radius="md" withBorder>
+                <Text c="dimmed" ta="center">
+                  Select a department to view details
+                </Text>
+              </Card>
+            )}
+          </Grid.Col>
         </Grid>
+
+        {/* Create Department Modal */}
+        <Modal
+          opened={createModalOpened}
+          onClose={closeCreateModal}
+          title="Create New Department"
+          size="md"
+        >
+          <DepartmentForm
+            departments={departments || []}
+            onSubmit={handleCreateDepartment}
+            onCancel={closeCreateModal}
+            loading={createDepartment.isPending}
+          />
+        </Modal>
+
+        {/* Edit Department Modal */}
+        <Modal
+          opened={editModalOpened}
+          onClose={() => {
+            closeEditModal();
+            setEditingDepartment(null);
+          }}
+          title="Edit Department"
+          size="md"
+        >
+          {editingDepartment && (
+            <DepartmentForm
+              department={editingDepartment}
+              departments={departments || []}
+              onSubmit={handleUpdateDepartment}
+              onCancel={() => {
+                closeEditModal();
+                setEditingDepartment(null);
+              }}
+              loading={updateDepartment.isPending}
+            />
+          )}
+        </Modal>
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          opened={deleteModalOpened}
+          onClose={closeDeleteModal}
+          title="Confirm Deletion"
+          centered
+        >
+          <Stack gap="md">
+            <Text>
+              Are you sure you want to delete the department{' '}
+              <strong>{selectedDepartment?.name}</strong>?
+              {selectedDepartment?.employeeCount && selectedDepartment.employeeCount > 0 && (
+                <Text c="red" size="sm" mt="xs">
+                  This department has {selectedDepartment.employeeCount} employees.
+                  They will need to be reassigned to another department.
+                </Text>
+              )}
+            </Text>
+
+            <Group justify="flex-end" gap="md">
+              <Button
+                variant="outline"
+                onClick={closeDeleteModal}
+                disabled={deleteDepartment.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                color="red"
+                onClick={confirmDeleteDepartment}
+                loading={deleteDepartment.isPending}
+              >
+                Delete Department
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
       </Stack>
-
-      {/* Create Department Modal */}
-      <Modal
-        opened={createModalOpened}
-        onClose={handleCreateCancel}
-        title={parentIdForNew ? 'Add Subdepartment' : 'Add Department'}
-        size="md"
-      >
-        <DepartmentForm
-          parentId={parentIdForNew}
-          onSuccess={handleCreateSuccess}
-          onCancel={handleCreateCancel}
-        />
-      </Modal>
-
-      {/* Move Department Dialog */}
-      {departmentToMove && (
-        <DepartmentMoveDialog
-          opened={moveDialogOpened}
-          onClose={handleMoveCancel}
-          department={departmentToMove}
-          onSuccess={handleMoveSuccess}
-        />
-      )}
     </Container>
   );
 };
+
+export default DepartmentsPage;

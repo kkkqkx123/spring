@@ -7,10 +7,18 @@ import { SkipLinks } from './components/accessibility/SkipLinks';
 import { LiveRegion } from './components/accessibility/LiveRegion';
 import { theme } from './theme';
 import { AppRouter } from './AppRouter';
+import { initializePerformanceMonitoring } from './utils/performance';
+import { preloadCommonLibraries } from './utils/dynamicImports';
 
 // Import Mantine styles
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+
+// Initialize performance monitoring
+initializePerformanceMonitoring();
+
+// Preload commonly used libraries
+preloadCommonLibraries();
 
 function App() {
   const skipLinks = [

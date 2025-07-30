@@ -167,3 +167,9 @@ export const arrayUtils = {
     });
   },
 };
+
+// Performance optimization utilities
+export * from './performance';
+export * from './lazyImport';
+export * from './dynamicImports';
+export * from './websocketOptimization';

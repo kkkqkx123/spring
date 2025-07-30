@@ -1,22 +1,27 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Center, Loader } from '@mantine/core';
 import { ROUTES } from './constants';
 import { ProtectedRoute, PublicRoute } from './components/routing';
 import { LoginPage, RegisterPage } from './features/auth/pages';
 import { AppShell } from './components/layout';
+import { LazyComponentWrapper } from './components/ui/LazyComponentWrapper';
+import { useAuth } from './hooks/useAuth';
 
-// Placeholder components - these will be implemented in later tasks
-const DashboardPage = () => <div>Dashboard Page - To be implemented</div>;
-const EmployeesPage = () => <div>Employees Page - To be implemented</div>;
-const DepartmentsPage = () => <div>Departments Page - To be implemented</div>;
-const ChatPage = () => <div>Chat Page - To be implemented</div>;
-const EmailPage = () => <div>Email Page - To be implemented</div>;
-const NotificationsPage = () => (
-  <div>Notifications Page - To be implemented</div>
-);
-const PermissionsPage = () => <div>Permissions Page - To be implemented</div>;
-const ProfilePage = () => <div>Profile Page - To be implemented</div>;
+// Lazy-loaded page components
+import {
+  DashboardPage,
+  EmployeesPage,
+  EmployeePage,
+  DepartmentsPage,
+  ChatPage,
+  EmailPage,
+  NotificationsPage,
+  PermissionsPage,
+  ProfilePage,
+  preloadCriticalPages,
+  preloadRoleBasedPages,
+} from './pages/lazy';
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -26,122 +31,174 @@ const LoadingFallback = () => (
 );
 
 export const AppRouter = () => {
+  const { user, isAuthenticated } = useAuth();
+
+  // Preload critical pages and role-based pages
+  useEffect(() => {
+    if (isAuthenticated) {
+      preloadCriticalPages();
+      
+      if (user?.roles) {
+        const roleNames = user.roles.map(role => role.name);
+        preloadRoleBasedPages(roleNames);
+      }
+    }
+  }, [isAuthenticated, user?.roles]);
+
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        {/* Public routes - no layout */}
-        <Route
-          path={ROUTES.LOGIN}
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path={ROUTES.REGISTER}
-          element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
+    <Routes>
+      {/* Public routes - no layout */}
+      <Route
+        path={ROUTES.LOGIN}
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path={ROUTES.REGISTER}
+        element={
+          <PublicRoute>
+            <RegisterPage />
+          </PublicRoute>
+        }
+      />
 
-        {/* Protected routes - with layout */}
-        <Route
-          path={ROUTES.DASHBOARD}
-          element={
-            <ProtectedRoute>
-              <AppShell>
+      {/* Protected routes - with layout and lazy loading */}
+      <Route
+        path={ROUTES.DASHBOARD}
+        element={
+          <ProtectedRoute>
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="page">
                 <DashboardPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.EMPLOYEES}
-          element={
-            <ProtectedRoute requiredPermission="EMPLOYEE_READ">
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.EMPLOYEES}
+        element={
+          <ProtectedRoute requiredPermission="EMPLOYEE_READ">
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="table">
                 <EmployeesPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.DEPARTMENTS}
-          element={
-            <ProtectedRoute requiredPermission="DEPARTMENT_READ">
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employees/:id"
+        element={
+          <ProtectedRoute requiredPermission="EMPLOYEE_READ">
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="form">
+                <EmployeePage />
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employees/new"
+        element={
+          <ProtectedRoute requiredPermission="EMPLOYEE_CREATE">
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="form">
+                <EmployeePage />
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.DEPARTMENTS}
+        element={
+          <ProtectedRoute requiredPermission="DEPARTMENT_READ">
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="page">
                 <DepartmentsPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.CHAT}
-          element={
-            <ProtectedRoute>
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.CHAT}
+        element={
+          <ProtectedRoute>
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="page">
                 <ChatPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.EMAIL}
-          element={
-            <ProtectedRoute requiredPermission="EMAIL_SEND">
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.EMAIL}
+        element={
+          <ProtectedRoute requiredPermission="EMAIL_SEND">
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="form">
                 <EmailPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.NOTIFICATIONS}
-          element={
-            <ProtectedRoute>
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.NOTIFICATIONS}
+        element={
+          <ProtectedRoute>
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="list">
                 <NotificationsPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.PERMISSIONS}
-          element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.PERMISSIONS}
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="table">
                 <PermissionsPage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.PROFILE}
-          element={
-            <ProtectedRoute>
-              <AppShell>
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.PROFILE}
+        element={
+          <ProtectedRoute>
+            <AppShell>
+              <LazyComponentWrapper skeletonVariant="form">
                 <ProfilePage />
-              </AppShell>
-            </ProtectedRoute>
-          }
-        />
+              </LazyComponentWrapper>
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      {/* Default redirect */}
+      <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 
-        {/* 404 page */}
-        <Route
-          path="*"
-          element={
-            <Center h="100vh">
-              <div>404 - Page Not Found</div>
-            </Center>
-          }
-        />
-      </Routes>
-    </Suspense>
+      {/* 404 page */}
+      <Route
+        path="*"
+        element={
+          <Center h="100vh">
+            <div>404 - Page Not Found</div>
+          </Center>
+        }
+      />
+    </Routes>
   );
 };

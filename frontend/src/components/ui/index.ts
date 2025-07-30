@@ -22,5 +22,17 @@ export {
 } from './ConfirmDialog';
 export { QueryErrorBoundary } from './QueryErrorBoundary';
 
+// Performance and Code Splitting Components
+export { LoadingSkeleton } from './LoadingSkeleton';
+export { LazyComponentWrapper } from './LazyComponentWrapper';
+export { VirtualizedList, useVirtualizedList } from './VirtualizedList';
+
+// Memoized Components for Performance
+export {
+  MemoizedEmployeeCard,
+  MemoizedChatMessage,
+  MemoizedNotificationItem,
+} from './MemoizedComponents';
+
 // Re-export types
 export type { ConfirmDialogProps } from './ConfirmDialog';
