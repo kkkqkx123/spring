@@ -39,13 +39,13 @@ export const RoleForm: React.FC<RoleFormProps> = ({
       permissionIds: role?.permissions?.map(p => p.id) || [],
     },
     validate: {
-      name: (value) => {
+      name: (value: string) => {
         if (!value.trim()) return 'Role name is required';
         if (value.length < 2) return 'Role name must be at least 2 characters';
         if (value.length > 50) return 'Role name must be less than 50 characters';
         return null;
       },
-      description: (value) => {
+      description: (value: string | any[]) => {
         if (value && value.length > 255) {
           return 'Description must be less than 255 characters';
         }
