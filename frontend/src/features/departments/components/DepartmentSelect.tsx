@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Select, SelectProps, Loader, Alert } from '@mantine/core';
+import { Select, type SelectProps, Loader } from '@mantine/core';
 import { IconAlertCircle, IconBuilding } from '@tabler/icons-react';
 import { useDepartmentTree } from '../hooks/useDepartmentTree';
-import { Department } from '../../../types';
+import { type Department } from '../../../types';
 
 interface DepartmentSelectProps extends Omit<SelectProps, 'data'> {
   excludeId?: number; // Exclude a specific department (useful when editing)
@@ -63,7 +63,7 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
   rootLabel = 'No Parent Department',
   showEmployeeCount = false,
   placeholder = 'Select department...',
-  ...props
+  ...rest
 }) => {
   const { data: departments, isLoading, error } = useDepartmentTree();
 
@@ -87,7 +87,7 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
   if (isLoading) {
     return (
       <Select
-        {...props}
+        {...rest}
         placeholder="Loading departments..."
         data={[]}
         disabled
@@ -99,7 +99,7 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
   if (error) {
     return (
       <Select
-        {...props}
+        {...rest}
         placeholder="Error loading departments"
         data={[]}
         disabled
@@ -111,7 +111,7 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
 
   return (
     <Select
-      {...props}
+      {...rest}
       data={options}
       placeholder={placeholder}
       leftSection={<IconBuilding size={16} />}

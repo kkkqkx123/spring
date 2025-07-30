@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { DepartmentSelect, SimpleDepartmentSelect } from './DepartmentSelect';
-import { Department } from '../../../types';
+import { type Department } from '../../../types';
 
 // Mock the hook
 vi.mock('../hooks/useDepartmentTree');

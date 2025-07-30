@@ -10,8 +10,12 @@ import { type Department } from '../../../types';
 // Mock the hooks
 vi.mock('../hooks/useDepartmentTree');
 vi.mock('./DepartmentSelect', () => ({
-  DepartmentSelect: ({ label, ...props }: any) => (
-    <select data-testid="department-select" {...props}>
+  DepartmentSelect: ({ value, onChange }: any) => (
+    <select
+      data-testid="department-select"
+      value={value}
+      onChange={e => onChange(e.target.value)}
+    >
       <option value="">Move to Root Level</option>
       <option value="1">Engineering</option>
       <option value="2">Marketing</option>
@@ -73,9 +77,19 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('Move Department')).toBeInTheDocument();
     expect(
-      screen.getByText(/moving department: frontend/i)
+      screen.getByRole('heading', { name: /move department/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText((content, element) => {
+        const hasText = (node: Element) =>
+          node.textContent === 'Moving department: Frontend';
+        const elementHasText = hasText(element as Element);
+        const childrenDontHaveText = Array.from(element?.children || []).every(
+          child => !hasText(child)
+        );
+        return elementHasText && childrenDontHaveText;
+      })
     ).toBeInTheDocument();
     expect(screen.getByTestId('department-select')).toBeInTheDocument();
     expect(
@@ -270,8 +284,24 @@ describe('DepartmentMoveDialog', () => {
     const departmentWithChildren = {
       ...mockDepartment,
       children: [
-        { id: 3, name: 'Child 1' },
-        { id: 4, name: 'Child 2' },
+        {
+          id: 3,
+          name: 'Child 1',
+          description: '',
+          parentId: 1,
+          employeeCount: 0,
+          createdAt: '2024-01-01T00:00:00Z',
+          children: [],
+        },
+        {
+          id: 4,
+          name: 'Child 2',
+          description: '',
+          parentId: 1,
+          employeeCount: 0,
+          createdAt: '2024-01-01T00:00:00Z',
+          children: [],
+        },
       ],
     };
 
@@ -342,13 +372,19 @@ describe('DepartmentMoveDialog', () => {
       { wrapper: createWrapper() }
     );
 
+    // Initially, only the current location is shown
+    expect(screen.getByText('Department ID: 2')).toBeInTheDocument();
+    expect(screen.queryByText('Department ID: 3')).not.toBeInTheDocument();
+
     // Change parent department
     const select = screen.getByTestId('department-select');
     fireEvent.change(select, { target: { value: '3' } });
 
-    await waitFor(() => {
-      expect(screen.getByText('Department ID: 2')).toBeInTheDocument(); // Current
-      expect(screen.getByText('Department ID: 3')).toBeInTheDocument(); // New
-    });
+    // Assert that the preview updates correctly
+    expect(await screen.findByText('Department ID: 3')).toBeInTheDocument();
+
+    // The original "Current Location" text should now be part of the preview
+    // and not duplicated.
+    expect(screen.getAllByText(/Department ID: 2/i)).toHaveLength(1);
   });
 });

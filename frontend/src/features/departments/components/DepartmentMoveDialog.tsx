@@ -13,7 +13,7 @@ import { IconAlertCircle, IconArrowRight } from '@tabler/icons-react';
 import { z } from 'zod';
 import { DepartmentSelect } from './DepartmentSelect';
 import { useMoveDepartment } from '../hooks/useDepartmentTree';
-import { Department } from '../../../types';
+import { type Department } from '../../../types';
 
 const moveSchema = z.object({
   newParentId: z.string().optional(),
@@ -67,7 +67,7 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
   };
 
   const isLoading = moveDepartment.isPending;
-  const error = moveDepartment.error;
+  const error = moveDepartment.error as any;
 
   // Get the current parent name for display
   const getCurrentParentName = () => {
@@ -111,17 +111,29 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
             </Text>
           </Alert>
 
-          {/* Current Location */}
-          <Stack gap="xs">
-            <Text size="sm" fw={500}>
-              Current Location
-            </Text>
-            <Text size="sm" c="dimmed">
-              {getCurrentParentName()}
-            </Text>
-          </Stack>
+          {/* Current and New Location */}
+          {form.values.newParentId ===
+          (department.parentId?.toString() || '') ? (
+            <Stack gap="xs">
+              <Text size="sm" fw={500}>
+                Current Location
+              </Text>
+              <Text size="sm" c="dimmed">
+                {getCurrentParentName()}
+              </Text>
+            </Stack>
+          ) : (
+            <Alert color="green" variant="light">
+              <Group gap="xs" align="center">
+                <Text size="sm">{getCurrentParentName()}</Text>
+                <IconArrowRight size={16} />
+                <Text size="sm" fw={700}>
+                  {getNewParentName()}
+                </Text>
+              </Group>
+            </Alert>
+          )}
 
-          {/* New Location */}
           <DepartmentSelect
             label="New Parent Department"
             placeholder="Select new parent department"
@@ -130,23 +142,6 @@ export const DepartmentMoveDialog: React.FC<DepartmentMoveDialogProps> = ({
             excludeId={department.id}
             {...form.getInputProps('newParentId')}
           />
-
-          {/* Preview */}
-          {form.values.newParentId !==
-            (department.parentId?.toString() || '') && (
-            <Alert color="green" variant="light">
-              <Group gap="xs" align="center">
-                <Text size="sm">
-                  <strong>{getCurrentParentName()}</strong>
-                </Text>
-                <IconArrowRight size={16} />
-                <Text size="sm">
-                  <strong>{getNewParentName()}</strong>
-                </Text>
-              </Group>
-            </Alert>
-          )}
-
           {/* Warning for moving with children */}
           {department.children && department.children.length > 0 && (
             <Alert color="yellow" variant="light">
