@@ -79,13 +79,13 @@ describe('DepartmentSelect', () => {
   it('renders department options correctly', async () => {
     render(<DepartmentSelect />, { wrapper: createWrapper() });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
       expect(screen.getByText('Engineering')).toBeInTheDocument();
-      expect(screen.getByText('  Frontend')).toBeInTheDocument(); // Indented
-      expect(screen.getByText('  Backend')).toBeInTheDocument(); // Indented
+      expect(screen.getByText(/Frontend/)).toBeInTheDocument();
+      expect(screen.getByText(/Backend/)).toBeInTheDocument();
       expect(screen.getByText('Marketing')).toBeInTheDocument();
     });
   });
@@ -95,13 +95,13 @@ describe('DepartmentSelect', () => {
       wrapper: createWrapper(),
     });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
       expect(screen.getByText('Engineering (15)')).toBeInTheDocument();
-      expect(screen.getByText('  Frontend (8)')).toBeInTheDocument();
-      expect(screen.getByText('  Backend (7)')).toBeInTheDocument();
+      expect(screen.getByText(/Frontend \(8\)/)).toBeInTheDocument();
+      expect(screen.getByText(/Backend \(7\)/)).toBeInTheDocument();
       expect(screen.getByText('Marketing (10)')).toBeInTheDocument();
     });
   });
@@ -111,7 +111,7 @@ describe('DepartmentSelect', () => {
       wrapper: createWrapper(),
     });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
@@ -123,15 +123,15 @@ describe('DepartmentSelect', () => {
   it('excludes specified department', async () => {
     render(<DepartmentSelect excludeId={1} />, { wrapper: createWrapper() });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
       expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
       expect(screen.getByText('Marketing')).toBeInTheDocument();
       // Children of excluded department should still be visible
-      expect(screen.getByText('Frontend')).toBeInTheDocument();
-      expect(screen.getByText('Backend')).toBeInTheDocument();
+      expect(screen.getByText(/Frontend/)).toBeInTheDocument();
+      expect(screen.getByText(/Backend/)).toBeInTheDocument();
     });
   });
 
@@ -144,8 +144,12 @@ describe('DepartmentSelect', () => {
 
     render(<DepartmentSelect />, { wrapper: createWrapper() });
 
-    expect(screen.getByDisplayValue('')).toHaveAttribute('disabled');
-    expect(screen.getByText('Loading departments...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Loading departments...')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Loading departments...')
+    ).toHaveAttribute('disabled');
   });
 
   it('shows error state', () => {
@@ -157,8 +161,12 @@ describe('DepartmentSelect', () => {
 
     render(<DepartmentSelect />, { wrapper: createWrapper() });
 
-    expect(screen.getByDisplayValue('')).toHaveAttribute('disabled');
-    expect(screen.getByText('Error loading departments')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Error loading departments')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Error loading departments')
+    ).toHaveAttribute('disabled');
   });
 
   it('handles selection correctly', async () => {
@@ -167,7 +175,7 @@ describe('DepartmentSelect', () => {
       wrapper: createWrapper(),
     });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
@@ -181,12 +189,12 @@ describe('DepartmentSelect', () => {
   it('is searchable', async () => {
     render(<DepartmentSelect />, { wrapper: createWrapper() });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.change(select, { target: { value: 'Front' } });
 
     await waitFor(() => {
       // Should filter to show only Frontend
-      expect(screen.getByText('  Frontend')).toBeInTheDocument();
+      expect(screen.getByText(/Frontend/)).toBeInTheDocument();
       expect(screen.queryByText('Engineering')).not.toBeInTheDocument();
       expect(screen.queryByText('Marketing')).not.toBeInTheDocument();
     });
@@ -199,7 +207,7 @@ describe('DepartmentSelect', () => {
     });
 
     // Find and click the clear button
-    const clearButton = screen.getByLabelText('Clear input');
+    const clearButton = screen.getByLabelText('Clear select');
     fireEvent.click(clearButton);
 
     expect(mockOnChange).toHaveBeenCalledWith(null, expect.any(Object));
@@ -220,13 +228,13 @@ describe('SimpleDepartmentSelect', () => {
   it('renders simplified department options', async () => {
     render(<SimpleDepartmentSelect />, { wrapper: createWrapper() });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
       expect(screen.getByText('Engineering')).toBeInTheDocument();
-      expect(screen.getByText('  Frontend')).toBeInTheDocument();
-      expect(screen.getByText('  Backend')).toBeInTheDocument();
+      expect(screen.getByText(/Frontend/)).toBeInTheDocument();
+      expect(screen.getByText(/Backend/)).toBeInTheDocument();
       expect(screen.getByText('Marketing')).toBeInTheDocument();
     });
   });
@@ -234,7 +242,7 @@ describe('SimpleDepartmentSelect', () => {
   it('does not show employee count', async () => {
     render(<SimpleDepartmentSelect />, { wrapper: createWrapper() });
 
-    const select = screen.getByRole('combobox');
+    const select = screen.getByRole('textbox');
     fireEvent.click(select);
 
     await waitFor(() => {
@@ -252,8 +260,10 @@ describe('SimpleDepartmentSelect', () => {
 
     render(<SimpleDepartmentSelect />, { wrapper: createWrapper() });
 
-    expect(screen.getByDisplayValue('')).toHaveAttribute('disabled');
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Loading...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Loading...')).toHaveAttribute(
+      'disabled'
+    );
   });
 
   it('shows error state', () => {
@@ -265,7 +275,11 @@ describe('SimpleDepartmentSelect', () => {
 
     render(<SimpleDepartmentSelect />, { wrapper: createWrapper() });
 
-    expect(screen.getByDisplayValue('')).toHaveAttribute('disabled');
-    expect(screen.getByText('Error loading departments')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Error loading departments')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Error loading departments')
+    ).toHaveAttribute('disabled');
   });
 });

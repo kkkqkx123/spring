@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/// <reference types="vitest" />
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 // Mock IntersectionObserver
 (global as any).IntersectionObserver = class IntersectionObserver {
@@ -60,4 +60,22 @@ Object.defineProperty(window, 'Notification', {
     permission: 'default',
     requestPermission: vi.fn().mockResolvedValue('default'),
   })),
+});
+
+// Setup Mantine Portal testing environment
+// Create a container for portal content
+const portalContainer = document.createElement('div');
+portalContainer.setAttribute('data-mantine-portal-container', 'true');
+document.body.appendChild(portalContainer);
+
+// Mock createPortal to render into our test container
+vi.mock('react-dom', async () => {
+  const actual = (await vi.importActual('react-dom')) as any;
+  return {
+    ...actual,
+    createPortal: (children: any) => {
+      // For testing, render children directly instead of using portal
+      return children;
+    },
+  };
 });

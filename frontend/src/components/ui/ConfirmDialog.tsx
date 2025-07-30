@@ -3,7 +3,6 @@ import { Modal, Text, Group, Button, Stack, ThemeIcon } from '@mantine/core';
 import {
   IconAlertTriangle,
   IconTrash,
-  IconExclamationMark,
   IconInfoCircle,
   IconCheck,
 } from '@tabler/icons-react';
@@ -19,6 +18,7 @@ export interface ConfirmDialogProps {
   variant?: 'danger' | 'warning' | 'info' | 'success';
   loading?: boolean;
   children?: React.ReactNode;
+  'data-testid'?: string;
 }
 
 const variantConfig = {
@@ -55,6 +55,7 @@ export function ConfirmDialog({
   variant = 'danger',
   loading = false,
   children,
+  'data-testid': dataTestId,
 }: ConfirmDialogProps) {
   const config = variantConfig[variant];
   const IconComponent = config.icon;
@@ -80,6 +81,7 @@ export function ConfirmDialog({
       closeOnClickOutside={!loading}
       closeOnEscape={!loading}
       withCloseButton={!loading}
+      data-testid={dataTestId}
     >
       <Stack gap="md">
         <Text size="sm" c="dimmed">

@@ -14,16 +14,16 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconAlertCircle, IconCheck } from '@tabler/icons-react';
-import { DepartmentTree, DepartmentForm } from '../components';
+import { DepartmentTree, DepartmentForm } from '../components/index';
+import { useDepartments } from '../hooks/useDepartments';
 import {
-  useDepartments,
   useCreateDepartment,
   useUpdateDepartment,
   useDeleteDepartment,
-} from '../hooks/useDepartments';
+} from '../hooks/useDepartmentTree';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
-import type { Department } from '../../../types/entities';
+import type { Department } from '../../../types';
 
 const DepartmentsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -98,7 +98,7 @@ const DepartmentsPage: React.FC = () => {
     try {
       await updateDepartment.mutateAsync({
         id: editingDepartment.id,
-        department: data,
+        ...data,
       });
       notifications.show({
         title: 'Success',
@@ -198,13 +198,8 @@ const DepartmentsPage: React.FC = () => {
                 Department Hierarchy
               </Text>
               <DepartmentTree
-                departments={departments || []}
-                selectedDepartment={selectedDepartment}
-                onDepartmentSelect={handleDepartmentSelect}
-                onDepartmentEdit={canEdit ? handleEditDepartment : undefined}
-                onDepartmentDelete={
-                  canDelete ? handleDeleteDepartment : undefined
-                }
+                selectedDepartmentId={selectedDepartment?.id}
+                onEditDepartment={canEdit ? handleEditDepartment : undefined}
               />
             </Card>
           </Grid.Col>
@@ -236,14 +231,6 @@ const DepartmentsPage: React.FC = () => {
                     </Text>
                     <Text>{selectedDepartment.employeeCount || 0}</Text>
                   </div>
-                  {selectedDepartment.parentName && (
-                    <div>
-                      <Text size="sm" fw={500} c="dimmed">
-                        Parent Department
-                      </Text>
-                      <Text>{selectedDepartment.parentName}</Text>
-                    </div>
-                  )}
                   <div>
                     <Text size="sm" fw={500} c="dimmed">
                       Created
@@ -300,10 +287,10 @@ const DepartmentsPage: React.FC = () => {
           size="md"
         >
           <DepartmentForm
-            departments={departments || []}
-            onSubmit={handleCreateDepartment}
+            onSuccess={() => {
+              handleCreateDepartment({});
+            }}
             onCancel={closeCreateModal}
-            loading={createDepartment.isPending}
           />
         </Modal>
 
@@ -320,13 +307,13 @@ const DepartmentsPage: React.FC = () => {
           {editingDepartment && (
             <DepartmentForm
               department={editingDepartment}
-              departments={departments || []}
-              onSubmit={handleUpdateDepartment}
+              onSuccess={() => {
+                handleUpdateDepartment({});
+              }}
               onCancel={() => {
                 closeEditModal();
                 setEditingDepartment(null);
               }}
-              loading={updateDepartment.isPending}
             />
           )}
         </Modal>

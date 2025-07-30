@@ -15,26 +15,23 @@ import {
   Loader,
 } from '@mantine/core';
 import {
-  IconChevronRight,
+  IconAlertCircle,
+  IconBuilding,
   IconChevronDown,
+  IconChevronRight,
   IconDots,
   IconEdit,
-  IconTrash,
   IconPlus,
+  IconTrash,
   IconUsers,
-  IconBuilding,
-  IconAlertCircle,
 } from '@tabler/icons-react';
-import { useDragAndDrop } from '@mantine/dnd';
-import { notifications } from '@mantine/notifications';
 import {
   useDepartmentTree,
   useDeleteDepartment,
   useMoveDepartment,
 } from '../hooks/useDepartmentTree';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
-import { Department } from '../../../types';
-
+import type { Department } from '../../../types';
 interface DepartmentTreeProps {
   onSelectDepartment?: (department: Department) => void;
   onEditDepartment?: (department: Department) => void;
@@ -119,6 +116,7 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
         borderColor: isSelected ? 'var(--mantine-color-blue-4)' : undefined,
       }}
       onClick={handleSelect}
+      data-testid={`department-node-${department.id}`}
     >
       <Group justify="space-between" wrap="nowrap">
         <Group gap={compact ? 'xs' : 'sm'} wrap="nowrap">
@@ -132,6 +130,7 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
             style={{
               visibility: hasChildren ? 'visible' : 'hidden',
             }}
+            aria-label={isExpanded ? 'Collapse' : 'Expand'}
           >
             {isExpanded ? (
               <IconChevronDown size={16} />
@@ -173,6 +172,7 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
               variant="subtle"
               size={compact ? 'sm' : 'md'}
               onClick={e => e.stopPropagation()}
+              aria-label="Open menu"
             >
               <IconDots size={16} />
             </ActionIcon>
@@ -230,7 +230,11 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
         nodeContent
       )}
 
-      <Collapse in={isExpanded}>
+      <Collapse
+        in={isExpanded}
+        key={`${department.id}-${isExpanded}`}
+        transitionDuration={0}
+      >
         {hasChildren && (
           <Stack gap={compact ? 'xs' : 'sm'} mt={compact ? 'xs' : 'sm'}>
             {department.children!.map(child => (
@@ -262,7 +266,7 @@ const DepartmentNode: React.FC<DepartmentNodeProps> = ({
         title="Delete Department"
         message={`Are you sure you want to delete "${department.name}"? This action cannot be undone.`}
         confirmLabel="Delete"
-        confirmColor="red"
+        data-testid={`delete-confirm-dialog-${department.id}`}
       />
     </>
   );
@@ -331,8 +335,8 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
 
   if (isLoading) {
     return (
-      <Center p="xl">
-        <Loader size="md" />
+      <Center p="xl" data-testid="loader">
+        <Loader size="md" role="progressbar" />
       </Center>
     );
   }
@@ -376,12 +380,20 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
           </Text>
           <Group gap="xs">
             <Tooltip label="Expand All">
-              <ActionIcon variant="subtle" onClick={expandAll}>
+              <ActionIcon
+                variant="subtle"
+                onClick={expandAll}
+                aria-label="Expand All"
+              >
                 <IconChevronDown size={16} />
               </ActionIcon>
             </Tooltip>
             <Tooltip label="Collapse All">
-              <ActionIcon variant="subtle" onClick={collapseAll}>
+              <ActionIcon
+                variant="subtle"
+                onClick={collapseAll}
+                aria-label="Collapse All"
+              >
                 <IconChevronRight size={16} />
               </ActionIcon>
             </Tooltip>
@@ -402,7 +414,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
       <Stack gap={compact ? 'xs' : 'sm'}>
         {departments.map(department => (
           <DepartmentNode
-            key={department.id}
+            key={`${department.id}-${expandedNodes.has(department.id)}`}
             department={department}
             level={0}
             onSelectDepartment={onSelectDepartment}

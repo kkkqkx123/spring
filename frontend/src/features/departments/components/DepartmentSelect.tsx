@@ -26,27 +26,25 @@ const flattenDepartments = (
   const options: DepartmentOption[] = [];
 
   departments.forEach(dept => {
-    if (excludeId && dept.id === excludeId) {
-      return; // Skip excluded department
+    if (!excludeId || dept.id !== excludeId) {
+      const indent = '  '.repeat(level);
+      const employeeCountText = showEmployeeCount
+        ? ` (${dept.employeeCount})`
+        : '';
+      const label = `${indent}${dept.name}${employeeCountText}`;
+
+      options.push({
+        value: dept.id.toString(),
+        label,
+        disabled: false,
+      });
     }
-
-    const indent = '  '.repeat(level);
-    const employeeCountText = showEmployeeCount
-      ? ` (${dept.employeeCount})`
-      : '';
-    const label = `${indent}${dept.name}${employeeCountText}`;
-
-    options.push({
-      value: dept.id.toString(),
-      label,
-      disabled: false,
-    });
 
     if (dept.children && dept.children.length > 0) {
       options.push(
         ...flattenDepartments(
           dept.children,
-          level + 1,
+          level + (excludeId === dept.id ? 0 : 1),
           excludeId,
           showEmployeeCount
         )
@@ -117,6 +115,7 @@ export const DepartmentSelect: React.FC<DepartmentSelectProps> = ({
       leftSection={<IconBuilding size={16} />}
       searchable
       clearable
+      clearButtonProps={{ 'aria-label': 'Clear select' }}
       maxDropdownHeight={300}
     />
   );
@@ -166,6 +165,7 @@ export const SimpleDepartmentSelect: React.FC<
       leftSection={<IconBuilding size={16} />}
       searchable
       clearable
+      clearButtonProps={{ 'aria-label': 'Clear select' }}
     />
   );
 };

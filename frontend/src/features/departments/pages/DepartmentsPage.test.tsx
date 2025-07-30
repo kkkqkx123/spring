@@ -1,10 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
-import { DepartmentsPage } from './DepartmentsPage';
-import { Department } from '../../../types';
+import { MemoryRouter } from 'react-router-dom';
+import DepartmentsPage from './DepartmentsPage';
+import * as departmentHooks from '../hooks/useDepartments';
+import * as departmentTreeHooks from '../hooks/useDepartmentTree';
+import { useAuth } from '../../../hooks/useAuth';
+
+// Mock the hooks
+vi.mock('../../../hooks/useAuth');
+vi.mock('../hooks/useDepartments', () => ({
+  useDepartments: vi.fn(),
+}));
+vi.mock('../hooks/useDepartmentTree', () => ({
+  useCreateDepartment: vi.fn(),
+  useUpdateDepartment: vi.fn(),
+  useDeleteDepartment: vi.fn(),
+}));
 
 // Mock the components
 vi.mock('../components/DepartmentTree', () => ({
@@ -72,23 +87,54 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>{children}</MantineProvider>
+      <MantineProvider>
+        <MemoryRouter>{children}</MemoryRouter>
+      </MantineProvider>
     </QueryClientProvider>
   );
 };
 
 describe('DepartmentsPage', () => {
+  const mockCreateDepartment = vi.fn();
+  const mockUpdateDepartment = vi.fn();
+  const mockDeleteDepartment = vi.fn();
+  const mockRefetch = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
+
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        roles: [{ name: 'ADMIN' }],
+      },
+    } as any);
+
+    vi.mocked(departmentHooks.useDepartments).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      refetch: mockRefetch,
+    } as any);
+
+    vi.mocked(departmentTreeHooks.useCreateDepartment).mockReturnValue({
+      mutateAsync: mockCreateDepartment,
+    } as any);
+
+    vi.mocked(departmentTreeHooks.useUpdateDepartment).mockReturnValue({
+      mutateAsync: mockUpdateDepartment,
+    } as any);
+
+    vi.mocked(departmentTreeHooks.useDeleteDepartment).mockReturnValue({
+      mutateAsync: mockDeleteDepartment,
+    } as any);
   });
 
   it('renders page header correctly', () => {
     render(<DepartmentsPage />, { wrapper: createWrapper() });
 
-    expect(screen.getByText('Department Management')).toBeInTheDocument();
+    expect(screen.getByText('Departments')).toBeInTheDocument();
     expect(
       screen.getByText(/manage your organization's department structure/i)
     ).toBeInTheDocument();
@@ -144,7 +190,7 @@ describe('DepartmentsPage', () => {
     fireEvent.click(addButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Department')).toBeInTheDocument();
+      expect(screen.getByText('Create New Department')).toBeInTheDocument();
       expect(screen.getByTestId('department-form')).toBeInTheDocument();
       expect(screen.getByText('Parent ID: None')).toBeInTheDocument();
     });
@@ -158,7 +204,7 @@ describe('DepartmentsPage', () => {
     fireEvent.click(createChildButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Subdepartment')).toBeInTheDocument();
+      expect(screen.getByText('Create New Department')).toBeInTheDocument();
       expect(screen.getByTestId('department-form')).toBeInTheDocument();
       expect(screen.getByText('Parent ID: 1')).toBeInTheDocument();
     });
@@ -220,7 +266,7 @@ describe('DepartmentsPage', () => {
     fireEvent.click(addChildButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Subdepartment')).toBeInTheDocument();
+      expect(screen.getByText('Create New Department')).toBeInTheDocument();
       expect(screen.getByText('Parent ID: 1')).toBeInTheDocument();
     });
   });
