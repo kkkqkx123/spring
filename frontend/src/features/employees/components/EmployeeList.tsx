@@ -25,7 +25,7 @@ import {
   IconDots,
   IconAlertCircle,
 } from '@tabler/icons-react';
-import { DataTable } from '../../../components/ui/DataTable';
+import { ResponsiveDataTable } from '../../../components/ui/ResponsiveDataTable';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { EmployeeSearch } from './EmployeeSearch';
 import { EmployeeCard } from './EmployeeCard';
@@ -352,7 +352,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
           </Stack>
         </Center>
       ) : viewMode === 'table' ? (
-        <DataTable
+        <ResponsiveDataTable
           data={employees}
           columns={tableColumns}
           loading={isLoading}

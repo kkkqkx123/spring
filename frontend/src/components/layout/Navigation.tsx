@@ -17,6 +17,8 @@ import { User } from '../../types';
 export interface NavigationProps {
   user: User;
   onNavigate?: () => void;
+  isMobile?: boolean;
+  isTablet?: boolean;
 }
 
 interface NavigationItem {
@@ -74,7 +76,7 @@ const navigationItems: NavigationItem[] = [
   },
 ];
 
-export function Navigation({ user, onNavigate }: NavigationProps) {
+export function Navigation({ user, onNavigate, isMobile = false, isTablet = false }: NavigationProps) {
   const location = useLocation();
 
   const hasRequiredRole = (requiredRoles?: string[]): boolean => {
@@ -94,31 +96,51 @@ export function Navigation({ user, onNavigate }: NavigationProps) {
     onNavigate?.();
   };
 
+  const getIconSize = () => {
+    if (isMobile) return 20;
+    if (isTablet) return 18;
+    return 18;
+  };
+
+  const getTextSize = () => {
+    if (isMobile) return 'md';
+    return 'sm';
+  };
+
+  const getSpacing = () => {
+    if (isMobile) return 'sm';
+    return 'xs';
+  };
+
   return (
-    <Stack gap="xs" h="100%">
+    <Stack gap={getSpacing()} h="100%">
       {/* User Info */}
       <Group
         gap="sm"
-        p="sm"
-        style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}
+        p={isMobile ? 'md' : 'sm'}
+        style={{ 
+          borderBottom: '1px solid var(--mantine-color-gray-3)',
+          // Add touch-friendly spacing on mobile
+          minHeight: isMobile ? '60px' : 'auto',
+        }}
       >
-        <ThemeIcon size="lg" variant="light">
-          <IconUsers size={20} />
+        <ThemeIcon size={isMobile ? 'xl' : 'lg'} variant="light">
+          <IconUsers size={isMobile ? 24 : 20} />
         </ThemeIcon>
         <div style={{ flex: 1 }}>
-          <Text size="sm" fw={600}>
+          <Text size={getTextSize()} fw={600} lineClamp={1}>
             {user.firstName && user.lastName
               ? `${user.firstName} ${user.lastName}`
               : user.username}
           </Text>
-          <Text size="xs" c="dimmed">
+          <Text size="xs" c="dimmed" lineClamp={1}>
             {user.roles.map(role => role.name).join(', ')}
           </Text>
         </div>
       </Group>
 
       {/* Navigation Items */}
-      <Stack gap="xs" style={{ flex: 1 }}>
+      <Stack gap={getSpacing()} style={{ flex: 1 }}>
         {navigationItems
           .filter(item => hasRequiredRole(item.requiredRoles))
           .map(item => {
@@ -131,11 +153,21 @@ export function Navigation({ user, onNavigate }: NavigationProps) {
                 component={Link}
                 to={item.href}
                 label={item.label}
-                leftSection={<IconComponent size={18} />}
+                leftSection={<IconComponent size={getIconSize()} />}
                 active={active}
                 onClick={onNavigate}
                 style={{
                   borderRadius: 'var(--mantine-radius-sm)',
+                  // Touch-friendly sizing on mobile
+                  minHeight: isMobile ? '48px' : '36px',
+                  fontSize: isMobile ? '1rem' : '0.875rem',
+                  padding: isMobile ? '0.75rem' : '0.5rem',
+                }}
+                styles={{
+                  label: {
+                    fontSize: isMobile ? '1rem' : '0.875rem',
+                    fontWeight: isMobile ? 500 : 400,
+                  },
                 }}
               />
             );
@@ -146,11 +178,20 @@ export function Navigation({ user, onNavigate }: NavigationProps) {
       <Divider />
       <NavLink
         label="Logout"
-        leftSection={<IconLogout size={18} />}
+        leftSection={<IconLogout size={getIconSize()} />}
         onClick={handleLogout}
         style={{
           borderRadius: 'var(--mantine-radius-sm)',
           color: 'var(--mantine-color-red-6)',
+          minHeight: isMobile ? '48px' : '36px',
+          fontSize: isMobile ? '1rem' : '0.875rem',
+          padding: isMobile ? '0.75rem' : '0.5rem',
+        }}
+        styles={{
+          label: {
+            fontSize: isMobile ? '1rem' : '0.875rem',
+            fontWeight: isMobile ? 500 : 400,
+          },
         }}
       />
     </Stack>

@@ -23,6 +23,7 @@ export interface HeaderProps {
   navbarOpened: boolean;
   toggleNavbar: () => void;
   isMobile: boolean;
+  isTablet?: boolean;
 }
 
 export function Header({
@@ -30,6 +31,7 @@ export function Header({
   navbarOpened,
   toggleNavbar,
   isMobile,
+  isTablet = false,
 }: HeaderProps) {
   const [searchValue, setSearchValue] = useState('');
 
@@ -54,60 +56,96 @@ export function Header({
     console.log('View all notifications clicked');
   };
 
+  const getHeaderPadding = () => {
+    if (isMobile) return 'sm';
+    return 'md';
+  };
+
+  const getSearchMaxWidth = () => {
+    if (isMobile) return 200;
+    if (isTablet) return 300;
+    return 400;
+  };
+
+  const showFullUserInfo = !isMobile && !isTablet;
+
   return (
-    <Group h="100%" px="md" justify="space-between">
+    <Group h="100%" px={getHeaderPadding()} justify="space-between" wrap="nowrap">
       {/* Left Section */}
-      <Group>
+      <Group gap="sm" style={{ minWidth: 0 }}>
         {isMobile && (
           <Burger
             opened={navbarOpened}
             onClick={toggleNavbar}
             size="sm"
             aria-label="Toggle navigation"
+            style={{
+              // Touch-friendly size
+              minWidth: '44px',
+              minHeight: '44px',
+            }}
           />
         )}
 
-        <Text size="lg" fw={700} c="blue">
-          Employee Management
+        <Text 
+          size={isMobile ? 'md' : 'lg'} 
+          fw={700} 
+          c="blue"
+          truncate
+          style={{ 
+            maxWidth: isMobile ? '120px' : 'none',
+          }}
+        >
+          {isMobile ? 'EMS' : 'Employee Management'}
         </Text>
       </Group>
 
-      {/* Center Section - Search */}
-      <Group style={{ flex: 1, maxWidth: 400 }}>
-        <form onSubmit={handleSearch} style={{ width: '100%' }}>
-          <TextInput
-            placeholder="Search employees, departments..."
-            leftSection={<IconSearch size={16} />}
-            value={searchValue}
-            onChange={event => setSearchValue(event.currentTarget.value)}
-            style={{ width: '100%' }}
-            size="sm"
-          />
-        </form>
-      </Group>
+      {/* Center Section - Search (hidden on mobile) */}
+      {!isMobile && (
+        <Group style={{ flex: 1, maxWidth: getSearchMaxWidth() }}>
+          <form onSubmit={handleSearch} style={{ width: '100%' }}>
+            <TextInput
+              placeholder={isTablet ? "Search..." : "Search employees, departments..."}
+              leftSection={<IconSearch size={16} />}
+              value={searchValue}
+              onChange={event => setSearchValue(event.currentTarget.value)}
+              style={{ width: '100%' }}
+              size="sm"
+            />
+          </form>
+        </Group>
+      )}
 
       {/* Right Section */}
-      <Group gap="sm">
+      <Group gap={isMobile ? 'xs' : 'sm'} wrap="nowrap">
         {/* Notifications */}
         <NotificationDropdown onViewAll={handleViewAllNotifications} />
 
         {/* User Menu */}
         <Menu shadow="md" width={200} position="bottom-end">
           <Menu.Target>
-            <UnstyledButton>
-              <Group gap="sm">
-                <Avatar size="sm" color="blue">
+            <UnstyledButton
+              style={{
+                // Touch-friendly size on mobile
+                minWidth: isMobile ? '44px' : 'auto',
+                minHeight: isMobile ? '44px' : 'auto',
+                borderRadius: 'var(--mantine-radius-sm)',
+                padding: isMobile ? '0.25rem' : '0.5rem',
+              }}
+            >
+              <Group gap="sm" wrap="nowrap">
+                <Avatar size={isMobile ? 'md' : 'sm'} color="blue">
                   {user.firstName?.[0] || user.username[0]}
                 </Avatar>
-                {!isMobile && (
+                {showFullUserInfo && (
                   <>
-                    <div>
-                      <Text size="sm" fw={500}>
+                    <div style={{ minWidth: 0 }}>
+                      <Text size="sm" fw={500} truncate>
                         {user.firstName && user.lastName
                           ? `${user.firstName} ${user.lastName}`
                           : user.username}
                       </Text>
-                      <Text size="xs" c="dimmed">
+                      <Text size="xs" c="dimmed" truncate>
                         {user.email}
                       </Text>
                     </div>
@@ -119,6 +157,21 @@ export function Header({
           </Menu.Target>
 
           <Menu.Dropdown>
+            {/* Show user info in dropdown on mobile/tablet */}
+            {!showFullUserInfo && (
+              <>
+                <Menu.Label>
+                  {user.firstName && user.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : user.username}
+                </Menu.Label>
+                <Text size="xs" c="dimmed" px="sm" pb="xs">
+                  {user.email}
+                </Text>
+                <Menu.Divider />
+              </>
+            )}
+            
             <Menu.Label>Account</Menu.Label>
             <Menu.Item
               leftSection={<IconUser size={16} />}
@@ -132,6 +185,19 @@ export function Header({
             >
               Settings
             </Menu.Item>
+
+            {/* Mobile search option */}
+            {isMobile && (
+              <Menu.Item
+                leftSection={<IconSearch size={16} />}
+                onClick={() => {
+                  // This would open a search modal on mobile
+                  console.log('Open search modal');
+                }}
+              >
+                Search
+              </Menu.Item>
+            )}
 
             <Menu.Divider />
 
