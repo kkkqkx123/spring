@@ -60,9 +60,12 @@ describe('Accessibility Utilities', () => {
         addEventListener: vi.fn(),
         querySelectorAll: vi
           .fn()
-          .mockReturnValue([document.createElement('button'), document.createElement('a')]),
+          .mockReturnValue([
+            document.createElement('button'),
+            document.createElement('a'),
+          ]),
       };
-      
+
       const { result } = renderHook(() => useFocusTrap(true));
 
       // Simulate container ref being set

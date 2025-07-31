@@ -254,10 +254,10 @@ export function usePerformanceMonitor() {
 
 // Component performance profiler
 export function withPerformanceProfiler<P extends object>(
-  Component: React.ComponentType<P>,
+  WrappedComponent: React.ComponentType<P>,
   componentName: string
 ) {
-  return React.memo((props: P) => {
+  const ProfiledComponent = React.memo((props: P) => {
     const renderStart = React.useRef<number>(0);
     const renderCount = React.useRef<number>(0);
 
@@ -277,8 +277,11 @@ export function withPerformanceProfiler<P extends object>(
       }
     });
 
-    return <Component {...props} />;
+    return <WrappedComponent {...props} />;
   });
+
+  ProfiledComponent.displayName = `withPerformanceProfiler(${componentName})`;
+  return ProfiledComponent;
 }
 
 // Hook for measuring component render time

@@ -140,7 +140,6 @@ describe('RegisterForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
-
     it('should validate username format', async () => {
       const user = userEvent.setup();
       renderWithProvider(defaultProps);

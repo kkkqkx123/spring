@@ -1,10 +1,22 @@
-import React from 'react';
-import { Modal, Text, Group, Button, Stack, ThemeIcon } from '@mantine/core';
+import React, { useState, useEffect } from 'react';
+import { 
+  Modal, 
+  Text, 
+  Group, 
+  Button, 
+  Stack, 
+  ThemeIcon, 
+  Checkbox,
+  TextInput,
+  Alert,
+  Progress,
+} from '@mantine/core';
 import {
   IconAlertTriangle,
   IconTrash,
   IconInfoCircle,
   IconCheck,
+  IconExclamationMark,
 } from '@tabler/icons-react';
 
 export interface ConfirmDialogProps {
@@ -18,6 +30,12 @@ export interface ConfirmDialogProps {
   variant?: 'danger' | 'warning' | 'info' | 'success';
   loading?: boolean;
   children?: React.ReactNode;
+  requireConfirmation?: boolean;
+  confirmationText?: string;
+  showDontAskAgain?: boolean;
+  onDontAskAgainChange?: (checked: boolean) => void;
+  countdown?: number;
+  details?: string[];
   'data-testid'?: string;
 }
 
@@ -55,13 +73,62 @@ export function ConfirmDialog({
   variant = 'danger',
   loading = false,
   children,
+  requireConfirmation = false,
+  confirmationText = '',
+  showDontAskAgain = false,
+  onDontAskAgainChange,
+  countdown,
+  details,
   'data-testid': dataTestId,
 }: ConfirmDialogProps) {
+  const [confirmationInput, setConfirmationInput] = useState('');
+  const [dontAskAgain, setDontAskAgain] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(countdown || 0);
+
   const config = variantConfig[variant];
   const IconComponent = config.icon;
 
+  const isConfirmationValid = !requireConfirmation || 
+    confirmationInput.toLowerCase() === confirmationText.toLowerCase();
+
+  const canConfirm = isConfirmationValid && (countdown ? timeLeft === 0 : true);
+
+  useEffect(() => {
+    if (countdown && countdown > 0 && opened) {
+      setTimeLeft(countdown);
+      const interval = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [countdown, opened]);
+
+  useEffect(() => {
+    if (!opened) {
+      setConfirmationInput('');
+      setDontAskAgain(false);
+      setTimeLeft(countdown || 0);
+    }
+  }, [opened, countdown]);
+
   const handleConfirm = () => {
-    onConfirm();
+    if (canConfirm) {
+      onConfirm();
+      if (showDontAskAgain && onDontAskAgainChange) {
+        onDontAskAgainChange(dontAskAgain);
+      }
+    }
+  };
+
+  const handleDontAskAgainChange = (checked: boolean) => {
+    setDontAskAgain(checked);
   };
 
   return (
@@ -88,7 +155,65 @@ export function ConfirmDialog({
           {message}
         </Text>
 
+        {details && details.length > 0 && (
+          <Alert
+            icon={<IconExclamationMark size={16} />}
+            color={config.color}
+            variant="light"
+          >
+            <Stack gap="xs">
+              {details.map((detail, index) => (
+                <Text key={index} size="sm">
+                  • {detail}
+                </Text>
+              ))}
+            </Stack>
+          </Alert>
+        )}
+
+        {requireConfirmation && (
+          <Stack gap="xs">
+            <Text size="sm" fw={500}>
+              Type "{confirmationText}" to confirm:
+            </Text>
+            <TextInput
+              value={confirmationInput}
+              onChange={(e) => setConfirmationInput(e.target.value)}
+              placeholder={confirmationText}
+              error={confirmationInput && !isConfirmationValid ? 'Text does not match' : undefined}
+              disabled={loading}
+            />
+          </Stack>
+        )}
+
+        {countdown && countdown > 0 && (
+          <Stack gap="xs">
+            <Group justify="space-between" align="center">
+              <Text size="sm" c="dimmed">
+                Please wait before confirming
+              </Text>
+              <Text size="sm" fw={500} c={config.color}>
+                {timeLeft}s
+              </Text>
+            </Group>
+            <Progress
+              value={((countdown - timeLeft) / countdown) * 100}
+              color={config.color}
+              size="sm"
+            />
+          </Stack>
+        )}
+
         {children && <div>{children}</div>}
+
+        {showDontAskAgain && (
+          <Checkbox
+            label="Don't ask me again"
+            checked={dontAskAgain}
+            onChange={(e) => handleDontAskAgainChange(e.currentTarget.checked)}
+            disabled={loading}
+          />
+        )}
 
         <Group justify="flex-end" gap="sm">
           <Button
@@ -103,9 +228,11 @@ export function ConfirmDialog({
             color={config.confirmColor}
             onClick={handleConfirm}
             loading={loading}
-            autoFocus
+            disabled={!canConfirm}
+            autoFocus={canConfirm}
           >
             {confirmLabel}
+            {timeLeft > 0 && ` (${timeLeft})`}
           </Button>
         </Group>
       </Stack>
@@ -224,6 +351,91 @@ export function LogoutConfirmDialog({
       cancelLabel="Stay Logged In"
       variant="info"
       loading={loading}
+    />
+  );
+}
+
+export function DestructiveActionDialog({
+  opened,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  actionName,
+  itemName,
+  loading = false,
+  requireConfirmation = true,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  actionName: string;
+  itemName: string;
+  loading?: boolean;
+  requireConfirmation?: boolean;
+}) {
+  return (
+    <ConfirmDialog
+      opened={opened}
+      onClose={onClose}
+      onConfirm={onConfirm}
+      title={title}
+      message={message}
+      confirmLabel={actionName}
+      cancelLabel="Cancel"
+      variant="danger"
+      loading={loading}
+      requireConfirmation={requireConfirmation}
+      confirmationText={itemName}
+      countdown={3}
+      details={[
+        'This action cannot be undone',
+        'All associated data will be permanently removed',
+        'This may affect other parts of the system',
+      ]}
+    />
+  );
+}
+
+export function BulkActionDialog({
+  opened,
+  onClose,
+  onConfirm,
+  action,
+  count,
+  itemType,
+  loading = false,
+  showDontAskAgain = false,
+  onDontAskAgainChange,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  action: string;
+  count: number;
+  itemType: string;
+  loading?: boolean;
+  showDontAskAgain?: boolean;
+  onDontAskAgainChange?: (checked: boolean) => void;
+}) {
+  const isDestructive = ['delete', 'remove', 'archive'].includes(action.toLowerCase());
+  
+  return (
+    <ConfirmDialog
+      opened={opened}
+      onClose={onClose}
+      onConfirm={onConfirm}
+      title={`${action} ${count} ${itemType}${count > 1 ? 's' : ''}`}
+      message={`Are you sure you want to ${action.toLowerCase()} ${count} selected ${itemType}${count > 1 ? 's' : ''}?`}
+      confirmLabel={`${action} ${count} item${count > 1 ? 's' : ''}`}
+      cancelLabel="Cancel"
+      variant={isDestructive ? 'danger' : 'info'}
+      loading={loading}
+      showDontAskAgain={showDontAskAgain}
+      onDontAskAgainChange={onDontAskAgainChange}
+      details={isDestructive ? ['This action cannot be undone'] : undefined}
     />
   );
 }

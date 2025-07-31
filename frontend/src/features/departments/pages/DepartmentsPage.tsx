@@ -21,6 +21,7 @@ import {
   useUpdateDepartment,
   useDeleteDepartment,
 } from '../hooks/useDepartmentTree';
+import type { DepartmentCreateRequest } from '../services/departmentApi';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
 import type { Department } from '../../../types';
@@ -71,7 +72,7 @@ const DepartmentsPage: React.FC = () => {
     openCreateModal();
   };
 
-  const handleCreateDepartment = async (data: any) => {
+  const handleCreateDepartment = async (data: DepartmentCreateRequest) => {
     try {
       const departmentData = creatingParentId
         ? { ...data, parentId: creatingParentId }
@@ -101,7 +102,7 @@ const DepartmentsPage: React.FC = () => {
     openEditModal();
   };
 
-  const handleUpdateDepartment = async (data: any) => {
+  const handleUpdateDepartment = async (data: DepartmentCreateRequest) => {
     if (!editingDepartment) return;
 
     try {

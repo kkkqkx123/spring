@@ -3,25 +3,33 @@
  */
 
 // Chart libraries (loaded only when needed)
-export const loadChartLibrary = async (): Promise<typeof import('recharts')> => {
+export const loadChartLibrary = async (): Promise<
+  typeof import('recharts')
+> => {
   const [recharts] = await Promise.all([import('recharts')]);
   return recharts;
 };
 
 // Date picker library (loaded only when needed)
-export const loadDatePicker = async (): Promise<typeof import('@mantine/dates')> => {
+export const loadDatePicker = async (): Promise<
+  typeof import('@mantine/dates')
+> => {
   const [datePicker] = await Promise.all([import('@mantine/dates')]);
   return datePicker;
 };
 
 // Rich text editor (loaded only when needed)
-export const loadRichTextEditor = async (): Promise<typeof import('@mantine/tiptap')> => {
+export const loadRichTextEditor = async (): Promise<
+  typeof import('@mantine/tiptap')
+> => {
   const [editor] = await Promise.all([import('@mantine/tiptap')]);
   return editor;
 };
 
 // File upload utilities (loaded only when needed)
-export const loadFileUploadUtils = async (): Promise<typeof import('@mantine/dropzone')> => {
+export const loadFileUploadUtils = async (): Promise<
+  typeof import('@mantine/dropzone')
+> => {
   const [dropzone] = await Promise.all([import('@mantine/dropzone')]);
   return dropzone;
 };
@@ -39,13 +47,17 @@ export const loadPDFGenerator = async (): Promise<typeof import('jspdf')> => {
 };
 
 // QR Code generator (loaded only when needed)
-export const loadQRCodeGenerator = async (): Promise<typeof import('qrcode')> => {
+export const loadQRCodeGenerator = async (): Promise<
+  typeof import('qrcode')
+> => {
   const [qrcode] = await Promise.all([import('qrcode')]);
   return qrcode;
 };
 
 // Image processing utilities (loaded only when needed)
-export const loadImageProcessor = async (): Promise<typeof import('browser-image-compression')> => {
+export const loadImageProcessor = async (): Promise<
+  typeof import('browser-image-compression')
+> => {
   const [imageCompression] = await Promise.all([
     import('browser-image-compression'),
   ]);
@@ -53,25 +65,33 @@ export const loadImageProcessor = async (): Promise<typeof import('browser-image
 };
 
 // Markdown processor (loaded only when needed)
-export const loadMarkdownProcessor = async (): Promise<typeof import('marked')> => {
+export const loadMarkdownProcessor = async (): Promise<
+  typeof import('marked')
+> => {
   const [marked] = await Promise.all([import('marked')]);
   return marked;
 };
 
 // CSV processing (loaded only when needed)
-export const loadCSVProcessor = async (): Promise<typeof import('papaparse')> => {
+export const loadCSVProcessor = async (): Promise<
+  typeof import('papaparse')
+> => {
   const [papaparse] = await Promise.all([import('papaparse')]);
   return papaparse;
 };
 
 // Animation library (loaded only when needed)
-export const loadAnimationLibrary = async (): Promise<typeof import('framer-motion')> => {
+export const loadAnimationLibrary = async (): Promise<
+  typeof import('framer-motion')
+> => {
   const [framerMotion] = await Promise.all([import('framer-motion')]);
   return framerMotion;
 };
 
 // Validation library extensions (loaded only when needed)
-export const loadValidationExtensions = async (): Promise<typeof import('yup')> => {
+export const loadValidationExtensions = async (): Promise<
+  typeof import('yup')
+> => {
   const [yup] = await Promise.all([import('yup')]);
   return yup;
 };
