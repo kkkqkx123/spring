@@ -98,7 +98,9 @@ export const ToastNotification: React.FC<ToastNotificationProps> = ({
     onClose(id);
   };
 
-  const progressValue = autoClose ? ((duration - timeLeft) / duration) * 100 : progress;
+  const progressValue = autoClose
+    ? ((duration - timeLeft) / duration) * 100
+    : progress;
 
   return (
     <Notification
@@ -116,7 +118,7 @@ export const ToastNotification: React.FC<ToastNotificationProps> = ({
     >
       <Stack gap="xs">
         <Text size="sm">{message}</Text>
-        
+
         {action && (
           <Group gap="xs">
             <ActionIcon
@@ -129,7 +131,7 @@ export const ToastNotification: React.FC<ToastNotificationProps> = ({
             </ActionIcon>
           </Group>
         )}
-        
+
         {(autoClose || typeof progress === 'number') && (
           <Progress
             value={progressValue}
@@ -185,44 +187,59 @@ export const ToastContainer: React.FC = () => {
 export const useToast = () => {
   const { addNotification } = useUiStore();
 
-  const showToast = React.useCallback((
-    type: 'success' | 'error' | 'warning' | 'info',
-    title: string,
-    message: string,
-    options?: {
-      autoClose?: boolean;
-      duration?: number;
-      action?: {
-        label: string;
-        onClick: () => void;
-      };
-    }
-  ) => {
-    addNotification({
-      type,
-      title,
-      message,
-      autoClose: options?.autoClose,
-      duration: options?.duration,
-      ...options,
-    });
-  }, [addNotification]);
+  const showToast = React.useCallback(
+    (
+      type: 'success' | 'error' | 'warning' | 'info',
+      title: string,
+      message: string,
+      options?: {
+        autoClose?: boolean;
+        duration?: number;
+        action?: {
+          label: string;
+          onClick: () => void;
+        };
+      }
+    ) => {
+      addNotification({
+        type,
+        title,
+        message,
+        autoClose: options?.autoClose,
+        duration: options?.duration,
+        ...options,
+      });
+    },
+    [addNotification]
+  );
 
-  const success = React.useCallback((title: string, message: string, options?: any) => {
-    showToast('success', title, message, options);
-  }, [showToast]);
+  const success = React.useCallback(
+    (title: string, message: string, options?: any) => {
+      showToast('success', title, message, options);
+    },
+    [showToast]
+  );
 
-  const error = React.useCallback((title: string, message: string, options?: any) => {
-    showToast('error', title, message, { ...options, autoClose: false });
-  }, [showToast]);
+  const error = React.useCallback(
+    (title: string, message: string, options?: any) => {
+      showToast('error', title, message, { ...options, autoClose: false });
+    },
+    [showToast]
+  );
 
-  const warning = React.useCallback((title: string, message: string, options?: any) => {
-    showToast('warning', title, message, options);
-  }, [showToast]);
+  const warning = React.useCallback(
+    (title: string, message: string, options?: any) => {
+      showToast('warning', title, message, options);
+    },
+    [showToast]
+  );
 
-  const info = React.useCallback((title: string, message: string, options?: any) => {
-    showToast('info', title, message, options);
-  }, [showToast]);
+  const info = React.useCallback(
+    (title: string, message: string, options?: any) => {
+      showToast('info', title, message, options);
+    },
+    [showToast]
+  );
 
   return {
     showToast,
@@ -237,63 +254,62 @@ export const useToast = () => {
 export const useProgressToast = () => {
   const { addNotification, removeNotification } = useUiStore();
 
-  const showProgressToast = React.useCallback((
-    title: string,
-    message: string,
-    initialProgress: number = 0
-  ) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    
-    addNotification({
-      id,
-      type: 'info',
-      title,
-      message,
-      autoClose: false,
-      progress: initialProgress,
-    } as any);
+  const showProgressToast = React.useCallback(
+    (title: string, message: string, initialProgress: number = 0) => {
+      const id = Math.random().toString(36).substr(2, 9);
 
-    const updateProgress = (progress: number, newMessage?: string) => {
-      removeNotification(id);
       addNotification({
         id,
         type: 'info',
         title,
-        message: newMessage || message,
+        message,
         autoClose: false,
-        progress,
+        progress: initialProgress,
       } as any);
-    };
 
-    const complete = (successMessage?: string) => {
-      removeNotification(id);
-      addNotification({
-        type: 'success',
-        title: 'Completed',
-        message: successMessage || 'Operation completed successfully',
-        autoClose: true,
-        duration: 3000,
-      });
-    };
+      const updateProgress = (progress: number, newMessage?: string) => {
+        removeNotification(id);
+        addNotification({
+          id,
+          type: 'info',
+          title,
+          message: newMessage || message,
+          autoClose: false,
+          progress,
+        } as any);
+      };
 
-    const fail = (errorMessage?: string) => {
-      removeNotification(id);
-      addNotification({
-        type: 'error',
-        title: 'Failed',
-        message: errorMessage || 'Operation failed',
-        autoClose: false,
-      });
-    };
+      const complete = (successMessage?: string) => {
+        removeNotification(id);
+        addNotification({
+          type: 'success',
+          title: 'Completed',
+          message: successMessage || 'Operation completed successfully',
+          autoClose: true,
+          duration: 3000,
+        });
+      };
 
-    return {
-      id,
-      updateProgress,
-      complete,
-      fail,
-      close: () => removeNotification(id),
-    };
-  }, [addNotification, removeNotification]);
+      const fail = (errorMessage?: string) => {
+        removeNotification(id);
+        addNotification({
+          type: 'error',
+          title: 'Failed',
+          message: errorMessage || 'Operation failed',
+          autoClose: false,
+        });
+      };
+
+      return {
+        id,
+        updateProgress,
+        complete,
+        fail,
+        close: () => removeNotification(id),
+      };
+    },
+    [addNotification, removeNotification]
+  );
 
   return { showProgressToast };
 };

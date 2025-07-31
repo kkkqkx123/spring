@@ -4,6 +4,18 @@ import React from 'react';
  * Performance monitoring utilities for tracking and optimizing application performance
  */
 
+// Custom interface for performance.memory
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+// Extend the standard Performance interface
+interface PerformanceWithMemory extends Performance {
+  memory: PerformanceMemory;
+}
+
 // Performance metrics interface
 export interface PerformanceMetrics {
   renderTime: number;
@@ -40,7 +52,7 @@ export class PerformanceMonitor {
   private setupObservers(): void {
     // Observe paint timing
     if ('PerformanceObserver' in window) {
-      const paintObserver = new PerformanceObserver((list) => {
+      const paintObserver = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach(entry => {
           console.log(`${entry.name}: ${entry.startTime}ms`);
@@ -50,18 +62,20 @@ export class PerformanceMonitor {
       try {
         paintObserver.observe({ entryTypes: ['paint'] });
         this.observers.push(paintObserver);
-      } catch (error) {
+      } catch {
         console.warn('Paint timing not supported');
       }
 
       // Observe navigation timing
-      const navigationObserver = new PerformanceObserver((list) => {
+      const navigationObserver = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach(entry => {
           if (entry.entryType === 'navigation') {
             const navEntry = entry as PerformanceNavigationTiming;
             console.log('Navigation timing:', {
-              domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.domContentLoadedEventStart,
+              domContentLoaded:
+                navEntry.domContentLoadedEventEnd -
+                navEntry.domContentLoadedEventStart,
               loadComplete: navEntry.loadEventEnd - navEntry.loadEventStart,
               totalTime: navEntry.loadEventEnd - navEntry.fetchStart,
             });
@@ -72,12 +86,12 @@ export class PerformanceMonitor {
       try {
         navigationObserver.observe({ entryTypes: ['navigation'] });
         this.observers.push(navigationObserver);
-      } catch (error) {
+      } catch {
         console.warn('Navigation timing not supported');
       }
 
       // Observe resource timing
-      const resourceObserver = new PerformanceObserver((list) => {
+      const resourceObserver = new PerformanceObserver(list => {
         const entries = list.getEntries();
         const slowResources = entries.filter(entry => entry.duration > 1000);
         if (slowResources.length > 0) {
@@ -88,12 +102,12 @@ export class PerformanceMonitor {
       try {
         resourceObserver.observe({ entryTypes: ['resource'] });
         this.observers.push(resourceObserver);
-      } catch (error) {
+      } catch {
         console.warn('Resource timing not supported');
       }
 
       // Observe long tasks
-      const longTaskObserver = new PerformanceObserver((list) => {
+      const longTaskObserver = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach(entry => {
           console.warn(`Long task detected: ${entry.duration}ms`);
@@ -103,7 +117,7 @@ export class PerformanceMonitor {
       try {
         longTaskObserver.observe({ entryTypes: ['longtask'] });
         this.observers.push(longTaskObserver);
-      } catch (error) {
+      } catch {
         console.warn('Long task timing not supported');
       }
     }
@@ -139,33 +153,42 @@ export class PerformanceMonitor {
 
   private measureRenderTime(): number {
     const paintEntries = performance.getEntriesByType('paint');
-    const firstContentfulPaint = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+    const firstContentfulPaint = paintEntries.find(
+      entry => entry.name === 'first-contentful-paint'
+    );
     return firstContentfulPaint ? firstContentfulPaint.startTime : 0;
   }
 
   private countComponents(): number {
     // Count React components in the DOM (approximate)
-    const reactElements = document.querySelectorAll('[data-reactroot], [data-react-helmet]');
+    const reactElements = document.querySelectorAll(
+      '[data-reactroot], [data-react-helmet]'
+    );
     return reactElements.length;
   }
 
   private getMemoryUsage(): number {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as PerformanceWithMemory).memory;
       return memory.usedJSHeapSize / 1024 / 1024; // MB
     }
     return 0;
   }
 
   private getBundleSize(): number {
-    const resourceEntries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    const jsResources = resourceEntries.filter(entry => 
-      entry.name.includes('.js') && !entry.name.includes('node_modules')
+    const resourceEntries = performance.getEntriesByType(
+      'resource'
+    ) as PerformanceResourceTiming[];
+    const jsResources = resourceEntries.filter(
+      entry =>
+        entry.name.includes('.js') && !entry.name.includes('node_modules')
     );
-    
-    return jsResources.reduce((total, resource) => {
-      return total + (resource.transferSize || 0);
-    }, 0) / 1024; // KB
+
+    return (
+      jsResources.reduce((total, resource) => {
+        return total + (resource.transferSize || 0);
+      }, 0) / 1024
+    ); // KB
   }
 
   private getNetworkRequestCount(): number {
@@ -174,9 +197,15 @@ export class PerformanceMonitor {
   }
 
   private getCacheHitRate(): number {
-    const resourceEntries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    const cachedResources = resourceEntries.filter(entry => entry.transferSize === 0);
-    return resourceEntries.length > 0 ? (cachedResources.length / resourceEntries.length) * 100 : 0;
+    const resourceEntries = performance.getEntriesByType(
+      'resource'
+    ) as PerformanceResourceTiming[];
+    const cachedResources = resourceEntries.filter(
+      entry => entry.transferSize === 0
+    );
+    return resourceEntries.length > 0
+      ? (cachedResources.length / resourceEntries.length) * 100
+      : 0;
   }
 
   getMetrics(): PerformanceMetrics[] {
@@ -184,27 +213,32 @@ export class PerformanceMonitor {
   }
 
   getLatestMetrics(): PerformanceMetrics | null {
-    return this.metrics.length > 0 ? this.metrics[this.metrics.length - 1] : null;
+    return this.metrics.length > 0
+      ? this.metrics[this.metrics.length - 1]
+      : null;
   }
 
   getAverageMetrics(): Partial<PerformanceMetrics> {
     if (this.metrics.length === 0) return {};
 
-    const totals = this.metrics.reduce((acc, metric) => ({
-      renderTime: acc.renderTime + metric.renderTime,
-      componentCount: acc.componentCount + metric.componentCount,
-      memoryUsage: acc.memoryUsage + metric.memoryUsage,
-      bundleSize: acc.bundleSize + metric.bundleSize,
-      networkRequests: acc.networkRequests + metric.networkRequests,
-      cacheHitRate: acc.cacheHitRate + metric.cacheHitRate,
-    }), {
-      renderTime: 0,
-      componentCount: 0,
-      memoryUsage: 0,
-      bundleSize: 0,
-      networkRequests: 0,
-      cacheHitRate: 0,
-    });
+    const totals = this.metrics.reduce(
+      (acc, metric) => ({
+        renderTime: acc.renderTime + metric.renderTime,
+        componentCount: acc.componentCount + metric.componentCount,
+        memoryUsage: acc.memoryUsage + metric.memoryUsage,
+        bundleSize: acc.bundleSize + metric.bundleSize,
+        networkRequests: acc.networkRequests + metric.networkRequests,
+        cacheHitRate: acc.cacheHitRate + metric.cacheHitRate,
+      }),
+      {
+        renderTime: 0,
+        componentCount: 0,
+        memoryUsage: 0,
+        bundleSize: 0,
+        networkRequests: 0,
+        cacheHitRate: 0,
+      }
+    );
 
     const count = this.metrics.length;
     return {
@@ -228,7 +262,7 @@ export class PerformanceMonitor {
 
 // React hook for performance monitoring
 export function usePerformanceMonitor() {
-  const monitorRef = React.useRef<PerformanceMonitor>();
+  const monitorRef = React.useRef<PerformanceMonitor | null>(null);
 
   if (!monitorRef.current) {
     monitorRef.current = new PerformanceMonitor();
@@ -253,10 +287,10 @@ export function usePerformanceMonitor() {
 }
 
 // Component performance profiler
-export function withPerformanceProfiler<P extends object>(
+export const withPerformanceProfiler = <P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName: string
-) {
+) => {
   const ProfiledComponent = React.memo((props: P) => {
     const renderStart = React.useRef<number>(0);
     const renderCount = React.useRef<number>(0);
@@ -270,22 +304,30 @@ export function withPerformanceProfiler<P extends object>(
       const renderTime = renderEnd - renderStart.current;
       renderCount.current++;
 
-      console.log(`${componentName} render #${renderCount.current}: ${renderTime.toFixed(2)}ms`);
+      console.log(
+        `${componentName} render #${renderCount.current}: ${renderTime.toFixed(2)}ms`
+      );
 
-      if (renderTime > 16) { // More than one frame (60fps)
-        console.warn(`${componentName} slow render detected: ${renderTime.toFixed(2)}ms`);
+      if (renderTime > 16) {
+        // More than one frame (60fps)
+        console.warn(
+          `${componentName} slow render detected: ${renderTime.toFixed(2)}ms`
+        );
       }
     });
 
-    return <WrappedComponent {...props} />;
+    return React.createElement(WrappedComponent, props);
   });
 
   ProfiledComponent.displayName = `withPerformanceProfiler(${componentName})`;
   return ProfiledComponent;
-}
+};
 
 // Hook for measuring component render time
-export function useRenderTime(componentName: string) {
+export function useRenderTime(
+  componentName: string,
+  _p0?: { start: number; end: number }
+) {
   const renderStart = React.useRef<number>(0);
   const renderTimes = React.useRef<number[]>([]);
 
@@ -296,29 +338,34 @@ export function useRenderTime(componentName: string) {
   React.useEffect(() => {
     const renderEnd = performance.now();
     const renderTime = renderEnd - renderStart.current;
-    
+
     renderTimes.current.push(renderTime);
-    
+
     // Keep only last 10 render times
     if (renderTimes.current.length > 10) {
       renderTimes.current = renderTimes.current.slice(-10);
     }
 
-    const averageRenderTime = renderTimes.current.reduce((sum, time) => sum + time, 0) / renderTimes.current.length;
+    const averageRenderTime =
+      renderTimes.current.reduce((sum, time) => sum + time, 0) /
+      renderTimes.current.length;
 
     if (renderTime > 16) {
-      console.warn(`${componentName} slow render: ${renderTime.toFixed(2)}ms (avg: ${averageRenderTime.toFixed(2)}ms)`);
+      console.warn(
+        `${componentName} slow render: ${renderTime.toFixed(2)}ms (avg: ${averageRenderTime.toFixed(2)}ms)`
+      );
     }
   });
 
   return {
     getAverageRenderTime: () => {
-      return renderTimes.current.length > 0 
-        ? renderTimes.current.reduce((sum, time) => sum + time, 0) / renderTimes.current.length
+      return renderTimes.current.length > 0
+        ? renderTimes.current.reduce((sum, time) => sum + time, 0) /
+            renderTimes.current.length
         : 0;
     },
     getLastRenderTime: () => {
-      return renderTimes.current.length > 0 
+      return renderTimes.current.length > 0
         ? renderTimes.current[renderTimes.current.length - 1]
         : 0;
     },
@@ -328,8 +375,10 @@ export function useRenderTime(componentName: string) {
 
 // Bundle analyzer utility
 export function analyzeBundleSize() {
-  const resourceEntries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-  
+  const resourceEntries = performance.getEntriesByType(
+    'resource'
+  ) as PerformanceResourceTiming[];
+
   const bundles = resourceEntries
     .filter(entry => entry.name.includes('.js') || entry.name.includes('.css'))
     .map(entry => ({
@@ -341,7 +390,9 @@ export function analyzeBundleSize() {
     .sort((a, b) => b.size - a.size);
 
   const totalSize = bundles.reduce((sum, bundle) => sum + bundle.size, 0);
-  const cachedSize = bundles.filter(bundle => bundle.cached).reduce((sum, bundle) => sum + bundle.size, 0);
+  const cachedSize = bundles
+    .filter(bundle => bundle.cached)
+    .reduce((sum, bundle) => sum + bundle.size, 0);
 
   return {
     bundles,
@@ -359,7 +410,7 @@ export function detectMemoryLeaks() {
     return null;
   }
 
-  const memory = (performance as any).memory;
+  const memory = (performance as PerformanceWithMemory).memory;
   const initialMemory = memory.usedJSHeapSize;
 
   return {
@@ -369,7 +420,9 @@ export function detectMemoryLeaks() {
       const memoryIncreasePercent = (memoryIncrease / initialMemory) * 100;
 
       if (memoryIncreasePercent > 50) {
-        console.warn(`Potential memory leak detected: ${memoryIncreasePercent.toFixed(2)}% increase`);
+        console.warn(
+          `Potential memory leak detected: ${memoryIncreasePercent.toFixed(2)}% increase`
+        );
       }
 
       return {

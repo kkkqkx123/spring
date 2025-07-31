@@ -111,12 +111,16 @@ export const RetryHandler: React.FC<RetryHandlerProps> = ({
               <Text size="xs" c="dimmed">
                 Attempt {retryCount + 1} of {maxRetries + 1}
               </Text>
-              
+
               {showProgress && countdown > 0 && (
                 <Group gap="xs" style={{ flex: 1 }}>
                   <IconClock size={14} />
                   <Progress
-                    value={(baseDelay * Math.pow(2, retryCount) - countdown) / (baseDelay * Math.pow(2, retryCount)) * 100}
+                    value={
+                      ((baseDelay * Math.pow(2, retryCount) - countdown) /
+                        (baseDelay * Math.pow(2, retryCount))) *
+                      100
+                    }
                     size="sm"
                     style={{ flex: 1 }}
                   />
@@ -191,21 +195,28 @@ export const AutoRetryWrapper: React.FC<AutoRetryWrapperProps> = ({
   retryCondition,
 }) => {
   const [error, setError] = useState<ApiError | null>(null);
-  const [retryFunction, setRetryFunction] = useState<(() => Promise<void>) | null>(null);
+  const [retryFunction, setRetryFunction] = useState<
+    (() => Promise<void>) | null
+  >(null);
 
-  const handleError = useCallback((error: ApiError, retryFn: () => Promise<void>) => {
-    const processedError = processApiError(error);
-    
-    // Check if error should be retried
-    const shouldRetry = retryCondition ? retryCondition(error) : processedError.retryable;
-    
-    if (shouldRetry) {
-      setError(error);
-      setRetryFunction(() => retryFn);
-    } else {
-      onError?.(error);
-    }
-  }, [onError, retryCondition]);
+  const handleError = useCallback(
+    (error: ApiError, retryFn: () => Promise<void>) => {
+      const processedError = processApiError(error);
+
+      // Check if error should be retried
+      const shouldRetry = retryCondition
+        ? retryCondition(error)
+        : processedError.retryable;
+
+      if (shouldRetry) {
+        setError(error);
+        setRetryFunction(() => retryFn);
+      } else {
+        onError?.(error);
+      }
+    },
+    [onError, retryCondition]
+  );
 
   const handleRetry = useCallback(async () => {
     if (retryFunction) {

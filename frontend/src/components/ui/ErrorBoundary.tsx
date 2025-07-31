@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { Button, Container, Text, Title, Stack, Alert, Group } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Text,
+  Title,
+  Stack,
+  Alert,
+  Group,
+} from '@mantine/core';
 import { IconRefresh, IconBug, IconHome } from '@tabler/icons-react';
 
 interface Props {
@@ -25,10 +33,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     const errorId = Math.random().toString(36).substr(2, 9);
-    return { 
-      hasError: true, 
+    return {
+      hasError: true,
       error,
-      errorId
+      errorId,
     };
   }
 
@@ -65,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
     };
 
     console.error('Error Report:', errorReport);
-    
+
     // In a real application, send to error reporting service:
     // errorReportingService.captureException(error, {
     //   extra: errorReport,
@@ -112,11 +120,11 @@ export class ErrorBoundary extends Component<Props, State> {
             >
               ⚠️
             </div>
-            
+
             <Title order={2} ta="center">
               Something went wrong
             </Title>
-            
+
             <Text ta="center" c="dimmed" size="lg">
               An unexpected error occurred. We apologize for the inconvenience.
             </Text>
@@ -135,7 +143,7 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 Try Again
               </Button>
-              
+
               <Button
                 leftSection={<IconRefresh size={16} />}
                 onClick={this.handleRefresh}
@@ -143,7 +151,7 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 Refresh Page
               </Button>
-              
+
               <Button
                 leftSection={<IconHome size={16} />}
                 onClick={this.handleGoHome}
@@ -165,22 +173,22 @@ export class ErrorBoundary extends Component<Props, State> {
                   <Text size="sm" fw={500}>
                     {this.state.error.name}: {this.state.error.message}
                   </Text>
-                  
+
                   {this.state.error.stack && (
                     <Text
                       size="xs"
                       c="dimmed"
-                      style={{ 
+                      style={{
                         fontFamily: 'monospace',
                         whiteSpace: 'pre-wrap',
                         maxHeight: '200px',
-                        overflow: 'auto'
+                        overflow: 'auto',
                       }}
                     >
                       {this.state.error.stack}
                     </Text>
                   )}
-                  
+
                   {this.state.errorInfo?.componentStack && (
                     <>
                       <Text size="sm" fw={500} mt="md">
@@ -189,11 +197,11 @@ export class ErrorBoundary extends Component<Props, State> {
                       <Text
                         size="xs"
                         c="dimmed"
-                        style={{ 
+                        style={{
                           fontFamily: 'monospace',
                           whiteSpace: 'pre-wrap',
                           maxHeight: '150px',
-                          overflow: 'auto'
+                          overflow: 'auto',
                         }}
                       >
                         {this.state.errorInfo.componentStack}
@@ -224,6 +232,6 @@ export const withErrorBoundary = <P extends object>(
   );
 
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 };

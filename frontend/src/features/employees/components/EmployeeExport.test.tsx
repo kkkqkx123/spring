@@ -64,12 +64,18 @@ describe('EmployeeExport', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
     mockUseEmployeeExport.mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
       isError: false,
       error: null,
     } as any);
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   const renderComponent = (props = {}) => {

@@ -17,26 +17,34 @@ const ERROR_MESSAGES: Record<number, string> = {
 
 // Specific error code mappings for business logic errors
 const BUSINESS_ERROR_MESSAGES: Record<string, string> = {
-  'USER_NOT_FOUND': 'User not found. Please check the username or email.',
-  'INVALID_CREDENTIALS': 'Invalid username or password. Please try again.',
-  'EMAIL_ALREADY_EXISTS': 'An account with this email already exists.',
-  'USERNAME_ALREADY_EXISTS': 'This username is already taken. Please choose another.',
-  'EMPLOYEE_NOT_FOUND': 'Employee not found. They may have been deleted.',
-  'DEPARTMENT_NOT_FOUND': 'Department not found. It may have been deleted.',
-  'DEPARTMENT_HAS_EMPLOYEES': 'Cannot delete department that contains employees.',
-  'DEPARTMENT_HAS_SUBDEPARTMENTS': 'Cannot delete department that contains subdepartments.',
-  'INVALID_DEPARTMENT_HIERARCHY': 'Invalid department hierarchy. Cannot move department to its own subdepartment.',
-  'EMAIL_SEND_FAILED': 'Failed to send email. Please try again later.',
-  'FILE_UPLOAD_FAILED': 'File upload failed. Please check the file and try again.',
-  'FILE_TOO_LARGE': 'File is too large. Please choose a smaller file.',
-  'INVALID_FILE_TYPE': 'Invalid file type. Please choose a supported file format.',
-  'PERMISSION_DENIED': 'You do not have permission to perform this action.',
-  'TOKEN_EXPIRED': 'Your session has expired. Please log in again.',
-  'VALIDATION_ERROR': 'Please check your input and correct any errors.',
-  'DUPLICATE_EMPLOYEE_NUMBER': 'Employee number already exists. Please use a unique number.',
-  'INVALID_DATE_RANGE': 'Invalid date range. End date must be after start date.',
-  'PAYROLL_ALREADY_PROCESSED': 'Payroll for this period has already been processed.',
-  'INSUFFICIENT_PERMISSIONS': 'You do not have sufficient permissions for this action.',
+  USER_NOT_FOUND: 'User not found. Please check the username or email.',
+  INVALID_CREDENTIALS: 'Invalid username or password. Please try again.',
+  EMAIL_ALREADY_EXISTS: 'An account with this email already exists.',
+  USERNAME_ALREADY_EXISTS:
+    'This username is already taken. Please choose another.',
+  EMPLOYEE_NOT_FOUND: 'Employee not found. They may have been deleted.',
+  DEPARTMENT_NOT_FOUND: 'Department not found. It may have been deleted.',
+  DEPARTMENT_HAS_EMPLOYEES: 'Cannot delete department that contains employees.',
+  DEPARTMENT_HAS_SUBDEPARTMENTS:
+    'Cannot delete department that contains subdepartments.',
+  INVALID_DEPARTMENT_HIERARCHY:
+    'Invalid department hierarchy. Cannot move department to its own subdepartment.',
+  EMAIL_SEND_FAILED: 'Failed to send email. Please try again later.',
+  FILE_UPLOAD_FAILED:
+    'File upload failed. Please check the file and try again.',
+  FILE_TOO_LARGE: 'File is too large. Please choose a smaller file.',
+  INVALID_FILE_TYPE:
+    'Invalid file type. Please choose a supported file format.',
+  PERMISSION_DENIED: 'You do not have permission to perform this action.',
+  TOKEN_EXPIRED: 'Your session has expired. Please log in again.',
+  VALIDATION_ERROR: 'Please check your input and correct any errors.',
+  DUPLICATE_EMPLOYEE_NUMBER:
+    'Employee number already exists. Please use a unique number.',
+  INVALID_DATE_RANGE: 'Invalid date range. End date must be after start date.',
+  PAYROLL_ALREADY_PROCESSED:
+    'Payroll for this period has already been processed.',
+  INSUFFICIENT_PERMISSIONS:
+    'You do not have sufficient permissions for this action.',
 };
 
 // Network error messages
@@ -67,7 +75,9 @@ export const processApiError = (error: ApiError): ProcessedError => {
       type: 'error',
       retryable: isRetryableError(error),
       actionable: isActionableError(error),
-      details: error.details ? JSON.stringify(error.details, null, 2) : undefined,
+      details: error.details
+        ? JSON.stringify(error.details, null, 2)
+        : undefined,
     };
   }
 
@@ -79,7 +89,10 @@ export const processApiError = (error: ApiError): ProcessedError => {
       type: getErrorType(error.status),
       retryable: isRetryableError(error),
       actionable: isActionableError(error),
-      details: error.message !== ERROR_MESSAGES[error.status] ? error.message : undefined,
+      details:
+        error.message !== ERROR_MESSAGES[error.status]
+          ? error.message
+          : undefined,
     };
   }
 
@@ -147,20 +160,20 @@ const getErrorType = (status: number): 'error' | 'warning' | 'info' => {
 const isRetryableError = (error: ApiError): boolean => {
   // Network errors are retryable
   if (error.status === 0) return true;
-  
+
   // Server errors are retryable
   if (error.status >= 500) return true;
-  
+
   // Rate limiting is retryable
   if (error.status === 429) return true;
-  
+
   // Timeout errors are retryable
   if (error.status === 408 || error.status === 504) return true;
-  
+
   // Specific business errors that are retryable
   const retryableCodes = ['EMAIL_SEND_FAILED', 'FILE_UPLOAD_FAILED'];
   if (error.code && retryableCodes.includes(error.code)) return true;
-  
+
   return false;
 };
 
@@ -170,13 +183,13 @@ const isRetryableError = (error: ApiError): boolean => {
 const isActionableError = (error: ApiError): boolean => {
   // Authentication errors require user action
   if (error.status === 401) return true;
-  
+
   // Validation errors require user action
   if (error.status === 400 || error.status === 422) return true;
-  
+
   // Conflict errors may require user action
   if (error.status === 409) return true;
-  
+
   // Specific business errors that require action
   const actionableCodes = [
     'INVALID_CREDENTIALS',
@@ -187,23 +200,25 @@ const isActionableError = (error: ApiError): boolean => {
     'INVALID_DATE_RANGE',
   ];
   if (error.code && actionableCodes.includes(error.code)) return true;
-  
+
   return false;
 };
 
 /**
  * Extract validation errors from API response
  */
-export const extractValidationErrors = (error: ApiError): Record<string, string> => {
+export const extractValidationErrors = (
+  error: ApiError
+): Record<string, string> => {
   if (error.status === 422 && error.details) {
     // Assuming validation errors are in the format { field: message }
     return error.details as Record<string, string>;
   }
-  
+
   if (error.code === 'VALIDATION_ERROR' && error.details) {
     return error.details as Record<string, string>;
   }
-  
+
   return {};
 };
 
@@ -220,13 +235,17 @@ export const createRetryFunction = (
       return await originalFunction();
     } catch (error) {
       const apiError = error as ApiError;
-      
+
       if (retryCount < maxRetries && isRetryableError(apiError)) {
         const delay = baseDelay * Math.pow(2, retryCount);
         await new Promise(resolve => setTimeout(resolve, delay));
-        return createRetryFunction(originalFunction, maxRetries, baseDelay)(retryCount + 1);
+        return createRetryFunction(
+          originalFunction,
+          maxRetries,
+          baseDelay
+        )(retryCount + 1);
       }
-      
+
       throw error;
     }
   };
@@ -237,20 +256,20 @@ export const createRetryFunction = (
  */
 export const setupGlobalErrorHandling = () => {
   // Handle unhandled promise rejections
-  window.addEventListener('unhandledrejection', (event) => {
+  window.addEventListener('unhandledrejection', event => {
     console.error('Unhandled promise rejection:', event.reason);
-    
+
     // Prevent the default browser behavior
     event.preventDefault();
-    
+
     // You could show a global error notification here
     // notificationService.showError('An unexpected error occurred');
   });
 
   // Handle general JavaScript errors
-  window.addEventListener('error', (event) => {
+  window.addEventListener('error', event => {
     console.error('Global error:', event.error);
-    
+
     // You could report this to an error tracking service
     // errorReportingService.captureException(event.error);
   });
@@ -259,22 +278,25 @@ export const setupGlobalErrorHandling = () => {
 /**
  * Format error for logging/reporting
  */
-export const formatErrorForLogging = (error: Error | ApiError, context?: Record<string, any>) => {
+export const formatErrorForLogging = (
+  error: Error | ApiError,
+  context?: Record<string, any>
+) => {
   const timestamp = new Date().toISOString();
   const userAgent = navigator.userAgent;
   const url = window.location.href;
-  
+
   return {
     timestamp,
     userAgent,
     url,
     error: {
-      name: error.name || 'Error',
+      name: 'name' in error ? error.name : 'ApiError',
       message: error.message,
       stack: 'stack' in error ? error.stack : undefined,
-      ...(('status' in error) && { status: error.status }),
-      ...(('code' in error) && { code: error.code }),
-      ...(('details' in error) && { details: error.details }),
+      ...('status' in error && { status: error.status }),
+      ...('code' in error && { code: error.code }),
+      ...('details' in error && { details: error.details }),
     },
     context,
   };

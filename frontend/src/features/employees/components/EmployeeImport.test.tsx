@@ -124,11 +124,17 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    // Create a proper drop event with files
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [file],
+        items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     // Simulate file processing
     if (mockFileReader.onload) {
@@ -149,11 +155,16 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [file],
+        items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     // Should show error notification (mocked)
     expect(screen.queryByText('employees.txt')).not.toBeInTheDocument();
@@ -169,11 +180,18 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [largeFile],
+        items: [
+          { kind: 'file', type: largeFile.type, getAsFile: () => largeFile },
+        ],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     // Should not process the file
     expect(screen.queryByText('large.xlsx')).not.toBeInTheDocument();
@@ -188,11 +206,16 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [file],
+        items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     // Simulate file processing with validation errors
     if (mockFileReader.onload) {
@@ -221,11 +244,16 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [file],
+        items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     if (mockFileReader.onload) {
       mockFileReader.onload({ target: { result: 'mock-result' } } as any);
@@ -257,11 +285,16 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [file],
+        items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     if (mockFileReader.onload) {
       mockFileReader.onload({ target: { result: 'mock-result' } } as any);
@@ -299,11 +332,16 @@ describe('EmployeeImport', () => {
 
     const dropzone = screen.getByTestId('employee-import-dropzone');
 
-    fireEvent.drop(dropzone, {
-      dataTransfer: {
+    const dropEvent = new Event('drop', { bubbles: true });
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
         files: [file],
+        items: [{ kind: 'file', type: file.type, getAsFile: () => file }],
+        types: ['Files'],
       },
     });
+
+    fireEvent(dropzone, dropEvent);
 
     if (mockFileReader.onload) {
       mockFileReader.onload({ target: { result: 'mock-result' } } as any);

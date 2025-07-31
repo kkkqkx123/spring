@@ -1,10 +1,10 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { 
-  useLoadingState, 
-  useMultipleLoadingStates, 
+import {
+  useLoadingState,
+  useMultipleLoadingStates,
   useFormSubmission,
-  useAsyncOperation 
+  useAsyncOperation,
 } from './useLoadingState';
 
 // Mock the toast hook
@@ -80,12 +80,13 @@ describe('useLoadingState', () => {
 
   it('handles retries on failure', async () => {
     vi.useFakeTimers();
-    
-    const { result } = renderHook(() => 
+
+    const { result } = renderHook(() =>
       useLoadingState({ retries: 2, retryDelay: 100 })
     );
-    
-    const mockAsyncFunction = vi.fn()
+
+    const mockAsyncFunction = vi
+      .fn()
       .mockRejectedValueOnce(new Error('First failure'))
       .mockRejectedValueOnce(new Error('Second failure'))
       .mockResolvedValueOnce('success after retries');
@@ -106,7 +107,7 @@ describe('useLoadingState', () => {
     expect(mockAsyncFunction).toHaveBeenCalledTimes(3);
     expect(result.current.data).toBe('success after retries');
     expect(result.current.error).toBe(null);
-    
+
     vi.useRealTimers();
   });
 
@@ -155,13 +156,14 @@ describe('useLoadingState', () => {
   it('cancels ongoing operation', async () => {
     const { result } = renderHook(() => useLoadingState());
     const mockAsyncFunction = vi.fn().mockImplementation(
-      (signal) => new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => resolve('data'), 1000);
-        signal?.addEventListener('abort', () => {
-          clearTimeout(timeout);
-          reject(new Error('Aborted'));
-        });
-      })
+      signal =>
+        new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => resolve('data'), 1000);
+          signal?.addEventListener('abort', () => {
+            clearTimeout(timeout);
+            reject(new Error('Aborted'));
+          });
+        })
     );
 
     let promise: Promise<any>;
@@ -324,15 +326,16 @@ describe('useFormSubmission', () => {
 describe('useAsyncOperation', () => {
   it('starts and tracks async operation', async () => {
     const { result } = renderHook(() => useAsyncOperation());
-    
+
     const mockAsyncFunction = vi.fn().mockImplementation(
-      (updateProgress) => new Promise((resolve) => {
-        updateProgress(50);
-        setTimeout(() => {
-          updateProgress(100);
-          resolve('operation result');
-        }, 100);
-      })
+      updateProgress =>
+        new Promise(resolve => {
+          updateProgress(50);
+          setTimeout(() => {
+            updateProgress(100);
+            resolve('operation result');
+          }, 100);
+        })
     );
 
     act(() => {
@@ -353,11 +356,15 @@ describe('useAsyncOperation', () => {
   it('handles operation failure', async () => {
     const { result } = renderHook(() => useAsyncOperation());
     const mockError = new Error('Operation failed');
-    
+
     const mockAsyncFunction = vi.fn().mockRejectedValue(mockError);
 
     act(() => {
-      result.current.startOperation('op1', 'Failed Operation', mockAsyncFunction);
+      result.current.startOperation(
+        'op1',
+        'Failed Operation',
+        mockAsyncFunction
+      );
     });
 
     await waitFor(() => {
@@ -369,7 +376,7 @@ describe('useAsyncOperation', () => {
 
   it('cancels operation', () => {
     const { result } = renderHook(() => useAsyncOperation());
-    
+
     const mockAsyncFunction = vi.fn().mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
@@ -389,7 +396,7 @@ describe('useAsyncOperation', () => {
 
   it('removes operation', () => {
     const { result } = renderHook(() => useAsyncOperation());
-    
+
     const mockAsyncFunction = vi.fn().mockResolvedValue('result');
 
     act(() => {
@@ -407,19 +414,29 @@ describe('useAsyncOperation', () => {
 
   it('clears completed operations', async () => {
     const { result } = renderHook(() => useAsyncOperation());
-    
+
     const mockAsyncFunction1 = vi.fn().mockResolvedValue('result1');
     const mockAsyncFunction2 = vi.fn().mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
     act(() => {
-      result.current.startOperation('op1', 'Completed Operation', mockAsyncFunction1);
-      result.current.startOperation('op2', 'Running Operation', mockAsyncFunction2);
+      result.current.startOperation(
+        'op1',
+        'Completed Operation',
+        mockAsyncFunction1
+      );
+      result.current.startOperation(
+        'op2',
+        'Running Operation',
+        mockAsyncFunction2
+      );
     });
 
     await waitFor(() => {
-      expect(result.current.operations.find(op => op.id === 'op1')?.status).toBe('completed');
+      expect(
+        result.current.operations.find(op => op.id === 'op1')?.status
+      ).toBe('completed');
     });
 
     expect(result.current.operations).toHaveLength(2);

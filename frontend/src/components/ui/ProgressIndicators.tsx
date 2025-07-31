@@ -56,7 +56,7 @@ export const LinearProgress: React.FC<LinearProgressProps> = ({
           )}
         </Group>
       )}
-      
+
       <Progress
         value={value}
         color={color}
@@ -67,7 +67,7 @@ export const LinearProgress: React.FC<LinearProgressProps> = ({
           transition: 'all 0.3s ease',
         }}
       />
-      
+
       {description && (
         <Text size="xs" c="dimmed">
           {description}
@@ -116,7 +116,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
           ) : undefined
         }
       />
-      
+
       {label && (
         <Text size="sm" ta="center" fw={500}>
           {label}
@@ -188,7 +188,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                 </Text>
               )}
             </Center>
-            
+
             <Stack gap="xs" style={{ flex: 1 }}>
               <Text size="sm" fw={500}>
                 {step.label}
@@ -225,18 +225,18 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                 </Text>
               )}
             </Center>
-            
+
             <Text size="xs" ta="center" fw={500}>
               {step.label}
             </Text>
-            
+
             {step.description && (
               <Text size="xs" c="dimmed" ta="center">
                 {step.description}
               </Text>
             )}
           </Stack>
-          
+
           {index < steps.length - 1 && (
             <Box
               style={{
@@ -328,7 +328,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
               </Text>
             )}
           </Stack>
-          
+
           <Group gap="xs">
             {status === 'running' && onPause && (
               <Tooltip label="Pause">
@@ -337,7 +337,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
                 </ActionIcon>
               </Tooltip>
             )}
-            
+
             {status === 'paused' && onResume && (
               <Tooltip label="Resume">
                 <ActionIcon variant="subtle" onClick={onResume}>
@@ -345,7 +345,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
                 </ActionIcon>
               </Tooltip>
             )}
-            
+
             {(status === 'error' || status === 'cancelled') && onRetry && (
               <Tooltip label="Retry">
                 <ActionIcon variant="subtle" onClick={onRetry}>
@@ -353,7 +353,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
                 </ActionIcon>
               </Tooltip>
             )}
-            
+
             {(status === 'running' || status === 'paused') && onCancel && (
               <Tooltip label="Cancel">
                 <ActionIcon variant="subtle" color="red" onClick={onCancel}>
@@ -375,7 +375,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
           <Text size="sm" c={getStatusColor()}>
             {getStatusText()}
           </Text>
-          
+
           {estimatedTime && status === 'running' && (
             <Text size="sm" c="dimmed">
               Est. {estimatedTime} remaining
@@ -408,46 +408,60 @@ export const useOperationProgress = () => {
     Map<string, OperationProgressProps>
   >(new Map());
 
-  const startOperation = React.useCallback((
-    id: string,
-    operation: Omit<OperationProgressProps, 'progress' | 'status'>
-  ) => {
-    setOperations(prev => new Map(prev).set(id, {
-      ...operation,
-      progress: 0,
-      status: 'running',
-    }));
-  }, []);
+  const startOperation = React.useCallback(
+    (
+      id: string,
+      operation: Omit<OperationProgressProps, 'progress' | 'status'>
+    ) => {
+      setOperations(prev =>
+        new Map(prev).set(id, {
+          ...operation,
+          progress: 0,
+          status: 'running',
+        })
+      );
+    },
+    []
+  );
 
-  const updateProgress = React.useCallback((
-    id: string,
-    progress: number,
-    updates?: Partial<OperationProgressProps>
-  ) => {
-    setOperations(prev => {
-      const newMap = new Map(prev);
-      const existing = newMap.get(id);
-      if (existing) {
-        newMap.set(id, {
-          ...existing,
-          progress,
-          ...updates,
-        });
-      }
-      return newMap;
-    });
-  }, []);
+  const updateProgress = React.useCallback(
+    (
+      id: string,
+      progress: number,
+      updates?: Partial<OperationProgressProps>
+    ) => {
+      setOperations(prev => {
+        const newMap = new Map(prev);
+        const existing = newMap.get(id);
+        if (existing) {
+          newMap.set(id, {
+            ...existing,
+            progress,
+            ...updates,
+          });
+        }
+        return newMap;
+      });
+    },
+    []
+  );
 
-  const completeOperation = React.useCallback((id: string) => {
-    updateProgress(id, 100, { status: 'completed' });
-  }, [updateProgress]);
+  const completeOperation = React.useCallback(
+    (id: string) => {
+      updateProgress(id, 100, { status: 'completed' });
+    },
+    [updateProgress]
+  );
 
-  const failOperation = React.useCallback((id: string, error?: string) => {
-    updateProgress(id, 0, { 
-      status: 'error',
-      description: error,
-    });
-  }, [updateProgress]);
+  const failOperation = React.useCallback(
+    (id: string, error?: string) => {
+      updateProgress(id, 0, {
+        status: 'error',
+        description: error,
+      });
+    },
+    [updateProgress]
+  );
 
   const removeOperation = React.useCallback((id: string) => {
     setOperations(prev => {

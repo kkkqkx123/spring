@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Modal, 
-  Text, 
-  Group, 
-  Button, 
-  Stack, 
-  ThemeIcon, 
+import {
+  Modal,
+  Text,
+  Group,
+  Button,
+  Stack,
+  ThemeIcon,
   Checkbox,
   TextInput,
   Alert,
@@ -88,7 +88,8 @@ export function ConfirmDialog({
   const config = variantConfig[variant];
   const IconComponent = config.icon;
 
-  const isConfirmationValid = !requireConfirmation || 
+  const isConfirmationValid =
+    !requireConfirmation ||
     confirmationInput.toLowerCase() === confirmationText.toLowerCase();
 
   const canConfirm = isConfirmationValid && (countdown ? timeLeft === 0 : true);
@@ -178,9 +179,13 @@ export function ConfirmDialog({
             </Text>
             <TextInput
               value={confirmationInput}
-              onChange={(e) => setConfirmationInput(e.target.value)}
+              onChange={e => setConfirmationInput(e.target.value)}
               placeholder={confirmationText}
-              error={confirmationInput && !isConfirmationValid ? 'Text does not match' : undefined}
+              error={
+                confirmationInput && !isConfirmationValid
+                  ? 'Text does not match'
+                  : undefined
+              }
               disabled={loading}
             />
           </Stack>
@@ -210,7 +215,7 @@ export function ConfirmDialog({
           <Checkbox
             label="Don't ask me again"
             checked={dontAskAgain}
-            onChange={(e) => handleDontAskAgainChange(e.currentTarget.checked)}
+            onChange={e => handleDontAskAgainChange(e.currentTarget.checked)}
             disabled={loading}
           />
         )}
@@ -420,8 +425,10 @@ export function BulkActionDialog({
   showDontAskAgain?: boolean;
   onDontAskAgainChange?: (checked: boolean) => void;
 }) {
-  const isDestructive = ['delete', 'remove', 'archive'].includes(action.toLowerCase());
-  
+  const isDestructive = ['delete', 'remove', 'archive'].includes(
+    action.toLowerCase()
+  );
+
   return (
     <ConfirmDialog
       opened={opened}

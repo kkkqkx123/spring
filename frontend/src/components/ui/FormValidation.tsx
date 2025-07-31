@@ -1,18 +1,18 @@
 import React from 'react';
-import { 
-  Text, 
-  Alert, 
-  Stack, 
-  List, 
+import {
+  Text,
+  Alert,
+  Stack,
+  List,
   Group,
   ActionIcon,
-  Tooltip 
+  Tooltip,
 } from '@mantine/core';
-import { 
-  IconAlertCircle, 
-  IconCheck, 
-  IconX, 
-  IconInfoCircle 
+import {
+  IconAlertCircle,
+  IconCheck,
+  IconX,
+  IconInfoCircle,
 } from '@tabler/icons-react';
 import type { FieldError, FieldErrors } from 'react-hook-form';
 
@@ -35,9 +35,9 @@ export const FormErrorDisplay: React.FC<FormErrorDisplayProps> = ({
   return (
     <Group gap="xs" align="flex-start" mt="xs">
       {showIcon && (
-        <IconAlertCircle 
-          size={16} 
-          color="var(--mantine-color-red-6)" 
+        <IconAlertCircle
+          size={16}
+          color="var(--mantine-color-red-6)"
           style={{ marginTop: 2, flexShrink: 0 }}
         />
       )}
@@ -63,9 +63,9 @@ export const FormSuccessDisplay: React.FC<FormSuccessDisplayProps> = ({
   return (
     <Group gap="xs" align="flex-start" mt="xs">
       {showIcon && (
-        <IconCheck 
-          size={16} 
-          color="var(--mantine-color-green-6)" 
+        <IconCheck
+          size={16}
+          color="var(--mantine-color-green-6)"
           style={{ marginTop: 2, flexShrink: 0 }}
         />
       )}
@@ -88,11 +88,13 @@ interface FormErrorSummaryProps {
  */
 export const FormErrorSummary: React.FC<FormErrorSummaryProps> = ({
   errors,
-  title = "Please correct the following errors:",
+  title = 'Please correct the following errors:',
   showFieldNames = true,
   onFieldClick,
 }) => {
-  const errorEntries = Object.entries(errors).filter(([_, error]) => error?.message);
+  const errorEntries = Object.entries(errors).filter(
+    ([_, error]) => error?.message
+  );
 
   if (errorEntries.length === 0) return null;
 
@@ -109,12 +111,12 @@ export const FormErrorSummary: React.FC<FormErrorSummaryProps> = ({
           <List.Item key={fieldName}>
             <Group gap="xs" align="flex-start">
               {showFieldNames && (
-                <Text 
-                  fw={500} 
+                <Text
+                  fw={500}
                   size="sm"
-                  style={{ 
+                  style={{
                     cursor: onFieldClick ? 'pointer' : 'default',
-                    textDecoration: onFieldClick ? 'underline' : 'none'
+                    textDecoration: onFieldClick ? 'underline' : 'none',
                   }}
                   onClick={() => onFieldClick?.(fieldName)}
                 >
@@ -144,7 +146,7 @@ interface ValidationRulesDisplayProps {
  */
 export const ValidationRulesDisplay: React.FC<ValidationRulesDisplayProps> = ({
   rules,
-  title = "Password Requirements:",
+  title = 'Password Requirements:',
 }) => {
   return (
     <Stack gap="xs" mt="xs">
@@ -160,11 +162,7 @@ export const ValidationRulesDisplay: React.FC<ValidationRulesDisplayProps> = ({
           ) : (
             <IconX size={16} color="var(--mantine-color-red-6)" />
           )}
-          <Text 
-            size="sm" 
-            c={rule.valid ? 'green' : 'red'}
-            style={{ flex: 1 }}
-          >
+          <Text size="sm" c={rule.valid ? 'green' : 'red'} style={{ flex: 1 }}>
             {rule.label}
           </Text>
           {rule.message && (
@@ -207,15 +205,11 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   return (
     <Stack gap="xs">
       {children}
-      
-      {error && touched && (
-        <FormErrorDisplay error={error} touched={touched} />
-      )}
-      
-      {success && !error && (
-        <FormSuccessDisplay message={success} />
-      )}
-      
+
+      {error && touched && <FormErrorDisplay error={error} touched={touched} />}
+
+      {success && !error && <FormSuccessDisplay message={success} />}
+
       {showValidationRules && validationRules && (
         <ValidationRulesDisplay rules={validationRules} />
       )}
@@ -238,28 +232,31 @@ const formatFieldName = (fieldName: string): string => {
  * Hook to validate password strength
  */
 export const usePasswordValidation = (password: string) => {
-  const rules = React.useMemo(() => [
-    {
-      label: 'At least 8 characters long',
-      valid: password.length >= 8,
-    },
-    {
-      label: 'Contains uppercase letter',
-      valid: /[A-Z]/.test(password),
-    },
-    {
-      label: 'Contains lowercase letter',
-      valid: /[a-z]/.test(password),
-    },
-    {
-      label: 'Contains number',
-      valid: /\d/.test(password),
-    },
-    {
-      label: 'Contains special character',
-      valid: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    },
-  ], [password]);
+  const rules = React.useMemo(
+    () => [
+      {
+        label: 'At least 8 characters long',
+        valid: password.length >= 8,
+      },
+      {
+        label: 'Contains uppercase letter',
+        valid: /[A-Z]/.test(password),
+      },
+      {
+        label: 'Contains lowercase letter',
+        valid: /[a-z]/.test(password),
+      },
+      {
+        label: 'Contains number',
+        valid: /\d/.test(password),
+      },
+      {
+        label: 'Contains special character',
+        valid: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      },
+    ],
+    [password]
+  );
 
   const isValid = rules.every(rule => rule.valid);
   const strength = rules.filter(rule => rule.valid).length;
@@ -295,17 +292,22 @@ const getPasswordStrengthLabel = (strength: number): string => {
  */
 export const useFormValidation = () => {
   const [touched, setTouched] = React.useState<Record<string, boolean>>({});
-  const [serverErrors, setServerErrors] = React.useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = React.useState<
+    Record<string, string>
+  >({});
 
   const markFieldTouched = (fieldName: string) => {
     setTouched(prev => ({ ...prev, [fieldName]: true }));
   };
 
   const markAllFieldsTouched = (fieldNames: string[]) => {
-    const touchedFields = fieldNames.reduce((acc, name) => {
-      acc[name] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
+    const touchedFields = fieldNames.reduce(
+      (acc, name) => {
+        acc[name] = true;
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
     setTouched(touchedFields);
   };
 

@@ -43,99 +43,104 @@ export const useLoadingState = (options: LoadingOptions = {}) => {
     retryDelay = 1000,
   } = options;
 
-  const execute = useCallback(async (
-    asyncFunction: (signal?: AbortSignal) => Promise<any>
-  ) => {
-    // Cancel any ongoing request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new abort controller
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
-
-    setState(prev => ({
-      ...prev,
-      isLoading: true,
-      error: null,
-    }));
-
-    try {
-      const result = await asyncFunction(signal);
-      
-      if (!signal.aborted) {
-        setState({
-          isLoading: false,
-          error: null,
-          data: result,
-        });
-
-        if (showSuccessToast) {
-          toast.success('Success', successMessage);
-        }
-
-        onSuccess?.(result);
-        retryCountRef.current = 0;
+  const execute = useCallback(
+    async (asyncFunction: (signal?: AbortSignal) => Promise<any>) => {
+      // Cancel any ongoing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
 
-      return result;
-    } catch (error) {
-      if (!signal.aborted) {
-        const errorObj = error instanceof Error ? error : new Error(String(error));
-        
-        // Retry logic
-        if (retryCountRef.current < retries) {
-          retryCountRef.current++;
-          
-          setTimeout(() => {
-            if (!signal.aborted) {
-              execute(asyncFunction);
-            }
-          }, retryDelay * Math.pow(2, retryCountRef.current - 1)); // Exponential backoff
-          
-          return;
+      // Create new abort controller
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+
+      setState(prev => ({
+        ...prev,
+        isLoading: true,
+        error: null,
+      }));
+
+      try {
+        const result = await asyncFunction(signal);
+
+        if (!signal.aborted) {
+          setState({
+            isLoading: false,
+            error: null,
+            data: result,
+          });
+
+          if (showSuccessToast) {
+            toast.success('Success', successMessage);
+          }
+
+          onSuccess?.(result);
+          retryCountRef.current = 0;
         }
 
-        setState({
-          isLoading: false,
-          error: errorObj,
-          data: null,
-        });
+        return result;
+      } catch (error) {
+        if (!signal.aborted) {
+          const errorObj =
+            error instanceof Error ? error : new Error(String(error));
 
-        if (showErrorToast) {
-          toast.error('Error', errorMessage);
+          // Retry logic
+          if (retryCountRef.current < retries) {
+            retryCountRef.current++;
+
+            setTimeout(
+              () => {
+                if (!signal.aborted) {
+                  execute(asyncFunction);
+                }
+              },
+              retryDelay * Math.pow(2, retryCountRef.current - 1)
+            ); // Exponential backoff
+
+            return;
+          }
+
+          setState({
+            isLoading: false,
+            error: errorObj,
+            data: null,
+          });
+
+          if (showErrorToast) {
+            toast.error('Error', errorMessage);
+          }
+
+          onError?.(errorObj);
+          retryCountRef.current = 0;
         }
 
-        onError?.(errorObj);
-        retryCountRef.current = 0;
+        throw error;
       }
-
-      throw error;
-    }
-  }, [
-    showSuccessToast,
-    showErrorToast,
-    successMessage,
-    errorMessage,
-    onSuccess,
-    onError,
-    retries,
-    retryDelay,
-    toast,
-  ]);
+    },
+    [
+      showSuccessToast,
+      showErrorToast,
+      successMessage,
+      errorMessage,
+      onSuccess,
+      onError,
+      retries,
+      retryDelay,
+      toast,
+    ]
+  );
 
   const reset = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
+
     setState({
       isLoading: false,
       error: null,
       data: null,
     });
-    
+
     retryCountRef.current = 0;
   }, []);
 
@@ -143,7 +148,7 @@ export const useLoadingState = (options: LoadingOptions = {}) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
+
     setState(prev => ({
       ...prev,
       isLoading: false,
@@ -207,9 +212,12 @@ export const useMultipleLoadingStates = () => {
     }));
   }, []);
 
-  const getState = useCallback((key: string): LoadingState => {
-    return states[key] || { isLoading: false, error: null, data: null };
-  }, [states]);
+  const getState = useCallback(
+    (key: string): LoadingState => {
+      return states[key] || { isLoading: false, error: null, data: null };
+    },
+    [states]
+  );
 
   const isAnyLoading = useCallback(() => {
     return Object.values(states).some(state => state.isLoading);
@@ -248,37 +256,42 @@ export const useMultipleLoadingStates = () => {
  */
 export const useFormSubmission = <T = any>(options: LoadingOptions = {}) => {
   const loadingState = useLoadingState(options);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
-  const submit = useCallback(async (
-    submitFunction: () => Promise<T>,
-    validationFunction?: () => Record<string, string> | null
-  ) => {
-    // Clear previous validation errors
-    setValidationErrors({});
+  const submit = useCallback(
+    async (
+      submitFunction: () => Promise<T>,
+      validationFunction?: () => Record<string, string> | null
+    ) => {
+      // Clear previous validation errors
+      setValidationErrors({});
 
-    // Run validation if provided
-    if (validationFunction) {
-      const errors = validationFunction();
-      if (errors && Object.keys(errors).length > 0) {
-        setValidationErrors(errors);
-        return;
-      }
-    }
-
-    try {
-      return await loadingState.execute(submitFunction);
-    } catch (error) {
-      // Handle validation errors from server
-      if (error instanceof Error && 'details' in error) {
-        const details = (error as any).details;
-        if (typeof details === 'object' && details !== null) {
-          setValidationErrors(details);
+      // Run validation if provided
+      if (validationFunction) {
+        const errors = validationFunction();
+        if (errors && Object.keys(errors).length > 0) {
+          setValidationErrors(errors);
+          return;
         }
       }
-      throw error;
-    }
-  }, [loadingState]);
+
+      try {
+        return await loadingState.execute(submitFunction);
+      } catch (error) {
+        // Handle validation errors from server
+        if (error instanceof Error && 'details' in error) {
+          const details = (error as any).details;
+          if (typeof details === 'object' && details !== null) {
+            setValidationErrors(details);
+          }
+        }
+        throw error;
+      }
+    },
+    [loadingState]
+  );
 
   const clearValidationErrors = useCallback(() => {
     setValidationErrors({});
@@ -296,69 +309,81 @@ export const useFormSubmission = <T = any>(options: LoadingOptions = {}) => {
  * Hook for managing async operations with progress tracking
  */
 export const useAsyncOperation = () => {
-  const [operations, setOperations] = useState<Map<string, {
-    id: string;
-    title: string;
-    progress: number;
-    status: 'running' | 'completed' | 'error' | 'cancelled';
-    error?: Error;
-    result?: any;
-  }>>(new Map());
+  const [operations, setOperations] = useState<
+    Map<
+      string,
+      {
+        id: string;
+        title: string;
+        progress: number;
+        status: 'running' | 'completed' | 'error' | 'cancelled';
+        error?: Error;
+        result?: any;
+      }
+    >
+  >(new Map());
 
-  const startOperation = useCallback((
-    id: string,
-    title: string,
-    asyncFunction: (updateProgress: (progress: number) => void) => Promise<any>
-  ) => {
-    setOperations(prev => new Map(prev).set(id, {
-      id,
-      title,
-      progress: 0,
-      status: 'running',
-    }));
+  const startOperation = useCallback(
+    (
+      id: string,
+      title: string,
+      asyncFunction: (
+        updateProgress: (progress: number) => void
+      ) => Promise<any>
+    ) => {
+      setOperations(prev =>
+        new Map(prev).set(id, {
+          id,
+          title,
+          progress: 0,
+          status: 'running',
+        })
+      );
 
-    const updateProgress = (progress: number) => {
-      setOperations(prev => {
-        const newMap = new Map(prev);
-        const operation = newMap.get(id);
-        if (operation) {
-          newMap.set(id, { ...operation, progress });
-        }
-        return newMap;
-      });
-    };
-
-    asyncFunction(updateProgress)
-      .then(result => {
+      const updateProgress = (progress: number) => {
         setOperations(prev => {
           const newMap = new Map(prev);
           const operation = newMap.get(id);
           if (operation) {
-            newMap.set(id, {
-              ...operation,
-              progress: 100,
-              status: 'completed',
-              result,
-            });
+            newMap.set(id, { ...operation, progress });
           }
           return newMap;
         });
-      })
-      .catch(error => {
-        setOperations(prev => {
-          const newMap = new Map(prev);
-          const operation = newMap.get(id);
-          if (operation) {
-            newMap.set(id, {
-              ...operation,
-              status: 'error',
-              error,
-            });
-          }
-          return newMap;
+      };
+
+      asyncFunction(updateProgress)
+        .then(result => {
+          setOperations(prev => {
+            const newMap = new Map(prev);
+            const operation = newMap.get(id);
+            if (operation) {
+              newMap.set(id, {
+                ...operation,
+                progress: 100,
+                status: 'completed',
+                result,
+              });
+            }
+            return newMap;
+          });
+        })
+        .catch(error => {
+          setOperations(prev => {
+            const newMap = new Map(prev);
+            const operation = newMap.get(id);
+            if (operation) {
+              newMap.set(id, {
+                ...operation,
+                status: 'error',
+                error,
+              });
+            }
+            return newMap;
+          });
         });
-      });
-  }, []);
+    },
+    []
+  );
 
   const cancelOperation = useCallback((id: string) => {
     setOperations(prev => {

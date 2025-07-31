@@ -5,7 +5,9 @@ import { MantineProvider } from '@mantine/core';
 import { ErrorBoundary, withErrorBoundary } from './ErrorBoundary';
 
 // Mock component that throws an error
-const ThrowError: React.FC<{ shouldThrow?: boolean }> = ({ shouldThrow = true }) => {
+const ThrowError: React.FC<{ shouldThrow?: boolean }> = ({
+  shouldThrow = true,
+}) => {
   if (shouldThrow) {
     throw new Error('Test error message');
   }
@@ -57,10 +59,18 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText(/An unexpected error occurred/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /refresh page/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /go home/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/An unexpected error occurred/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /try again/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /refresh page/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /go home/i })
+    ).toBeInTheDocument();
   });
 
   it('shows error details in development mode', () => {
@@ -233,9 +243,11 @@ describe('withErrorBoundary HOC', () => {
   it('sets correct display name', () => {
     const TestComponent: React.FC = () => <div>Test</div>;
     TestComponent.displayName = 'TestComponent';
-    
+
     const WrappedComponent = withErrorBoundary(TestComponent);
 
-    expect(WrappedComponent.displayName).toBe('withErrorBoundary(TestComponent)');
+    expect(WrappedComponent.displayName).toBe(
+      'withErrorBoundary(TestComponent)'
+    );
   });
 });

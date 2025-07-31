@@ -2,7 +2,12 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MantineProvider } from '@mantine/core';
-import { ToastNotification, ToastContainer, useToast, useProgressToast } from './ToastNotifications';
+import {
+  ToastNotification,
+  ToastContainer,
+  useToast,
+  useProgressToast,
+} from './ToastNotifications';
 import { useUiStore } from '../../stores/uiStore';
 
 // Mock the UI store
@@ -35,7 +40,9 @@ describe('ToastNotification', () => {
     );
 
     expect(screen.getByText('Success')).toBeInTheDocument();
-    expect(screen.getByText('Operation completed successfully')).toBeInTheDocument();
+    expect(
+      screen.getByText('Operation completed successfully')
+    ).toBeInTheDocument();
   });
 
   it('renders error notification correctly', () => {
@@ -129,7 +136,7 @@ describe('ToastNotification', () => {
 
   it('shows action button when action is provided', () => {
     const mockAction = vi.fn();
-    
+
     render(
       <TestWrapper>
         <ToastNotification
@@ -148,7 +155,7 @@ describe('ToastNotification', () => {
 
     const actionButton = screen.getByText('Retry');
     expect(actionButton).toBeInTheDocument();
-    
+
     fireEvent.click(actionButton);
     expect(mockAction).toHaveBeenCalled();
   });
@@ -199,16 +206,16 @@ describe('ToastNotification', () => {
     );
 
     const notification = screen.getByRole('alert');
-    
+
     // Start timer
     vi.advanceTimersByTime(500);
-    
+
     // Pause on mouse enter
     fireEvent.mouseEnter(notification);
     vi.advanceTimersByTime(1000);
-    
+
     expect(mockOnClose).not.toHaveBeenCalled();
-    
+
     // Resume on mouse leave
     fireEvent.mouseLeave(notification);
     vi.advanceTimersByTime(500);
@@ -290,7 +297,7 @@ describe('useToast hook', () => {
   it('provides toast methods', () => {
     const TestComponent = () => {
       const toast = useToast();
-      
+
       return (
         <div>
           <button onClick={() => toast.success('Success', 'Success message')}>
@@ -361,20 +368,16 @@ describe('useProgressToast hook', () => {
   it('creates and manages progress toast', () => {
     const TestComponent = () => {
       const { showProgressToast } = useProgressToast();
-      
+
       const handleStart = () => {
         const progress = showProgressToast('Upload', 'Uploading file...', 0);
-        
+
         // Simulate progress updates
         setTimeout(() => progress.updateProgress(50, 'Halfway done...'), 100);
         setTimeout(() => progress.complete('Upload completed!'), 200);
       };
 
-      return (
-        <button onClick={handleStart}>
-          Start Progress
-        </button>
-      );
+      return <button onClick={handleStart}>Start Progress</button>;
     };
 
     render(

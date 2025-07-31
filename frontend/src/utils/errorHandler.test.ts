@@ -218,13 +218,14 @@ describe('createRetryFunction', () => {
   it('implements exponential backoff', async () => {
     const delays: number[] = [];
     const originalSetTimeout = global.setTimeout;
-    
+
     global.setTimeout = vi.fn().mockImplementation((callback, delay) => {
       delays.push(delay);
       return originalSetTimeout(callback, 0); // Execute immediately for test
     });
 
-    const mockFunction = vi.fn()
+    const mockFunction = vi
+      .fn()
       .mockRejectedValueOnce({ status: 500, message: 'Error 1' })
       .mockRejectedValueOnce({ status: 500, message: 'Error 2' })
       .mockResolvedValueOnce('success');
@@ -305,7 +306,10 @@ describe('setupGlobalErrorHandling', () => {
 
     errorHandler(mockEvent);
 
-    expect(console.error).toHaveBeenCalledWith('Global error:', mockEvent.error);
+    expect(console.error).toHaveBeenCalledWith(
+      'Global error:',
+      mockEvent.error
+    );
   });
 });
 

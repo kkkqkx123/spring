@@ -109,6 +109,18 @@ export interface Position {
 
 export type EmployeeStatus = 'ACTIVE' | 'INACTIVE' | 'TERMINATED';
 
+export interface EmployeeSearchCriteria {
+  name?: string;
+  email?: string;
+  departmentId?: number;
+  positionId?: number;
+  status?: EmployeeStatus;
+  hireDate?: {
+    from?: string;
+    to?: string;
+  };
+}
+
 // Chat types
 export interface ChatMessage {
   id: number;
