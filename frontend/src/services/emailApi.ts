@@ -25,7 +25,9 @@ export const emailApi = {
   },
 
   // Send bulk emails
-  sendBulkEmails: (request: EmailRequest): Promise<{ message: string; count: number }> => {
+  sendBulkEmails: (
+    request: EmailRequest
+  ): Promise<{ message: string; count: number }> => {
     return apiClient.post('/api/email/send-bulk', request);
   },
 
@@ -42,7 +44,10 @@ export const emailApi = {
     departmentId: number,
     request: Omit<EmailRequest, 'to' | 'recipients'>
   ): Promise<{ message: string }> => {
-    return apiClient.post(`/api/email/send-to-department/${departmentId}`, request);
+    return apiClient.post(
+      `/api/email/send-to-department/${departmentId}`,
+      request
+    );
   },
 
   // Get available email templates
@@ -55,6 +60,9 @@ export const emailApi = {
     templateName: string,
     variables: Record<string, any>
   ): Promise<EmailPreview> => {
-    return apiClient.post(`/api/email/templates/${templateName}/preview`, variables);
+    return apiClient.post(
+      `/api/email/templates/${templateName}/preview`,
+      variables
+    );
   },
 };

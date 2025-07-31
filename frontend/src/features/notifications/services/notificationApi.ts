@@ -1,5 +1,5 @@
 import { apiClient } from '../../../services/api';
-import { Notification, PaginatedResponse, Pageable } from '../../../types';
+import type { Notification, PaginatedResponse, Pageable } from '../../../types';
 
 export interface NotificationRequest {
   title: string;
@@ -19,62 +19,126 @@ export class NotificationApi {
   async getNotifications(
     pageable: Pageable
   ): Promise<PaginatedResponse<Notification>> {
-    const response = await this.client.get('/api/notifications', {
-      params: pageable,
-    });
-    return response.data;
+    try {
+      const response: { data: PaginatedResponse<Notification> } =
+        await this.client.get('/api/notifications', {
+          params: pageable,
+        });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      throw error;
+    }
   }
 
   async getNotification(id: number): Promise<Notification> {
-    const response = await this.client.get(`/api/notifications/${id}`);
-    return response.data;
+    try {
+      const response: { data: Notification } = await this.client.get(
+        `/api/notifications/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching notification ${id}:`, error);
+      throw error;
+    }
   }
 
   async createNotification(
     notification: NotificationRequest
   ): Promise<Notification> {
-    const response = await this.client.post('/api/notifications', notification);
-    return response.data;
+    try {
+      const response: { data: Notification } = await this.client.post(
+        '/api/notifications',
+        notification
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
   }
 
   async updateNotification(
     id: number,
     updates: NotificationUpdateRequest
   ): Promise<Notification> {
-    const response = await this.client.put(`/api/notifications/${id}`, updates);
-    return response.data;
+    try {
+      const response: { data: Notification } = await this.client.put(
+        `/api/notifications/${id}`,
+        updates
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating notification ${id}:`, error);
+      throw error;
+    }
   }
 
   async deleteNotification(id: number): Promise<void> {
-    await this.client.delete(`/api/notifications/${id}`);
+    try {
+      await this.client.delete(`/api/notifications/${id}`);
+    } catch (error) {
+      console.error(`Error deleting notification ${id}:`, error);
+      throw error;
+    }
   }
 
   async markAsRead(id: number): Promise<Notification> {
-    const response = await this.client.put(`/api/notifications/${id}/read`);
-    return response.data;
+    try {
+      const response: { data: Notification } = await this.client.put(
+        `/api/notifications/${id}/read`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error marking notification ${id} as read:`, error);
+      throw error;
+    }
   }
 
   async markAllAsRead(): Promise<void> {
-    await this.client.put('/api/notifications/read-all');
+    try {
+      await this.client.put('/api/notifications/read-all');
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      throw error;
+    }
   }
 
   async getUnreadCount(): Promise<number> {
-    const response = await this.client.get('/api/notifications/unread/count');
-    return response.data;
+    try {
+      const response: { data: number } = await this.client.get(
+        '/api/notifications/unread/count'
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+      throw error;
+    }
   }
 
   async deleteAllRead(): Promise<void> {
-    await this.client.delete('/api/notifications/read');
+    try {
+      await this.client.delete('/api/notifications/read');
+    } catch (error) {
+      console.error('Error deleting all read notifications:', error);
+      throw error;
+    }
   }
 
   async searchNotifications(
     query: string,
     pageable: Pageable
   ): Promise<PaginatedResponse<Notification>> {
-    const response = await this.client.get('/api/notifications/search', {
-      params: { q: query, ...pageable },
-    });
-    return response.data;
+    try {
+      const response: { data: PaginatedResponse<Notification> } =
+        await this.client.get('/api/notifications/search', {
+          params: { q: query, ...pageable },
+        });
+      return response.data;
+    } catch (error) {
+      console.error('Error searching notifications:', error);
+      throw error;
+    }
   }
 }
 

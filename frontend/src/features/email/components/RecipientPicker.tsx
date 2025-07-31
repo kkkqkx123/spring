@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Modal,
   Stack,
@@ -26,9 +26,7 @@ import {
 } from '@tabler/icons-react';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEmailRecipients, useDepartmentRecipients } from '../hooks/useEmail';
-import { useDepartments } from '../../departments/hooks/useDepartments';
-import { useEmployees } from '../../employees/hooks/useEmployees';
-import type { EmailRecipient, Department, Employee } from '../../../types';
+import type { EmailRecipient } from '../../../types';
 
 interface RecipientPickerProps {
   opened: boolean;
@@ -53,30 +51,35 @@ export const RecipientPicker: React.FC<RecipientPickerProps> = ({
   // API hooks
   const { data: allRecipients, isLoading: recipientsLoading } =
     useEmailRecipients();
-  const { data: departments, isLoading: departmentsLoading } = useDepartments();
-  const { data: employees, isLoading: employeesLoading } = useEmployees({
-    page: 0,
-    size: 100,
-  });
   const { data: departmentEmployees } = useDepartmentRecipients(
     selectedDepartment || 0
   );
 
   // Filter recipients based on search and tab
-  const filteredIndividuals =
-    allRecipients?.filter(
-      recipient =>
-        recipient.type === 'individual' &&
-        (recipient.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          recipient.email.toLowerCase().includes(debouncedSearch.toLowerCase()))
-    ) || [];
+  const filteredIndividuals = useMemo(
+    () =>
+      allRecipients?.filter(
+        (recipient: EmailRecipient) =>
+          recipient.type === 'individual' &&
+          (recipient.name
+            .toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+            recipient.email
+              .toLowerCase()
+              .includes(debouncedSearch.toLowerCase()))
+      ) || [],
+    [allRecipients, debouncedSearch]
+  );
 
-  const filteredDepartments =
-    allRecipients?.filter(
-      recipient =>
-        recipient.type === 'department' &&
-        recipient.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-    ) || [];
+  const filteredDepartments = useMemo(
+    () =>
+      allRecipients?.filter(
+        (recipient: EmailRecipient) =>
+          recipient.type === 'department' &&
+          recipient.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      ) || [],
+    [allRecipients, debouncedSearch]
+  );
 
   // Check if recipient is selected
   const isRecipientSelected = (recipient: EmailRecipient) => {
@@ -100,7 +103,7 @@ export const RecipientPicker: React.FC<RecipientPickerProps> = ({
       activeTab === 'individuals' ? filteredIndividuals : filteredDepartments;
 
     const newRecipients = [...selectedRecipients];
-    visibleRecipients.forEach(recipient => {
+    visibleRecipients.forEach((recipient: EmailRecipient) => {
       if (!isRecipientSelected(recipient)) {
         newRecipients.push(recipient);
       }
@@ -114,23 +117,11 @@ export const RecipientPicker: React.FC<RecipientPickerProps> = ({
     onRecipientsChange([]);
   };
 
-  // Select entire department
-  const selectDepartment = (department: Department) => {
-    const departmentRecipient: EmailRecipient = {
-      id: department.id,
-      name: department.name,
-      email: `department-${department.id}@company.com`, // Placeholder
-      type: 'department',
-    };
-
-    toggleRecipient(departmentRecipient);
-  };
-
   const handleSave = () => {
     onClose();
   };
 
-  const isLoading = recipientsLoading || departmentsLoading || employeesLoading;
+  const isLoading = recipientsLoading;
 
   return (
     <Modal
@@ -183,7 +174,10 @@ export const RecipientPicker: React.FC<RecipientPickerProps> = ({
         </Card>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onChange={setActiveTab}>
+        <Tabs
+          value={activeTab}
+          onChange={value => value && setActiveTab(value)}
+        >
           <Tabs.List>
             <Tabs.Tab value="individuals" leftSection={<IconUser size={16} />}>
               Individuals ({filteredIndividuals.length})
@@ -342,7 +336,7 @@ export const RecipientPicker: React.FC<RecipientPickerProps> = ({
               </Group>
               <ScrollArea.Autosize mah={200}>
                 <Stack gap="xs">
-                  {departmentEmployees.map(employee => (
+                  {departmentEmployees.map((employee: EmailRecipient) => (
                     <Group key={employee.id} gap="sm">
                       <IconUser size={14} />
                       <div>

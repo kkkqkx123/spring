@@ -11,7 +11,12 @@ import {
   LoadingOverlay,
   Divider,
 } from '@mantine/core';
-import { IconAlertTriangle, IconUsers, IconShield, IconExclamationMark } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconUsers,
+  IconShield,
+  IconExclamationMark,
+} from '@tabler/icons-react';
 import type { UseMutationResult } from '@tanstack/react-query';
 
 interface PermissionImpactAnalysis {
@@ -27,7 +32,11 @@ interface PermissionImpactDialogProps {
   onConfirm: () => void;
   roleId?: number;
   permissionIds?: number[];
-  analyzeImpact: UseMutationResult<PermissionImpactAnalysis, Error, { roleId: number; permissionIds: number[] }>;
+  analyzeImpact: UseMutationResult<
+    PermissionImpactAnalysis,
+    Error,
+    { roleId: number; permissionIds: number[] }
+  >;
   loading?: boolean;
 }
 
@@ -99,7 +108,8 @@ export const PermissionImpactDialog: React.FC<PermissionImpactDialogProps> = ({
               color={getRiskColor(impactData.riskLevel)}
               title={`${impactData.riskLevel} Risk Level`}
             >
-              This permission change has been classified as {impactData.riskLevel.toLowerCase()} risk.
+              This permission change has been classified as{' '}
+              {impactData.riskLevel.toLowerCase()} risk.
             </Alert>
 
             {/* Affected Users */}
@@ -109,7 +119,8 @@ export const PermissionImpactDialog: React.FC<PermissionImpactDialogProps> = ({
                 Affected Users:
               </Text>
               <Badge color="blue" variant="light">
-                {impactData.affectedUsers} user{impactData.affectedUsers !== 1 ? 's' : ''}
+                {impactData.affectedUsers} user
+                {impactData.affectedUsers !== 1 ? 's' : ''}
               </Badge>
             </Group>
 
@@ -151,8 +162,9 @@ export const PermissionImpactDialog: React.FC<PermissionImpactDialogProps> = ({
               variant="light"
             >
               <Text size="sm">
-                Are you sure you want to proceed with this permission change? 
-                This action will immediately affect {impactData.affectedUsers} user{impactData.affectedUsers !== 1 ? 's' : ''}.
+                Are you sure you want to proceed with this permission change?
+                This action will immediately affect {impactData.affectedUsers}{' '}
+                user{impactData.affectedUsers !== 1 ? 's' : ''}.
               </Text>
             </Alert>
           </>
@@ -162,7 +174,8 @@ export const PermissionImpactDialog: React.FC<PermissionImpactDialogProps> = ({
             color="red"
             title="Analysis Failed"
           >
-            Unable to analyze the impact of this permission change. Please try again.
+            Unable to analyze the impact of this permission change. Please try
+            again.
           </Alert>
         )}
 

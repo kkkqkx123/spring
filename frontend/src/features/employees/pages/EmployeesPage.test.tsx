@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { EmployeesPage } from './EmployeesPage';
+import EmployeesPage from './EmployeesPage';
 import { useEmployeeListState } from '../hooks/useEmployees';
 
 // Mock the hooks and components

@@ -56,17 +56,23 @@ export const notificationApi = {
   },
 
   // Create notification for specific user
-  createUserNotification: (request: NotificationRequest): Promise<NotificationResponse> => {
+  createUserNotification: (
+    request: NotificationRequest
+  ): Promise<NotificationResponse> => {
     return apiClient.post('/api/notifications/user', request);
   },
 
   // Create notification for multiple users
-  createMultiUserNotification: (request: NotificationRequest): Promise<NotificationResponse> => {
+  createMultiUserNotification: (
+    request: NotificationRequest
+  ): Promise<NotificationResponse> => {
     return apiClient.post('/api/notifications/users', request);
   },
 
   // Create notification for users with specific role
-  createRoleNotification: (request: NotificationRequest): Promise<NotificationResponse> => {
+  createRoleNotification: (
+    request: NotificationRequest
+  ): Promise<NotificationResponse> => {
     return apiClient.post('/api/notifications/role', request);
   },
 

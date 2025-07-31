@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-// Using browser's built-in Notification type
+import type { Notification } from '../../../types';
 
 export interface UseBrowserNotificationsReturn {
   permission: NotificationPermission;

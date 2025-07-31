@@ -27,8 +27,8 @@ export const positionApi = {
   },
 
   search: (searchTerm?: string): Promise<PositionDto[]> => {
-    return apiClient.get('/api/positions/search', { 
-      params: searchTerm ? { searchTerm } : {} 
+    return apiClient.get('/api/positions/search', {
+      params: searchTerm ? { searchTerm } : {},
     });
   },
 

@@ -17,11 +17,7 @@ export { queryClient } from './queryClient';
 export { queryKeys } from './queryKeys';
 
 // Export types
-export type {
-  EmailRequest,
-  EmailTemplate,
-  EmailPreview,
-} from './emailApi';
+export type { EmailRequest, EmailTemplate, EmailPreview } from './emailApi';
 
 export type {
   NotificationResponse,
@@ -29,9 +25,7 @@ export type {
   NotificationParams,
 } from './notificationApi';
 
-export type {
-  PermissionCheckResponse,
-} from './permissionApi';
+export type { PermissionCheckResponse } from './permissionApi';
 
 export type {
   PayrollLedgerDTO,

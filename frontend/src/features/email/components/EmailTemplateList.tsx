@@ -34,7 +34,7 @@ export const EmailTemplateList: React.FC<EmailTemplateListProps> = ({
 
   return (
     <Stack gap="md">
-      {templates.map((template) => (
+      {templates.map(template => (
         <Card key={template.id} shadow="sm" padding="md" radius="md" withBorder>
           <Group justify="space-between" mb="xs">
             <Text fw={500} size="lg">

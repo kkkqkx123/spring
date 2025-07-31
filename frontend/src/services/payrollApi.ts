@@ -20,7 +20,7 @@ export enum PayrollStatus {
   CALCULATED = 'CALCULATED',
   APPROVED = 'APPROVED',
   PAID = 'PAID',
-  CANCELLED = 'CANCELLED'
+  CANCELLED = 'CANCELLED',
 }
 
 export interface PayrollSearchCriteria {
@@ -40,7 +40,9 @@ export interface PayrollStatistics {
 
 export const payrollApi = {
   // Basic CRUD operations
-  getAll: (params: Pageable = { page: 0, size: 10 }): Promise<PaginatedResponse<PayrollLedgerDTO>> => {
+  getAll: (
+    params: Pageable = { page: 0, size: 10 }
+  ): Promise<PaginatedResponse<PayrollLedgerDTO>> => {
     return apiClient.get('/api/payroll', { params });
   },
 
@@ -48,11 +50,16 @@ export const payrollApi = {
     return apiClient.get(`/api/payroll/${id}`);
   },
 
-  create: (payrollLedger: Omit<PayrollLedgerDTO, 'id'>): Promise<PayrollLedgerDTO> => {
+  create: (
+    payrollLedger: Omit<PayrollLedgerDTO, 'id'>
+  ): Promise<PayrollLedgerDTO> => {
     return apiClient.post('/api/payroll', payrollLedger);
   },
 
-  update: (id: number, payrollLedger: PayrollLedgerDTO): Promise<PayrollLedgerDTO> => {
+  update: (
+    id: number,
+    payrollLedger: PayrollLedgerDTO
+  ): Promise<PayrollLedgerDTO> => {
     return apiClient.put(`/api/payroll/${id}`, payrollLedger);
   },
 
@@ -94,37 +101,56 @@ export const payrollApi = {
   },
 
   // Payroll calculations
-  calculatePayroll: (payrollLedger: PayrollLedgerDTO): Promise<PayrollLedgerDTO> => {
+  calculatePayroll: (
+    payrollLedger: PayrollLedgerDTO
+  ): Promise<PayrollLedgerDTO> => {
     return apiClient.post('/api/payroll/calculate', payrollLedger);
   },
 
-  validateCalculations: (payrollLedger: PayrollLedgerDTO): Promise<{ valid: boolean }> => {
+  validateCalculations: (
+    payrollLedger: PayrollLedgerDTO
+  ): Promise<{ valid: boolean }> => {
     return apiClient.post('/api/payroll/validate', payrollLedger);
   },
 
   // Status management
-  updateStatus: (id: number, status: PayrollStatus): Promise<PayrollLedgerDTO> => {
+  updateStatus: (
+    id: number,
+    status: PayrollStatus
+  ): Promise<PayrollLedgerDTO> => {
     return apiClient.put(`/api/payroll/${id}/status`, null, {
-      params: { status }
+      params: { status },
     });
   },
 
-  processPayment: (id: number, paymentReference: string): Promise<PayrollLedgerDTO> => {
+  processPayment: (
+    id: number,
+    paymentReference: string
+  ): Promise<PayrollLedgerDTO> => {
     return apiClient.put(`/api/payroll/${id}/payment`, null, {
-      params: { paymentReference }
+      params: { paymentReference },
     });
   },
 
   // Statistics and reporting
-  getStatsByDepartment: (year: number, month: number): Promise<PayrollStatistics[]> => {
+  getStatsByDepartment: (
+    year: number,
+    month: number
+  ): Promise<PayrollStatistics[]> => {
     return apiClient.get(`/api/payroll/stats/department/${year}/${month}`);
   },
 
-  getStatsByStatus: (year: number, month: number): Promise<PayrollStatistics[]> => {
+  getStatsByStatus: (
+    year: number,
+    month: number
+  ): Promise<PayrollStatistics[]> => {
     return apiClient.get(`/api/payroll/stats/status/${year}/${month}`);
   },
 
-  getTotalAmount: (year: number, month: number): Promise<{ totalAmount: number }> => {
+  getTotalAmount: (
+    year: number,
+    month: number
+  ): Promise<{ totalAmount: number }> => {
     return apiClient.get(`/api/payroll/total/${year}/${month}`);
   },
 
@@ -133,11 +159,16 @@ export const payrollApi = {
     year: number,
     month: number
   ): Promise<{ totalAmount: number }> => {
-    return apiClient.get(`/api/payroll/total/department/${departmentId}/${year}/${month}`);
+    return apiClient.get(
+      `/api/payroll/total/department/${departmentId}/${year}/${month}`
+    );
   },
 
   // Payroll generation
-  generatePayrollLedgers: (year: number, month: number): Promise<PayrollLedgerDTO[]> => {
+  generatePayrollLedgers: (
+    year: number,
+    month: number
+  ): Promise<PayrollLedgerDTO[]> => {
     return apiClient.post(`/api/payroll/generate/${year}/${month}`);
   },
 
@@ -146,6 +177,8 @@ export const payrollApi = {
     year: number,
     month: number
   ): Promise<PayrollLedgerDTO> => {
-    return apiClient.post(`/api/payroll/generate/employee/${employeeId}/${year}/${month}`);
+    return apiClient.post(
+      `/api/payroll/generate/employee/${employeeId}/${year}/${month}`
+    );
   },
 };

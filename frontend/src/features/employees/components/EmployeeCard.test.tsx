@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { MantineProvider } from '@mantine/core';
 import { EmployeeCard } from './EmployeeCard';
-import { Employee } from '../../../types';
+import type { Employee } from '../../../types';
 
 const mockEmployee: Employee = {
   id: 1,

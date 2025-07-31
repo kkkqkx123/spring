@@ -142,7 +142,7 @@ export function useTimeout(callback: () => void, delay: number | null) {
 /**
  * Hook for managing async operations with automatic cleanup
  */
-export function useAsyncOperation() {
+export function useSafeAsyncOperation() {
   const { addCleanup } = useCleanup();
   const isMountedRef = useRef(true);
 

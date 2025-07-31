@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import {
   Paper,
@@ -15,9 +16,6 @@ import {
   LoadingOverlay,
   Progress,
   List,
-  Divider,
-  ActionIcon,
-  Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -28,7 +26,6 @@ import {
   IconAlertCircle,
   IconCheck,
   IconX,
-  IconRefresh,
 } from '@tabler/icons-react';
 import {
   useEmailTemplates,
@@ -40,7 +37,6 @@ import {
 import { useDepartments } from '../../departments/hooks/useDepartments';
 import { useEmployees } from '../../employees/hooks/useEmployees';
 import type { BulkEmailRequest } from '../services/emailApi';
-import type { EmailTemplate } from '../../../types';
 
 interface BulkEmailSenderProps {
   onSent?: () => void;
@@ -102,7 +98,7 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
   const { data: selectedTemplate } = useEmailTemplate(selectedTemplateId);
 
   // Progress tracking
-  const { data: progress, isLoading: progressLoading } = useBulkEmailProgress(
+  const { data: progress } = useBulkEmailProgress(
     jobId || '',
     !!jobId && showProgress
   );
@@ -123,7 +119,7 @@ export const BulkEmailSender: React.FC<BulkEmailSenderProps> = ({
         ),
       });
     }
-  }, [selectedTemplate]);
+  }, [form, selectedTemplate]);
 
   // Prepare select options
   const templateOptions = (templates || []).map(template => ({

@@ -4,8 +4,9 @@ import { queryKeys } from '../../../services/queryKeys';
 import {
   employeeApi,
   type EmployeeSearchCriteria,
+  type EmployeeUpdateRequest,
 } from '../services/employeeApi';
-import type { Pageable, Employee } from '../../../types';
+import type { Pageable } from '../../../types';
 
 export const useEmployees = (pageable: Pageable) => {
   return useQuery({
@@ -52,8 +53,13 @@ export const useUpdateEmployee = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, employee }: { id: number; employee: any }) =>
-      employeeApi.updateEmployee(id, employee),
+    mutationFn: ({
+      id,
+      employee,
+    }: {
+      id: number;
+      employee: EmployeeUpdateRequest;
+    }) => employeeApi.updateEmployee(id, employee),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.employees.detail(id),

@@ -14,7 +14,6 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
   IconPlus,
-  IconMail,
   IconTemplate,
   IconHistory,
   IconAlertCircle,
@@ -23,12 +22,11 @@ import {
 import { EmailComposer } from '../components/EmailComposer';
 import { EmailTemplateList } from '../components/EmailTemplateList';
 import { EmailHistory } from '../components/EmailHistory';
-import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
 
 const EmailPage: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>('compose');
+  const [activeTab, setActiveTab] = useState<string>('templates');
   const [
     composeModalOpened,
     { open: openComposeModal, close: closeComposeModal },
@@ -89,11 +87,11 @@ const EmailPage: React.FC = () => {
 
         {/* Tabs */}
         <Card padding="lg" radius="md" withBorder>
-          <Tabs value={activeTab} onChange={setActiveTab}>
+          <Tabs
+            value={activeTab}
+            onChange={value => value && setActiveTab(value)}
+          >
             <Tabs.List>
-              <Tabs.Tab value="compose" leftSection={<IconMail size={16} />}>
-                Compose
-              </Tabs.Tab>
               <Tabs.Tab
                 value="templates"
                 leftSection={<IconTemplate size={16} />}
@@ -105,12 +103,12 @@ const EmailPage: React.FC = () => {
               </Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel value="compose" pt="lg">
-              <EmailComposer onEmailSent={handleEmailSent} />
-            </Tabs.Panel>
-
             <Tabs.Panel value="templates" pt="lg">
-              <EmailTemplateList canManage={canManageTemplates} />
+              <EmailTemplateList
+                templates={[]}
+                onEdit={canManageTemplates ? () => {} : undefined}
+                onDelete={canManageTemplates ? () => {} : undefined}
+              />
             </Tabs.Panel>
 
             <Tabs.Panel value="history" pt="lg">
@@ -127,7 +125,7 @@ const EmailPage: React.FC = () => {
           size="xl"
         >
           <EmailComposer
-            onEmailSent={handleEmailSent}
+            onSent={handleEmailSent}
             onCancel={closeComposeModal}
           />
         </Modal>

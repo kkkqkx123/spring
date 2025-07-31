@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { renderHook, act } from '@testing-library/react';
 import { useBrowserNotifications } from './useBrowserNotifications';
-import { Notification } from '../../../types';
+import type { Notification } from '../../../types';
 
 import { vi } from 'vitest';
 
 // Mock the Notification API
 const mockNotification = {
   close: vi.fn(),
-  onclick: null,
-  onerror: null,
+  onclick: null as ((this: globalThis.Notification, ev: Event) => any) | null,
+  onerror: null as ((this: globalThis.Notification, ev: Event) => any) | null,
 };
 
 const mockNotificationConstructor = vi.fn(() => mockNotification);
@@ -17,11 +18,6 @@ const mockNotificationConstructor = vi.fn(() => mockNotification);
 Object.defineProperty(window, 'Notification', {
   writable: true,
   value: mockNotificationConstructor,
-});
-
-Object.defineProperty(window.Notification, 'permission', {
-  writable: true,
-  value: 'default',
 });
 
 Object.defineProperty(window.Notification, 'requestPermission', {
@@ -42,7 +38,9 @@ const mockTestNotification: Notification = {
 describe('useBrowserNotifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    window.Notification.permission = 'default';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'default'
+    );
     vi.useFakeTimers();
   });
 
@@ -57,7 +55,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('returns current permission status', () => {
-    window.Notification.permission = 'granted';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'granted'
+    );
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -95,7 +95,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('shows browser notification when permission is granted', () => {
-    window.Notification.permission = 'granted';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'granted'
+    );
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -117,7 +119,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('does not show notification when permission is denied', () => {
-    window.Notification.permission = 'denied';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'denied'
+    );
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -129,7 +133,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('requires interaction for error notifications', () => {
-    window.Notification.permission = 'granted';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'granted'
+    );
     const errorNotification = {
       ...mockTestNotification,
       type: 'error' as const,
@@ -150,7 +156,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('auto-closes non-error notifications after 5 seconds', () => {
-    window.Notification.permission = 'granted';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'granted'
+    );
 
     const { result } = renderHook(() => useBrowserNotifications());
 
@@ -168,7 +176,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('does not auto-close error notifications', () => {
-    window.Notification.permission = 'granted';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'granted'
+    );
     const errorNotification = {
       ...mockTestNotification,
       type: 'error' as const,
@@ -188,7 +198,9 @@ describe('useBrowserNotifications', () => {
   });
 
   it('handles notification click events', () => {
-    window.Notification.permission = 'granted';
+    vi.spyOn(window.Notification, 'permission', 'get').mockReturnValue(
+      'granted'
+    );
     const notificationWithUrl = {
       ...mockTestNotification,
       actionUrl: '/test-url',
@@ -208,7 +220,9 @@ describe('useBrowserNotifications', () => {
 
     // Simulate click event
     act(() => {
-      mockNotification.onclick?.({} as Event);
+      if (mockNotification.onclick) {
+        mockNotification.onclick.call(mockNotification as any, {} as Event);
+      }
     });
 
     expect(mockFocus).toHaveBeenCalled();

@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { NotificationDropdown } from './NotificationDropdown';
 import { useNotificationStore } from '../../../stores/notificationStore';
-import { Notification } from '../../../types';
+import type { Notification } from '../../../types';
 
 import { vi } from 'vitest';
 

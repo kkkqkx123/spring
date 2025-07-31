@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Stack,
   Group,
@@ -7,7 +7,6 @@ import {
   Text,
   SegmentedControl,
   Menu,
-  Modal,
   SimpleGrid,
   Center,
   Loader,
@@ -36,11 +35,18 @@ import {
   useEmployeeExport,
   useEmployeeListState,
 } from '../hooks/useEmployees';
-import { useDepartments } from '../../departments/hooks/useDepartments';
-import { usePositions } from '../../positions/hooks/usePositions';
-import { Employee, DataTableColumn } from '../../../types';
+import type {
+  Employee,
+  Department,
+  Position,
+  DataTableColumn,
+} from '../../../types';
 
 interface EmployeeListProps {
+  selectedIds: number[];
+  onSelectionChange: (ids: number[]) => void;
+  departments: Department[];
+  positions: Position[];
   onCreateEmployee?: () => void;
   onEditEmployee?: (employee: Employee) => void;
   onViewEmployee?: (employee: Employee) => void;
@@ -51,6 +57,10 @@ interface EmployeeListProps {
 type ViewMode = 'table' | 'grid';
 
 export const EmployeeList: React.FC<EmployeeListProps> = ({
+  selectedIds,
+  onSelectionChange,
+  departments,
+  positions,
   onCreateEmployee,
   onEditEmployee,
   onViewEmployee,
@@ -60,14 +70,12 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [
     deleteModalOpened,
-    { open: openDeleteModal, close: closeDeleteModal },
+    { open: openBulkDeleteModal, close: closeBulkDeleteModal },
   ] = useDisclosure(false);
 
   const {
     pageable,
     searchCriteria,
-    selectedEmployees,
-    setSelectedEmployees,
     updatePageable,
     updateSearchCriteria,
     clearSearch,
@@ -88,9 +96,6 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
     error: searchError,
   } = useEmployeeSearch(searchCriteria, pageable);
 
-  const { data: departments = [] } = useDepartments();
-  const { data: positions = [] } = usePositions();
-
   const deleteEmployeesMutation = useDeleteEmployees();
   const exportEmployeesMutation = useEmployeeExport();
 
@@ -106,28 +111,24 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
     updatePageable({ page: page - 1, size: pageSize }); // Convert to 0-based indexing
   };
 
-  const handleSort = (sort: string) => {
-    updatePageable({ sort });
-  };
-
   const handleRowSelection = (
-    selectedRowKeys: React.Key[],
+    _selectedRowKeys: React.Key[],
     selectedRows: Employee[]
   ) => {
-    setSelectedEmployees(selectedRows.map(emp => emp.id));
+    onSelectionChange(selectedRows.map(emp => emp.id));
   };
 
   const handleDeleteSelected = async () => {
     try {
-      await deleteEmployeesMutation.mutateAsync(selectedEmployees);
+      await deleteEmployeesMutation.mutateAsync(selectedIds);
       notifications.show({
         title: 'Success',
-        message: `${selectedEmployees.length} employee(s) deleted successfully`,
+        message: `${selectedIds.length} employee(s) deleted successfully`,
         color: 'green',
       });
-      setSelectedEmployees([]);
-      closeDeleteModal();
-    } catch (error) {
+      onSelectionChange([]);
+      closeBulkDeleteModal();
+    } catch {
       notifications.show({
         title: 'Error',
         message: 'Failed to delete employees',
@@ -139,7 +140,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
   const handleExportSelected = async () => {
     try {
       const blob = await exportEmployeesMutation.mutateAsync(
-        selectedEmployees.length > 0 ? selectedEmployees : undefined
+        selectedIds.length > 0 ? selectedIds : undefined
       );
 
       // Create download link
@@ -157,7 +158,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
         message: 'Employees exported successfully',
         color: 'green',
       });
-    } catch (error) {
+    } catch {
       notifications.show({
         title: 'Error',
         message: 'Failed to export employees',
@@ -203,24 +204,24 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
       key: 'status',
       title: 'Status',
       sortable: true,
-      render: value => (
+      render: (_, record) => (
         <Text
           size="sm"
           c={
-            value === 'ACTIVE'
+            record.status === 'ACTIVE'
               ? 'green'
-              : value === 'INACTIVE'
+              : record.status === 'INACTIVE'
                 ? 'yellow'
                 : 'red'
           }
           fw={500}
         >
-          {value}
+          {record.status}
         </Text>
       ),
     },
     {
-      key: 'actions',
+      key: 'id', // Use a valid key like 'id' for the actions column
       title: 'Actions',
       render: (_, record) => (
         <Menu shadow="md" width={200}>
@@ -276,15 +277,15 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
             </Button>
           )}
 
-          {selectedEmployees.length > 0 && (
+          {selectedIds.length > 0 && (
             <>
               <Button
                 variant="light"
                 color="red"
                 leftSection={<IconTrash size={16} />}
-                onClick={openDeleteModal}
+                onClick={openBulkDeleteModal}
               >
-                Delete ({selectedEmployees.length})
+                Delete ({selectedIds.length})
               </Button>
 
               <Button
@@ -363,7 +364,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
             onChange: handlePageChange,
           }}
           rowSelection={{
-            selectedRowKeys: selectedEmployees,
+            selectedRowKeys: selectedIds,
             onChange: handleRowSelection,
           }}
         />
@@ -373,13 +374,13 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
             <EmployeeCard
               key={employee.id}
               employee={employee}
-              selected={selectedEmployees.includes(employee.id)}
+              selected={selectedIds.includes(employee.id)}
               onSelect={selected => {
                 if (selected) {
-                  setSelectedEmployees(prev => [...prev, employee.id]);
+                  onSelectionChange([...selectedIds, employee.id]);
                 } else {
-                  setSelectedEmployees(prev =>
-                    prev.filter(id => id !== employee.id)
+                  onSelectionChange(
+                    selectedIds.filter(id => id !== employee.id)
                   );
                 }
               }}
@@ -394,12 +395,11 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
       {/* Delete Confirmation Modal */}
       <ConfirmDialog
         opened={deleteModalOpened}
-        onClose={closeDeleteModal}
+        onClose={closeBulkDeleteModal}
         onConfirm={handleDeleteSelected}
         title="Delete Employees"
-        message={`Are you sure you want to delete ${selectedEmployees.length} employee(s)? This action cannot be undone.`}
+        message={`Are you sure you want to delete ${selectedIds.length} employee(s)? This action cannot be undone.`}
         confirmLabel="Delete"
-        confirmColor="red"
         loading={deleteEmployeesMutation.isPending}
       />
     </Stack>

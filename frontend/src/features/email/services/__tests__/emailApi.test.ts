@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { vi } from 'vitest';
 import { emailApi, EmailApi } from '../emailApi';
 import { apiClient } from '../../../../services/api';

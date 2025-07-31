@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { vi } from 'vitest';
 import { NotificationItem } from './NotificationItem';
-import { Notification } from '../../../types';
+import type { Notification } from '../../../types';
 
 const mockNotification: Notification = {
   id: 1,

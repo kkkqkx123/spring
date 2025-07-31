@@ -4,7 +4,7 @@ import { webSocketService } from '../../../services/websocket';
 import { useBrowserNotifications } from './useBrowserNotifications';
 import { useNotificationPreferences } from './useNotificationPreferences';
 import { notificationApi } from '../services/notificationApi';
-import { Notification } from '../../../types';
+import type { Notification } from '../../../types';
 
 export interface UseRealTimeNotificationsReturn {
   isConnected: boolean;
@@ -219,11 +219,15 @@ export function useRealTimeNotifications(): UseRealTimeNotificationsReturn {
 }
 
 // Helper function to play notification sounds
-function playNotificationSound(type: string): void {
+interface WindowWithAudioContext extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
+export function playNotificationSound(type: string): void {
   try {
     // Create audio context if not exists
     const audioContext = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+      (window as WindowWithAudioContext).webkitAudioContext)();
 
     // Generate different tones for different notification types
     const frequency = getNotificationFrequency(type);

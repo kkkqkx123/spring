@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import {
   Paper,
@@ -11,7 +12,6 @@ import {
   Card,
   Text,
   Badge,
-  Alert,
   LoadingOverlay,
   Divider,
   ActionIcon,
@@ -22,7 +22,6 @@ import { notifications } from '@mantine/notifications';
 import {
   IconSend,
   IconEye,
-  IconUsers,
   IconUser,
   IconBuilding,
   IconAlertCircle,
@@ -38,7 +37,7 @@ import {
   useValidateVariables,
 } from '../hooks/useEmail';
 import { useDepartments } from '../../departments/hooks/useDepartments';
-import type { EmailRecipient, EmailComposition } from '../../../types';
+import type { EmailComposition } from '../../../types';
 
 interface EmailComposerProps {
   onSent?: () => void;
@@ -66,7 +65,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
   const { data: templates, isLoading: templatesLoading } = useEmailTemplates();
   const { data: recipients, isLoading: recipientsLoading } =
     useEmailRecipients();
-  const { data: departments } = useDepartments();
+  useDepartments();
   const sendEmailMutation = useSendEmail();
   const validateVariablesMutation = useValidateVariables();
 
@@ -118,7 +117,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
         ),
       });
     }
-  }, [selectedTemplate]);
+  }, [form, selectedTemplate]);
 
   // Prepare select options
   const templateOptions = (templates || []).map(template => ({
@@ -200,7 +199,7 @@ export const EmailComposer: React.FC<EmailComposerProps> = ({
 
     try {
       await sendEmailMutation.mutateAsync({
-        templateId: selectedTemplateId || undefined,
+        templateId: selectedTemplateId || null,
         recipients: values.recipients.map(id => parseInt(id)),
         variables: values.variables,
         subject: values.subject,

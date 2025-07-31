@@ -19,8 +19,8 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from '@tabler/icons-react';
-import { EmployeeSearchCriteria } from '../services/employeeApi';
-import { Department, Position } from '../../../types';
+import type { EmployeeSearchCriteria } from '../services/employeeApi';
+import type { Department, Position } from '../../../types';
 
 interface EmployeeSearchProps {
   onSearch: (criteria: EmployeeSearchCriteria) => void;

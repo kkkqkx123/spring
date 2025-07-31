@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import {
   NotificationSettings,
-  NotificationPreferences,
+  type NotificationPreferences,
 } from './NotificationSettings';
 import { vi } from 'vitest';
 

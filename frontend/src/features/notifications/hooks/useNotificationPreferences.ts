@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { NotificationPreferences } from '../components/NotificationSettings';
+import type { NotificationPreferences } from '../components/NotificationSettings';
 
 const STORAGE_KEY = 'notification-preferences';
 
@@ -106,7 +106,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
       // Default to showing if type is not in preferences
       return true;
     },
-    [preferences.notificationTypes]
+    [preferences]
   );
 
   return {

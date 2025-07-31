@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { renderHook, act } from '@testing-library/react';
 import { useNotifications } from './useNotifications';
 import { useNotificationStore } from '../../../stores/notificationStore';
-import { Notification } from '../../../types';
+import type { Notification } from '../../../types';
 
 import { vi } from 'vitest';
 

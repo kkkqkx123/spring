@@ -111,19 +111,20 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
         missingVariables: [
           ...new Set([
             ...clientResult.missingVariables,
-            ...serverResult.missingVariables,
+            ...(serverResult.missingVariables || []),
           ]),
         ],
         invalidVariables: [
           ...new Set([
             ...clientResult.invalidVariables,
-            ...serverResult.invalidVariables,
+            ...(serverResult.invalidVariables || []),
           ]),
         ],
       };
 
       setValidationResult(combinedResult);
       onValidationChange?.(combinedResult.valid);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       const clientResult = performClientValidation();
       setValidationResult({
@@ -146,7 +147,6 @@ export const EmailValidation: React.FC<EmailValidationProps> = ({
   }, [performClientValidation, onValidationChange]);
 
   const hasErrors = validationResult && !validationResult.valid;
-  const hasWarnings = validationResult?.invalidVariables.length > 0;
 
   return (
     <Stack gap="sm">

@@ -38,11 +38,17 @@ export const permissionApi = {
   },
 
   // User role assignment
-  assignRoleToUser: (userId: number, roleId: number): Promise<{ message: string }> => {
+  assignRoleToUser: (
+    userId: number,
+    roleId: number
+  ): Promise<{ message: string }> => {
     return apiClient.post(`/api/permissions/users/${userId}/roles/${roleId}`);
   },
 
-  removeRoleFromUser: (userId: number, roleId: number): Promise<{ message: string }> => {
+  removeRoleFromUser: (
+    userId: number,
+    roleId: number
+  ): Promise<{ message: string }> => {
     return apiClient.delete(`/api/permissions/users/${userId}/roles/${roleId}`);
   },
 
@@ -51,12 +57,22 @@ export const permissionApi = {
   },
 
   // Role resource assignment
-  assignResourceToRole: (roleName: string, resourceId: number): Promise<Role> => {
-    return apiClient.post(`/api/permissions/roles/${roleName}/resources/${resourceId}`);
+  assignResourceToRole: (
+    roleName: string,
+    resourceId: number
+  ): Promise<Role> => {
+    return apiClient.post(
+      `/api/permissions/roles/${roleName}/resources/${resourceId}`
+    );
   },
 
-  removeResourceFromRole: (roleId: number, resourceId: number): Promise<{ message: string }> => {
-    return apiClient.delete(`/api/permissions/roles/${roleId}/resources/${resourceId}`);
+  removeResourceFromRole: (
+    roleId: number,
+    resourceId: number
+  ): Promise<{ message: string }> => {
+    return apiClient.delete(
+      `/api/permissions/roles/${roleId}/resources/${resourceId}`
+    );
   },
 
   getRoleResources: (roleId: number): Promise<Resource[]> => {
@@ -64,9 +80,12 @@ export const permissionApi = {
   },
 
   // Permission checking
-  checkUserPermission: (userId: number, resource: string): Promise<PermissionCheckResponse> => {
+  checkUserPermission: (
+    userId: number,
+    resource: string
+  ): Promise<PermissionCheckResponse> => {
     return apiClient.get(`/api/permissions/users/${userId}/check`, {
-      params: { resource }
+      params: { resource },
     });
   },
 };

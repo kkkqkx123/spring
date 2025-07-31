@@ -58,7 +58,9 @@ export const chatApi = {
   },
 
   // Create a new message
-  createMessage: (messageContent: Partial<ChatMessage>): Promise<ChatMessageResponse> => {
+  createMessage: (
+    messageContent: Partial<ChatMessage>
+  ): Promise<ChatMessageResponse> => {
     return apiClient.post('/api/chat/messages', messageContent);
   },
 
@@ -68,7 +70,10 @@ export const chatApi = {
   },
 
   // Update message
-  updateMessage: (id: number, messageContent: Partial<ChatMessage>): Promise<ChatMessageResponse> => {
+  updateMessage: (
+    id: number,
+    messageContent: Partial<ChatMessage>
+  ): Promise<ChatMessageResponse> => {
     return apiClient.put(`/api/chat/messages/${id}`, messageContent);
   },
 
@@ -87,8 +92,8 @@ export const chatApi = {
     query: string,
     params: Omit<MessageSearchParams, 'query'> = { page: 0, size: 20 }
   ): Promise<PaginatedResponse<ChatMessageResponse>> => {
-    return apiClient.get('/api/chat/messages/search', { 
-      params: { query, ...params } 
+    return apiClient.get('/api/chat/messages/search', {
+      params: { query, ...params },
     });
   },
 
@@ -96,10 +101,13 @@ export const chatApi = {
   getMessagesByDateRange: (
     startDate: string,
     endDate: string,
-    params: Omit<DateRangeParams, 'startDate' | 'endDate'> = { page: 0, size: 20 }
+    params: Omit<DateRangeParams, 'startDate' | 'endDate'> = {
+      page: 0,
+      size: 20,
+    }
   ): Promise<PaginatedResponse<ChatMessageResponse>> => {
     return apiClient.get('/api/chat/messages/date-range', {
-      params: { startDate, endDate, ...params }
+      params: { startDate, endDate, ...params },
     });
   },
 };

@@ -1,7 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { authApi, employeeApi, departmentApi, chatApi, emailApi } from '../../services';
+import {
+  authApi,
+  employeeApi,
+  departmentApi,
+  chatApi,
+  emailApi,
+} from '../../services';
 import { apiClient } from '../../services/api';
 
 // Mock the API client
@@ -145,7 +151,10 @@ describe('API Integration Tests', () => {
 
       const result = await employeeApi.create(newEmployee);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/employees', newEmployee);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/employees',
+        newEmployee
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -180,7 +189,10 @@ describe('API Integration Tests', () => {
 
       const result = await employeeApi.search(searchCriteria);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/employees/search', searchCriteria);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/employees/search',
+        searchCriteria
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -222,7 +234,10 @@ describe('API Integration Tests', () => {
 
       const result = await departmentApi.create(newDepartment);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/departments', newDepartment);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/departments',
+        newDepartment
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -249,7 +264,10 @@ describe('API Integration Tests', () => {
 
       const result = await chatApi.sendMessage(messageRequest);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/chat/send', messageRequest);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/chat/send',
+        messageRequest
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -279,9 +297,12 @@ describe('API Integration Tests', () => {
 
       const result = await chatApi.getConversation(2, { page: 0, size: 20 });
 
-      expect(mockApiClient.get).toHaveBeenCalledWith('/api/chat/conversation/2', {
-        params: { page: 0, size: 20 },
-      });
+      expect(mockApiClient.get).toHaveBeenCalledWith(
+        '/api/chat/conversation/2',
+        {
+          params: { page: 0, size: 20 },
+        }
+      );
       expect(result).toEqual(mockResponse);
     });
   });
@@ -300,7 +321,10 @@ describe('API Integration Tests', () => {
 
       const result = await emailApi.sendEmail(emailRequest);
 
-      expect(mockApiClient.post).toHaveBeenCalledWith('/api/email/send', emailRequest);
+      expect(mockApiClient.post).toHaveBeenCalledWith(
+        '/api/email/send',
+        emailRequest
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -340,7 +364,9 @@ describe('API Integration Tests', () => {
       const networkError = new Error('Network Error');
       mockApiClient.get.mockRejectedValueOnce(networkError);
 
-      await expect(employeeApi.getAll({ page: 0, size: 10 })).rejects.toThrow('Network Error');
+      await expect(employeeApi.getAll({ page: 0, size: 10 })).rejects.toThrow(
+        'Network Error'
+      );
     });
   });
 

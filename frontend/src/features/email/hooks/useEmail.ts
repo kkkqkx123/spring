@@ -1,14 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../../../services/queryKeys';
-import { emailApi, type BulkEmailRequest } from '../services/emailApi';
-import type {
-  EmailTemplate,
-  EmailRequest,
-  EmailRecipient,
-  EmailHistory,
-  Pageable,
-} from '../../../types';
-
+import {
+  emailApi,
+  type EmailTemplateRequest,
+  type EmailSendProgress,
+} from '../services/emailApi';
+import type { Pageable } from '../../../types';
 // Template hooks
 export const useEmailTemplates = () => {
   return useQuery({
@@ -20,7 +17,7 @@ export const useEmailTemplates = () => {
 
 export const useEmailTemplate = (id: number) => {
   return useQuery({
-    queryKey: queryKeys.email.template(id),
+    queryKey: ['email', 'templates', id],
     queryFn: () => emailApi.getTemplate(id),
     enabled: !!id,
   });
@@ -41,11 +38,16 @@ export const useUpdateEmailTemplate = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, template }: { id: number; template: any }) =>
-      emailApi.updateTemplate(id, template),
+    mutationFn: ({
+      id,
+      template,
+    }: {
+      id: number;
+      template: EmailTemplateRequest;
+    }) => emailApi.updateTemplate(id, template),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.email.template(id) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.email.templates });
+      queryClient.invalidateQueries({ queryKey: ['email', 'templates', id] });
+      queryClient.invalidateQueries({ queryKey: ['email', 'templates'] });
     },
   });
 };
@@ -69,9 +71,7 @@ export const useSendEmail = () => {
     mutationFn: emailApi.sendEmail,
     onSuccess: () => {
       // Invalidate email history to show the new sent email
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.email.history({}),
-      });
+      queryClient.invalidateQueries({ queryKey: ['email', 'history'] });
     },
   });
 };
@@ -82,24 +82,24 @@ export const useSendBulkEmail = () => {
   return useMutation({
     mutationFn: emailApi.sendBulkEmail,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.email.history({}),
-      });
+      queryClient.invalidateQueries({ queryKey: ['email', 'history'] });
     },
   });
 };
 
 export const useBulkEmailProgress = (jobId: string, enabled = false) => {
-  return useQuery({
-    queryKey: queryKeys.email.bulkProgress(jobId),
+  return useQuery<EmailSendProgress>({
+    queryKey: ['email', 'bulkProgress', jobId],
     queryFn: () => emailApi.getBulkEmailProgress(jobId),
     enabled: enabled && !!jobId,
-    refetchInterval: data => {
-      // Stop polling when job is completed or failed
-      if (data?.status === 'COMPLETED' || data?.status === 'FAILED') {
+    refetchInterval: query => {
+      if (
+        query.state.data?.status === 'COMPLETED' ||
+        query.state.data?.status === 'FAILED'
+      ) {
         return false;
       }
-      return 2000; // Poll every 2 seconds
+      return 2000;
     },
   });
 };
@@ -107,7 +107,7 @@ export const useBulkEmailProgress = (jobId: string, enabled = false) => {
 // Recipient hooks
 export const useEmailRecipients = () => {
   return useQuery({
-    queryKey: queryKeys.email.recipients,
+    queryKey: ['email', 'recipients'],
     queryFn: () => emailApi.getAvailableRecipients(),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -115,7 +115,7 @@ export const useEmailRecipients = () => {
 
 export const useDepartmentRecipients = (departmentId: number) => {
   return useQuery({
-    queryKey: queryKeys.email.departmentRecipients(departmentId),
+    queryKey: ['email', 'recipients', 'department', departmentId],
     queryFn: () => emailApi.getDepartmentRecipients(departmentId),
     enabled: !!departmentId,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -125,7 +125,7 @@ export const useDepartmentRecipients = (departmentId: number) => {
 // Email history hooks
 export const useEmailHistory = (pageable: Pageable) => {
   return useQuery({
-    queryKey: queryKeys.email.history(pageable),
+    queryKey: ['email', 'history', pageable],
     queryFn: () => emailApi.getEmailHistory(pageable),
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -146,7 +146,7 @@ export const useTemplatePreview = (
   enabled = false
 ) => {
   return useQuery({
-    queryKey: queryKeys.email.preview(templateId, variables),
+    queryKey: ['email', 'preview', templateId, variables],
     queryFn: () => emailApi.previewTemplate(templateId, variables),
     enabled: enabled && !!templateId && Object.keys(variables).length > 0,
     staleTime: 0, // Always fresh for preview

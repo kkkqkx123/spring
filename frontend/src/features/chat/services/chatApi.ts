@@ -11,7 +11,7 @@ export interface ChatMessageRequest {
   content: string;
 }
 
-export interface ChatMessageResponse extends ChatMessage { }
+export interface ChatMessageResponse extends ChatMessage {}
 
 export interface ConversationSearchParams {
   query?: string;

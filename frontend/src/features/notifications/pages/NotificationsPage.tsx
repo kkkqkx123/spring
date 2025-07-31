@@ -10,9 +10,8 @@ import {
   Badge,
   ActionIcon,
   Menu,
-  Alert,
 } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
+import { notifications as notificationManager } from '@mantine/notifications';
 import {
   IconBell,
   IconBellOff,
@@ -24,41 +23,32 @@ import {
 } from '@tabler/icons-react';
 import { NotificationList } from '../components/NotificationList';
 import { NotificationSettings } from '../components/NotificationSettings';
-import {
-  useNotifications,
-} from '../hooks/useNotifications';
+import { useNotifications } from '../hooks/useNotifications';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
-import { useAuth } from '../../../hooks/useAuth';
+import type { Notification } from '../../../types';
 
 const NotificationsPage: React.FC = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string | null>('all');
 
-  // Queries and mutations
   const {
-    data: notificationsData,
+    notifications,
     isLoading,
-    error,
-    refetch,
+    markAllAsRead,
+    clearNotifications,
+    unreadCount,
   } = useNotifications();
-
-  const markAllAsRead = useMarkAllAsRead();
-  const clearAllNotifications = useClearAllNotifications();
-
-  const unreadCount = notificationsData?.filter(n => !n.read).length || 0;
 
   const handleMarkAllAsRead = async () => {
     try {
-      await markAllAsRead.mutateAsync();
-      notifications.show({
+      await markAllAsRead();
+      notificationManager.show({
         title: 'Success',
         message: 'All notifications marked as read',
         color: 'green',
         icon: <IconCheck size={16} />,
       });
-      refetch();
     } catch {
-      notifications.show({
+      notificationManager.show({
         title: 'Error',
         message: 'Failed to mark notifications as read',
         color: 'red',
@@ -69,16 +59,15 @@ const NotificationsPage: React.FC = () => {
 
   const handleClearAll = async () => {
     try {
-      await clearAllNotifications.mutateAsync();
-      notifications.show({
+      await clearNotifications();
+      notificationManager.show({
         title: 'Success',
         message: 'All notifications cleared',
         color: 'green',
         icon: <IconCheck size={16} />,
       });
-      refetch();
     } catch {
-      notifications.show({
+      notificationManager.show({
         title: 'Error',
         message: 'Failed to clear notifications',
         color: 'red',
@@ -88,35 +77,21 @@ const NotificationsPage: React.FC = () => {
   };
 
   const getFilteredNotifications = () => {
-    if (!notificationsData) return [];
+    if (!notifications) return [];
 
     switch (activeTab) {
       case 'unread':
-        return notificationsData.filter(n => !n.read);
+        return notifications.filter((n: Notification) => !n.read);
       case 'read':
-        return notificationsData.filter(n => n.read);
+        return notifications.filter((n: Notification) => n.read);
       case 'all':
       default:
-        return notificationsData;
+        return notifications;
     }
   };
 
   if (isLoading) {
     return <LoadingSkeleton variant="page" />;
-  }
-
-  if (error) {
-    return (
-      <Container size="lg" py="xl">
-        <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Error loading notifications"
-          color="red"
-        >
-          {error.message || 'Failed to load notifications'}
-        </Alert>
-      </Container>
-    );
   }
 
   const filteredNotifications = getFilteredNotifications();
@@ -146,7 +121,7 @@ const NotificationsPage: React.FC = () => {
                 leftSection={<IconCheck size={16} />}
                 variant="light"
                 onClick={handleMarkAllAsRead}
-                loading={markAllAsRead.isPending}
+                loading={isLoading}
               >
                 Mark All Read
               </Button>
@@ -171,7 +146,7 @@ const NotificationsPage: React.FC = () => {
                   leftSection={<IconTrash size={14} />}
                   color="red"
                   onClick={handleClearAll}
-                  disabled={clearAllNotifications.isPending}
+                  disabled={isLoading}
                 >
                   Clear All
                 </Menu.Item>
@@ -185,7 +160,7 @@ const NotificationsPage: React.FC = () => {
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Tabs.List>
               <Tabs.Tab value="all" leftSection={<IconBell size={16} />}>
-                All ({notificationsData?.length || 0})
+                All ({notifications?.length || 0})
               </Tabs.Tab>
               <Tabs.Tab
                 value="unread"
@@ -201,7 +176,7 @@ const NotificationsPage: React.FC = () => {
                 Unread
               </Tabs.Tab>
               <Tabs.Tab value="read" leftSection={<IconBellOff size={16} />}>
-                Read ({(notificationsData?.length || 0) - unreadCount})
+                Read ({(notifications?.length || 0) - unreadCount})
               </Tabs.Tab>
               <Tabs.Tab
                 value="settings"
@@ -212,24 +187,15 @@ const NotificationsPage: React.FC = () => {
             </Tabs.List>
 
             <Tabs.Panel value="all" pt="lg">
-              <NotificationList
-                notifications={filteredNotifications}
-                onNotificationUpdate={refetch}
-              />
+              <NotificationList />
             </Tabs.Panel>
 
             <Tabs.Panel value="unread" pt="lg">
-              <NotificationList
-                notifications={filteredNotifications}
-                onNotificationUpdate={refetch}
-              />
+              <NotificationList />
             </Tabs.Panel>
 
             <Tabs.Panel value="read" pt="lg">
-              <NotificationList
-                notifications={filteredNotifications}
-                onNotificationUpdate={refetch}
-              />
+              <NotificationList />
             </Tabs.Panel>
 
             <Tabs.Panel value="settings" pt="lg">

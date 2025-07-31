@@ -19,6 +19,7 @@ export interface Pageable {
   page: number;
   size: number;
   sort?: string;
+  [key: string]: string | number | undefined;
 }
 
 export interface ApiError {
@@ -210,7 +211,7 @@ export interface EmailTemplate {
 }
 
 export interface EmailRequest {
-  templateId: number;
+  templateId: number | null;
   recipients: number[];
   variables: Record<string, string>;
   subject?: string;

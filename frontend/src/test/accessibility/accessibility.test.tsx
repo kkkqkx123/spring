@@ -52,7 +52,14 @@ describe('Accessibility Tests', () => {
 
     const { container } = render(
       <TestWrapper>
-        <EmployeeList />
+        <EmployeeList
+          selectedIds={[]}
+          onSelectionChange={function (_ids: number[]): void {
+            throw new Error('Function not implemented.');
+          }}
+          departments={[]}
+          positions={[]}
+        />
       </TestWrapper>
     );
 

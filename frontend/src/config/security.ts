@@ -16,17 +16,8 @@ export const SECURITY_CONFIG = {
       "'unsafe-inline'", // Required for CSS-in-JS libraries
       'https://fonts.googleapis.com',
     ],
-    'font-src': [
-      "'self'",
-      'https://fonts.gstatic.com',
-      'data:',
-    ],
-    'img-src': [
-      "'self'",
-      'data:',
-      'blob:',
-      'https:',
-    ],
+    'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
+    'img-src': ["'self'", 'data:', 'blob:', 'https:'],
     'connect-src': [
       "'self'",
       import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
@@ -134,14 +125,14 @@ export class RateLimiter {
   isAllowed(key: string): boolean {
     const now = Date.now();
     const requests = this.requests.get(key) || [];
-    
+
     // Remove old requests outside the window
     const validRequests = requests.filter(time => now - time < this.windowMs);
-    
+
     if (validRequests.length >= this.maxRequests) {
       return false;
     }
-    
+
     validRequests.push(now);
     this.requests.set(key, validRequests);
     return true;

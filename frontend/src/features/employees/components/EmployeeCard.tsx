@@ -20,7 +20,7 @@ import {
   IconTrash,
   IconEye,
 } from '@tabler/icons-react';
-import { Employee } from '../../../types';
+import type { Employee } from '../../../types';
 
 interface EmployeeCardProps {
   employee: Employee;

@@ -1,5 +1,5 @@
 import { ApiClient } from '../../../services/api';
-import { Employee, PaginatedResponse, Pageable } from '../../../types';
+import type { Employee, PaginatedResponse, Pageable } from '../../../types';
 
 export interface EmployeeSearchCriteria {
   name?: string;
@@ -30,59 +30,76 @@ export class EmployeeApi {
   constructor(private client: ApiClient) {}
 
   async getEmployees(pageable: Pageable): Promise<PaginatedResponse<Employee>> {
-    const response = await this.client.get('/api/employees', {
-      params: pageable,
-    });
-    return response.data;
+    const response = await this.client.get<PaginatedResponse<Employee>>(
+      '/api/employees',
+      {
+        params: pageable,
+      }
+    );
+    return response;
   }
 
   async getEmployee(id: number): Promise<Employee> {
-    const response = await this.client.get(`/api/employees/${id}`);
-    return response.data;
+    const response = await this.client.get<Employee>(`/api/employees/${id}`);
+    return response;
   }
 
   async createEmployee(employee: EmployeeCreateRequest): Promise<Employee> {
-    const response = await this.client.post('/api/employees', employee);
-    return response.data;
+    const response = await this.client.post<Employee>(
+      '/api/employees',
+      employee
+    );
+    return response;
   }
 
   async updateEmployee(
     id: number,
     employee: EmployeeUpdateRequest
   ): Promise<Employee> {
-    const response = await this.client.put(`/api/employees/${id}`, employee);
-    return response.data;
+    const response = await this.client.put<Employee>(
+      `/api/employees/${id}`,
+      employee
+    );
+    return response;
   }
 
   async deleteEmployee(id: number): Promise<void> {
-    await this.client.delete(`/api/employees/${id}`);
+    await this.client.delete<void>(`/api/employees/${id}`);
   }
 
   async deleteEmployees(ids: number[]): Promise<void> {
-    await this.client.post('/api/employees/bulk-delete', { ids });
+    await this.client.post<void>('/api/employees/bulk-delete', { ids });
   }
 
   async searchEmployees(
     criteria: EmployeeSearchCriteria,
     pageable: Pageable
   ): Promise<PaginatedResponse<Employee>> {
-    const response = await this.client.post('/api/employees/search', criteria, {
-      params: pageable,
-    });
-    return response.data;
+    const response = await this.client.post<PaginatedResponse<Employee>>(
+      '/api/employees/search',
+      criteria,
+      {
+        params: pageable,
+      }
+    );
+    return response;
   }
 
   async importEmployees(file: File): Promise<Employee[]> {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await this.client.post('/api/employees/import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
+    const response = await this.client.post<Employee[]>(
+      '/api/employees/import',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
+    return response;
   }
 
   async exportEmployees(ids?: number[]): Promise<Blob> {
-    const response = await this.client.post(
+    const response = await this.client.postRaw(
       '/api/employees/export',
       ids || [],
       {
@@ -95,14 +112,14 @@ export class EmployeeApi {
   async uploadProfilePicture(employeeId: number, file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await this.client.post(
+    const response = await this.client.post<string>(
       `/api/employees/${employeeId}/profile-picture`,
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
       }
     );
-    return response.data;
+    return response;
   }
 }
 

@@ -33,7 +33,10 @@ export const authApi = {
     return apiClient.put('/api/auth/profile', userData);
   },
 
-  changePassword: (currentPassword: string, newPassword: string): Promise<void> => {
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> => {
     return apiClient.post('/api/auth/change-password', {
       currentPassword,
       newPassword,

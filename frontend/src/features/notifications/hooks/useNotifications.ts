@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNotificationStore } from '../../../stores/notificationStore';
-import { Notification, NotificationType } from '../../../types';
+import type { Notification, NotificationType } from '../../../types';
 
 export interface UseNotificationsReturn {
   notifications: Notification[];

@@ -12,7 +12,6 @@ import {
   ActionIcon,
   Tooltip,
   Alert,
-  Divider,
 } from '@mantine/core';
 import {
   IconSearch,
@@ -23,7 +22,7 @@ import {
   IconCalendar,
 } from '@tabler/icons-react';
 import { useDebouncedValue } from '@mantine/hooks';
-import { useEmailTemplates, useTemplatePreview } from '../hooks/useEmail';
+import { useEmailTemplates } from '../hooks/useEmail';
 import type { EmailTemplate } from '../../../types';
 
 interface EmailTemplateSelectorProps {

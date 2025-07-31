@@ -29,10 +29,7 @@ import {
 } from '@tabler/icons-react';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEmailHistory, useEmailDetails } from '../hooks/useEmail';
-import type {
-  EmailHistory as EmailHistoryType,
-  EmailStatus,
-} from '../../../types';
+import type { EmailStatus } from '../../../types';
 
 interface EmailHistoryProps {
   onResend?: (emailId: number) => void;

@@ -7,11 +7,8 @@ import {
   Button,
   Text,
   Card,
-  Tabs,
-  ActionIcon,
   Menu,
   Modal,
-  Alert,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -23,62 +20,39 @@ import {
   IconTrash,
   IconAlertCircle,
   IconCheck,
-  IconGrid3x3,
-  IconList,
 } from '@tabler/icons-react';
-import {
-  EmployeeList,
-  EmployeeSearch,
-  useEmployees,
-  useDeleteEmployees,
-  useEmployeeExport,
-} from '../index';
-import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
+import { EmployeeList, useDeleteEmployees, useEmployeeExport } from '../index';
 import { useAuth } from '../../../hooks/useAuth';
-
-type ViewMode = 'list' | 'grid';
+import { useDepartments } from '../../departments/hooks/useDepartments';
+import { usePositions } from '../../positions/hooks/usePositions';
+import type { Employee } from '../../../types';
 
 const EmployeesPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([]);
-  const [searchCriteria, setSearchCriteria] = useState({});
   const [
     bulkDeleteModalOpened,
     { open: openBulkDeleteModal, close: closeBulkDeleteModal },
   ] = useDisclosure(false);
 
   // Queries and mutations
-  const {
-    data: employeesData,
-    isLoading,
-    error,
-    refetch,
-  } = useEmployees({
-    page: 0,
-    size: 20,
-    ...searchCriteria,
-  });
-
   const deleteEmployees = useDeleteEmployees();
   const exportEmployees = useEmployeeExport();
+  const { data: departments = [] } = useDepartments();
+  const { data: positions = [] } = usePositions();
 
   // Permission checks
   const canCreate =
-    user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ??
+    user?.roles.some(role => ['ADMIN', 'HR_MANAGER'].includes(role.name)) ||
     false;
   const canDelete =
-    user?.roles.some(role => ['ADMIN'].includes(role.name)) ?? false;
+    user?.roles.some(role => ['ADMIN'].includes(role.name)) || false;
   const canExport =
     user?.roles.some(role =>
       ['ADMIN', 'HR_MANAGER', 'HR_STAFF'].includes(role.name)
-    ) ?? false;
-
-  const handleSearch = (criteria: any) => {
-    setSearchCriteria(criteria);
-  };
+    ) || false;
 
   const handleSelectionChange = (ids: number[]) => {
     setSelectedEmployees(ids);
@@ -94,7 +68,6 @@ const EmployeesPage: React.FC = () => {
         icon: <IconCheck size={16} />,
       });
       setSelectedEmployees([]);
-      refetch();
     } catch {
       notifications.show({
         title: 'Error',
@@ -107,46 +80,44 @@ const EmployeesPage: React.FC = () => {
     }
   };
 
-  const handleExport = async () => {
+  const handleExportSelected = async () => {
+    if (selectedEmployees.length === 0) return;
     try {
-      await exportEmployees.mutateAsync({
-        employeeIds:
-          selectedEmployees.length > 0 ? selectedEmployees : undefined,
-        format: 'xlsx',
-      });
+      await exportEmployees.mutateAsync(selectedEmployees);
       notifications.show({
         title: 'Success',
-        message: 'Employee data exported successfully',
+        message: 'Selected employee data exported successfully',
         color: 'green',
         icon: <IconCheck size={16} />,
       });
     } catch {
       notifications.show({
         title: 'Error',
-        message: 'Failed to export employee data',
+        message: 'Failed to export selected employee data',
         color: 'red',
         icon: <IconAlertCircle size={16} />,
       });
     }
   };
 
-  if (isLoading) {
-    return <LoadingSkeleton variant="page" />;
-  }
-
-  if (error) {
-    return (
-      <Container size="lg" py="xl">
-        <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Error loading employees"
-          color="red"
-        >
-          {error.message || 'Failed to load employee data'}
-        </Alert>
-      </Container>
-    );
-  }
+  const handleExportAll = async () => {
+    try {
+      await exportEmployees.mutateAsync(undefined); // Pass undefined to export all
+      notifications.show({
+        title: 'Success',
+        message: 'All employee data exported successfully',
+        color: 'green',
+        icon: <IconCheck size={16} />,
+      });
+    } catch {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to export all employee data',
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+    }
+  };
 
   return (
     <Container size="xl" py="xl">
@@ -161,24 +132,6 @@ const EmployeesPage: React.FC = () => {
           </div>
 
           <Group gap="sm">
-            {/* View Mode Toggle */}
-            <Group gap={0}>
-              <ActionIcon
-                variant={viewMode === 'list' ? 'filled' : 'light'}
-                onClick={() => setViewMode('list')}
-                aria-label="List view"
-              >
-                <IconList size={16} />
-              </ActionIcon>
-              <ActionIcon
-                variant={viewMode === 'grid' ? 'filled' : 'light'}
-                onClick={() => setViewMode('grid')}
-                aria-label="Grid view"
-              >
-                <IconGrid3x3 size={16} />
-              </ActionIcon>
-            </Group>
-
             {/* Bulk Actions */}
             {selectedEmployees.length > 0 && (
               <Menu shadow="md" width={200}>
@@ -192,7 +145,7 @@ const EmployeesPage: React.FC = () => {
                   {canExport && (
                     <Menu.Item
                       leftSection={<IconDownload size={14} />}
-                      onClick={handleExport}
+                      onClick={handleExportSelected}
                       disabled={exportEmployees.isPending}
                     >
                       Export Selected
@@ -216,7 +169,7 @@ const EmployeesPage: React.FC = () => {
               <Button
                 leftSection={<IconDownload size={16} />}
                 variant="light"
-                onClick={handleExport}
+                onClick={handleExportAll}
                 loading={exportEmployees.isPending}
               >
                 Export All
@@ -242,21 +195,19 @@ const EmployeesPage: React.FC = () => {
           </Group>
         </Group>
 
-        {/* Search */}
-        <Card padding="lg" radius="md" withBorder>
-          <EmployeeSearch onSearch={handleSearch} />
-        </Card>
-
-        {/* Employee List */}
+        {/* Employee List Component */}
         <Card padding="lg" radius="md" withBorder>
           <EmployeeList
-            employees={employeesData?.content || []}
-            totalElements={employeesData?.totalElements || 0}
-            viewMode={viewMode}
-            selectedIds={selectedEmployees}
+            onViewEmployee={(employee: Employee) =>
+              navigate(`/employees/${employee.id}`)
+            }
+            onEditEmployee={(employee: Employee) =>
+              navigate(`/employees/${employee.id}/edit`)
+            }
             onSelectionChange={handleSelectionChange}
-            onEmployeeClick={employee => navigate(`/employees/${employee.id}`)}
-            loading={isLoading}
+            departments={departments}
+            positions={positions}
+            selectedIds={selectedEmployees}
           />
         </Card>
 

@@ -1,5 +1,4 @@
 import { apiClient } from '../../../services/api';
-import { queryKeys } from '../../../services/queryKeys';
 import type {
   EmailTemplate,
   EmailRequest,
@@ -7,8 +6,6 @@ import type {
   EmailHistory,
   PaginatedResponse,
   Pageable,
-  User,
-  Department,
 } from '../../../types';
 
 export interface EmailTemplateRequest {
@@ -36,56 +33,67 @@ export interface EmailSendProgress {
   errors?: string[];
 }
 
+const API_BASE_PATH = '/api/email';
+
 export class EmailApi {
   // Template management
   async getTemplates(): Promise<EmailTemplate[]> {
-    return apiClient.get<EmailTemplate[]>('/api/email/templates');
+    return apiClient.get<EmailTemplate[]>(`${API_BASE_PATH}/templates`);
   }
 
   async getTemplate(id: number): Promise<EmailTemplate> {
-    return apiClient.get<EmailTemplate>(`/api/email/templates/${id}`);
+    return apiClient.get<EmailTemplate>(`${API_BASE_PATH}/templates/${id}`);
   }
 
   async createTemplate(template: EmailTemplateRequest): Promise<EmailTemplate> {
-    return apiClient.post<EmailTemplate>('/api/email/templates', template);
+    return apiClient.post<EmailTemplate>(
+      `${API_BASE_PATH}/templates`,
+      template
+    );
   }
 
   async updateTemplate(
     id: number,
     template: EmailTemplateRequest
   ): Promise<EmailTemplate> {
-    return apiClient.put<EmailTemplate>(`/api/email/templates/${id}`, template);
+    return apiClient.put<EmailTemplate>(
+      `${API_BASE_PATH}/templates/${id}`,
+      template
+    );
   }
 
   async deleteTemplate(id: number): Promise<void> {
-    return apiClient.delete<void>(`/api/email/templates/${id}`);
+    return apiClient.delete<void>(`${API_BASE_PATH}/templates/${id}`);
   }
 
   // Email composition and sending
   async sendEmail(request: EmailRequest): Promise<void> {
-    return apiClient.post<void>('/api/email/send', request);
+    return apiClient.post<void>(`${API_BASE_PATH}/send`, request);
   }
 
   async sendBulkEmail(request: BulkEmailRequest): Promise<{ jobId: string }> {
-    return apiClient.post<{ jobId: string }>('/api/email/send-bulk', request);
+    return apiClient.post<{ jobId: string }>(
+      `${API_BASE_PATH}/send-bulk`,
+      request
+    );
   }
 
   async getBulkEmailProgress(jobId: string): Promise<EmailSendProgress> {
     return apiClient.get<EmailSendProgress>(
-      `/api/email/bulk-progress/${jobId}`
+      `${API_BASE_PATH}/bulk-progress/${jobId}`
     );
   }
 
   // Recipient management
   async getAvailableRecipients(): Promise<EmailRecipient[]> {
-    return apiClient.get<EmailRecipient[]>('/api/email/recipients');
+    return apiClient.get<EmailRecipient[]>(`${API_BASE_PATH}/recipients`);
   }
 
   async getDepartmentRecipients(
     departmentId: number
   ): Promise<EmailRecipient[]> {
     return apiClient.get<EmailRecipient[]>(
-      `/api/email/recipients/department/${departmentId}`
+      `${API_BASE_PATH}/recipients/department/${departmentId}`
     );
   }
 
@@ -94,7 +102,7 @@ export class EmailApi {
     pageable: Pageable
   ): Promise<PaginatedResponse<EmailHistory>> {
     return apiClient.get<PaginatedResponse<EmailHistory>>(
-      '/api/email/history',
+      `${API_BASE_PATH}/history`,
       {
         params: pageable,
       }
@@ -104,7 +112,7 @@ export class EmailApi {
   async getEmailDetails(
     id: number
   ): Promise<EmailHistory & { content: string; recipients: EmailRecipient[] }> {
-    return apiClient.get(`/api/email/history/${id}`);
+    return apiClient.get(`${API_BASE_PATH}/history/${id}`);
   }
 
   // Template preview
@@ -115,7 +123,7 @@ export class EmailApi {
     subject: string;
     content: string;
   }> {
-    return apiClient.post(`/api/email/templates/${templateId}/preview`, {
+    return apiClient.post(`${API_BASE_PATH}/templates/${templateId}/preview`, {
       variables,
     });
   }
@@ -129,7 +137,7 @@ export class EmailApi {
     missingVariables: string[];
     invalidVariables: string[];
   }> {
-    return apiClient.post(`/api/email/templates/${templateId}/validate`, {
+    return apiClient.post(`${API_BASE_PATH}/templates/${templateId}/validate`, {
       variables,
     });
   }

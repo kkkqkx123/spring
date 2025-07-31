@@ -30,8 +30,13 @@ export const departmentApi = {
     return apiClient.get(`/api/departments/parent/${parentId}`);
   },
 
-  moveDepartment: (departmentId: number, newParentId: number): Promise<DepartmentDto> => {
-    return apiClient.put(`/api/departments/${departmentId}/move/${newParentId}`);
+  moveDepartment: (
+    departmentId: number,
+    newParentId: number
+  ): Promise<DepartmentDto> => {
+    return apiClient.put(
+      `/api/departments/${departmentId}/move/${newParentId}`
+    );
   },
 
   getByName: (name: string): Promise<DepartmentDto> => {

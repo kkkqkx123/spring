@@ -1,12 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { BulkEmailSender } from '../BulkEmailSender';
-import type { EmailTemplate, Department, Employee } from '../../../../types';
+import type { EmailTemplate, Department } from '../../../../types';
 
 // Mock the hooks
 const mockUseEmailTemplates = vi.fn();
