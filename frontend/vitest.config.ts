@@ -26,8 +26,6 @@ export default defineConfig({
     css: true,
     exclude: [
       'node_modules/',
-      'src/test/',
-      '**/*.d.ts',
       '**/*.config.{js,ts}',
       '**/index.ts',
       '**/*.performance.test.ts',

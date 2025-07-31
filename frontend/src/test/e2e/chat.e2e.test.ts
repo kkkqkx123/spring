@@ -24,7 +24,7 @@ test.describe('Chat E2E Tests', () => {
 
   test('sends and receives messages', async ({ page }) => {
     // Select a conversation or start new one
-    await page.click('[data-testid="conversation-item"]').first();
+    await page.locator('[data-testid="conversation-item"]').first().click();
 
     // Type and send message
     const messageText = 'Hello, this is a test message';
@@ -44,7 +44,7 @@ test.describe('Chat E2E Tests', () => {
 
     // Select user to chat with
     await page.click('[data-testid="user-selector"]');
-    await page.click('[data-testid="user-option"]').first();
+    await page.locator('[data-testid="user-option"]').first().click();
 
     // Send first message
     const firstMessage = 'Hi there! Starting a new conversation.';

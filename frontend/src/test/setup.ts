@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { toHaveNoViolations } from 'jest-axe';
+
+expect.extend({ toHaveNoViolations });
 
 // Mock IntersectionObserver
 (global as any).IntersectionObserver = class IntersectionObserver {

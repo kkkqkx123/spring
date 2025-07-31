@@ -142,16 +142,12 @@ export class AuthService {
    * Update user profile
    */
   async updateProfile(userData: Partial<User>): Promise<User> {
-    try {
-      const updatedUser = await apiClient.put<User>('/auth/profile', userData);
+    const updatedUser = await apiClient.put<User>('/auth/profile', userData);
 
-      // Update auth store
-      useAuthStore.getState().setUser(updatedUser);
+    // Update auth store
+    useAuthStore.getState().setUser(updatedUser);
 
-      return updatedUser;
-    } catch (error) {
-      throw error;
-    }
+    return updatedUser;
   }
 
   /**
@@ -161,64 +157,44 @@ export class AuthService {
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
-    try {
-      await apiClient.post('/auth/change-password', {
-        currentPassword,
-        newPassword,
-      });
-    } catch (error) {
-      throw error;
-    }
+    await apiClient.post('/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
   }
 
   /**
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<void> {
-    try {
-      await apiClient.post('/auth/forgot-password', { email });
-    } catch (error) {
-      throw error;
-    }
+    await apiClient.post('/auth/forgot-password', { email });
   }
 
   /**
    * Reset password with token
    */
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    try {
-      await apiClient.post('/auth/reset-password', {
-        token,
-        newPassword,
-      });
-    } catch (error) {
-      throw error;
-    }
+    await apiClient.post('/auth/reset-password', {
+      token,
+      newPassword,
+    });
   }
 
   /**
    * Verify email address
    */
   async verifyEmail(token: string): Promise<void> {
-    try {
-      await apiClient.post('/auth/verify-email', { token });
+    await apiClient.post('/auth/verify-email', { token });
 
-      // Refresh user data to get updated verification status
-      await this.getCurrentUser();
-    } catch (error) {
-      throw error;
-    }
+    // Refresh user data to get updated verification status
+    await this.getCurrentUser();
   }
 
   /**
    * Resend email verification
    */
   async resendEmailVerification(): Promise<void> {
-    try {
-      await apiClient.post('/auth/resend-verification');
-    } catch (error) {
-      throw error;
-    }
+    await apiClient.post('/auth/resend-verification');
   }
 
   /**
@@ -273,7 +249,7 @@ export class AuthService {
       apiClient.setAuthToken(token);
 
       // Verify token and get user data
-      const user = await this.getCurrentUser();
+      await this.getCurrentUser();
 
       // Connect to WebSocket
       try {
@@ -320,8 +296,13 @@ export class AuthService {
   /**
    * Handle authentication errors
    */
-  handleAuthError(error: any): void {
-    if (error.status === 401) {
+  handleAuthError(error: unknown): void {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'status' in error &&
+      (error as { status: unknown }).status === 401
+    ) {
       this.clearAuthData();
     }
   }

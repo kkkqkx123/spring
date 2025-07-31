@@ -81,9 +81,10 @@ test.describe('Employee CRUD E2E Tests', () => {
   test('edits existing employee', async ({ page }) => {
     // Click edit button for first employee
     await page
-      .click('[data-testid="employee-row"]')
+      .locator('[data-testid="employee-row"]')
       .first()
-      .locator('[data-testid="edit-button"]');
+      .locator('[data-testid="edit-button"]')
+      .click();
 
     // Verify form modal opens with existing data
     await expect(
@@ -123,9 +124,10 @@ test.describe('Employee CRUD E2E Tests', () => {
 
     // Click delete button for first employee
     await page
-      .click('[data-testid="employee-row"]')
+      .locator('[data-testid="employee-row"]')
       .first()
-      .locator('[data-testid="delete-button"]');
+      .locator('[data-testid="delete-button"]')
+      .click();
 
     // Verify confirmation dialog appears
     await expect(
@@ -157,9 +159,10 @@ test.describe('Employee CRUD E2E Tests', () => {
 
     // Click delete button for first employee
     await page
-      .click('[data-testid="employee-row"]')
+      .locator('[data-testid="employee-row"]')
       .first()
-      .locator('[data-testid="delete-button"]');
+      .locator('[data-testid="delete-button"]')
+      .click();
 
     // Verify confirmation dialog appears
     await expect(
@@ -285,13 +288,15 @@ test.describe('Employee CRUD E2E Tests', () => {
   test('handles bulk operations', async ({ page }) => {
     // Select multiple employees
     await page
-      .check('[data-testid="employee-row"]')
+      .locator('[data-testid="employee-row"]')
       .first()
-      .locator('[data-testid="select-checkbox"]');
+      .locator('[data-testid="select-checkbox"]')
+      .check();
     await page
-      .check('[data-testid="employee-row"]')
+      .locator('[data-testid="employee-row"]')
       .nth(1)
-      .locator('[data-testid="select-checkbox"]');
+      .locator('[data-testid="select-checkbox"]')
+      .check();
 
     // Verify bulk actions are enabled
     await expect(page.locator('[data-testid="bulk-actions"]')).toBeVisible();

@@ -1,4 +1,5 @@
 import axios, {
+  AxiosError,
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosResponse,
@@ -11,8 +12,8 @@ class ApiClient {
   private client: AxiosInstance;
   private isRefreshing = false;
   private failedQueue: Array<{
-    resolve: (value: any) => void;
-    reject: (error: any) => void;
+    resolve: (value: unknown) => void;
+    reject: (error: unknown) => void;
   }> = [];
 
   constructor(baseURL: string = API_BASE_URL) {
@@ -70,9 +71,13 @@ class ApiClient {
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return this.client(originalRequest);
           } catch (refreshError) {
-            this.processQueue(refreshError, null);
+            const error =
+              refreshError instanceof Error
+                ? refreshError
+                : new Error('An unknown error occurred during token refresh');
+            this.processQueue(error, null);
             await this.handleUnauthorized();
-            return Promise.reject(refreshError);
+            return Promise.reject(error);
           } finally {
             this.isRefreshing = false;
           }
@@ -83,7 +88,7 @@ class ApiClient {
     );
   }
 
-  private processQueue(error: any, token: string | null) {
+  private processQueue(error: Error | null, token: string | null) {
     this.failedQueue.forEach(({ resolve, reject }) => {
       if (error) {
         reject(error);
@@ -126,7 +131,7 @@ class ApiClient {
     }
   }
 
-  private handleError(error: any): ApiError {
+  private handleError(error: AxiosError<ApiError>): ApiError {
     if (error.response) {
       return {
         status: error.response.status,
@@ -160,7 +165,7 @@ class ApiClient {
 
   async post<T>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<T> {
     const response: AxiosResponse<ApiResponse<T>> = await this.client.post(
@@ -173,7 +178,7 @@ class ApiClient {
 
   async put<T>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<T> {
     const response: AxiosResponse<ApiResponse<T>> = await this.client.put(
@@ -202,7 +207,7 @@ class ApiClient {
 
   async postRaw(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<AxiosResponse> {
     return this.client.post(url, data, config);
@@ -210,7 +215,7 @@ class ApiClient {
 
   async putRaw(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<AxiosResponse> {
     return this.client.put(url, data, config);

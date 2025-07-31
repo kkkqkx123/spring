@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { axe } from 'jest-axe';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
@@ -8,9 +8,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { LoginForm } from '../../features/auth/components/LoginForm';
 import { EmployeeList } from '../../features/employees/components/EmployeeList';
 import { AppShell } from '../../components/layout/AppShell';
-
-// Extend Jest matchers
-expect.extend(toHaveNoViolations);
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = new QueryClient({
@@ -33,7 +30,7 @@ describe('Accessibility Tests', () => {
   it('LoginForm should not have accessibility violations', async () => {
     const { container } = render(
       <TestWrapper>
-        <LoginForm onSuccess={vi.fn()} />
+        <LoginForm onSubmit={vi.fn()} />
       </TestWrapper>
     );
 
@@ -64,10 +61,20 @@ describe('Accessibility Tests', () => {
   });
 
   it('AppShell should not have accessibility violations', async () => {
+    const mockUser = {
+      id: 1,
+      username: 'test',
+      email: 'test@example.com',
+      roles: [{ id: 1, name: 'USER', permissions: [] }],
+      enabled: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
     // Mock stores
     vi.mock('../../stores/authStore', () => ({
       useAuthStore: () => ({
-        user: { id: 1, username: 'test', roles: ['USER'] },
+        user: mockUser,
         isAuthenticated: true,
         logout: vi.fn(),
       }),
@@ -84,7 +91,7 @@ describe('Accessibility Tests', () => {
 
     const { container } = render(
       <TestWrapper>
-        <AppShell>
+        <AppShell user={mockUser}>
           <div>Test Content</div>
         </AppShell>
       </TestWrapper>
