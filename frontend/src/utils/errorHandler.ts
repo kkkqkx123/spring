@@ -225,12 +225,12 @@ export const extractValidationErrors = (
 /**
  * Create a retry function with exponential backoff
  */
-export const createRetryFunction = (
-  originalFunction: () => Promise<any>,
+export const createRetryFunction = <T>(
+  originalFunction: () => Promise<T>,
   maxRetries: number = 3,
   baseDelay: number = 1000
 ) => {
-  return async (retryCount: number = 0): Promise<any> => {
+  return async (retryCount: number = 0): Promise<T> => {
     try {
       return await originalFunction();
     } catch (error) {
@@ -280,7 +280,7 @@ export const setupGlobalErrorHandling = () => {
  */
 export const formatErrorForLogging = (
   error: Error | ApiError,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ) => {
   const timestamp = new Date().toISOString();
   const userAgent = navigator.userAgent;

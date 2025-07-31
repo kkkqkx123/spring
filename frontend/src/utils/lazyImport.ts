@@ -1,23 +1,23 @@
-import { lazy, ComponentType } from 'react';
+import { lazy, type ComponentType } from 'react';
 
 /**
  * Utility function for creating lazy-loaded components with better error handling
  * and loading states
  */
-export function lazyImport<T extends ComponentType<any>>(
+export function lazyImport<T extends ComponentType<object>>(
   importFunc: () => Promise<{ default: T }>,
-  fallback?: ComponentType
+  _fallback?: ComponentType
 ): T {
   const LazyComponent = lazy(importFunc);
 
   // Return a component that wraps the lazy component with error boundary
-  return LazyComponent as T;
+  return LazyComponent as unknown as T;
 }
 
 /**
  * Utility for lazy loading with named exports
  */
-export function lazyImportNamed<T extends ComponentType<any>>(
+export function lazyImportNamed<T extends ComponentType<object>>(
   importFunc: () => Promise<{ [key: string]: T }>,
   exportName: string
 ): T {
@@ -26,13 +26,13 @@ export function lazyImportNamed<T extends ComponentType<any>>(
     return { default: module[exportName] };
   });
 
-  return LazyComponent as T;
+  return LazyComponent as unknown as T;
 }
 
 /**
  * Preload a lazy component to improve perceived performance
  */
-export function preloadComponent(importFunc: () => Promise<any>): void {
+export function preloadComponent(importFunc: () => Promise<unknown>): void {
   // Preload the component in the background
   importFunc().catch(() => {
     // Silently fail - the component will be loaded when needed
@@ -42,7 +42,7 @@ export function preloadComponent(importFunc: () => Promise<any>): void {
 /**
  * Create a lazy component with retry functionality
  */
-export function lazyWithRetry<T extends ComponentType<any>>(
+export function lazyWithRetry<T extends ComponentType<object>>(
   importFunc: () => Promise<{ default: T }>,
   maxRetries: number = 3
 ): T {
@@ -67,5 +67,5 @@ export function lazyWithRetry<T extends ComponentType<any>>(
     throw lastError!;
   });
 
-  return LazyComponent as T;
+  return LazyComponent as unknown as T;
 }

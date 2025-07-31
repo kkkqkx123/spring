@@ -220,9 +220,9 @@ describe('createRetryFunction', () => {
     const originalSetTimeout = global.setTimeout;
 
     global.setTimeout = vi.fn().mockImplementation((callback, delay) => {
-      delays.push(delay);
+      delays.push(delay as number);
       return originalSetTimeout(callback, 0); // Execute immediately for test
-    });
+    }) as unknown as typeof global.setTimeout;
 
     const mockFunction = vi
       .fn()
@@ -242,16 +242,19 @@ describe('createRetryFunction', () => {
 describe('setupGlobalErrorHandling', () => {
   let originalAddEventListener: typeof window.addEventListener;
   let mockAddEventListener: ReturnType<typeof vi.fn>;
+  let originalConsoleError: typeof console.error;
 
   beforeEach(() => {
     originalAddEventListener = window.addEventListener;
     mockAddEventListener = vi.fn();
     window.addEventListener = mockAddEventListener;
+    originalConsoleError = console.error;
     console.error = vi.fn();
   });
 
   afterEach(() => {
     window.addEventListener = originalAddEventListener;
+    console.error = originalConsoleError;
   });
 
   it('sets up unhandled rejection handler', () => {

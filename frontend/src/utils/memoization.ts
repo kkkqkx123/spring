@@ -5,55 +5,65 @@ import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
  */
 
 // Deep comparison for complex objects
-export function deepEqual(a: any, b: any): boolean {
+export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
 
-  if (a == null || b == null) return false;
-
-  if (typeof a !== typeof b) return false;
-
-  if (typeof a !== 'object') return a === b;
-
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (
+    a == null ||
+    b == null ||
+    typeof a !== 'object' ||
+    typeof b !== 'object'
+  ) {
+    return false;
+  }
 
   if (Array.isArray(a)) {
-    if (a.length !== b.length) return false;
+    if (!Array.isArray(b) || a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) {
       if (!deepEqual(a[i], b[i])) return false;
     }
     return true;
   }
+  if (Array.isArray(b)) return false;
 
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
 
   if (keysA.length !== keysB.length) return false;
 
   for (const key of keysA) {
-    if (!keysB.includes(key)) return false;
-    if (!deepEqual(a[key], b[key])) return false;
+    if (
+      !Object.prototype.hasOwnProperty.call(objB, key) ||
+      !deepEqual(objA[key], objB[key])
+    ) {
+      return false;
+    }
   }
 
   return true;
 }
 
 // Memoization hook with deep comparison
-export function useDeepMemo<T>(factory: () => T, deps: any[]): T {
-  const ref = useRef<{ deps: any[]; value: T }>();
+export function useDeepMemo<T>(factory: () => T, deps: readonly unknown[]): T {
+  const ref = useRef<{ deps: readonly unknown[]; value: T } | null>(null);
 
   if (!ref.current || !deepEqual(ref.current.deps, deps)) {
     ref.current = { deps, value: factory() };
   }
 
-  return ref.current.value;
+  return ref.current!.value;
 }
 
 // Stable callback with deep dependency comparison
-export function useDeepCallback<T extends (...args: any[]) => any>(
+export function useDeepCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
-  deps: any[]
+  deps: readonly unknown[]
 ): T {
-  return useCallback(callback, deps);
+  // This hook provides a callback that only changes when its dependencies
+  // change, as determined by a deep equality check.
+  return useDeepMemo(() => callback, deps);
 }
 
 // Memoized selector for Zustand stores
@@ -61,18 +71,20 @@ export function createMemoizedSelector<T, R>(
   selector: (state: T) => R,
   equalityFn: (a: R, b: R) => boolean = Object.is
 ) {
-  let lastResult: R;
-  let lastState: T;
+  let lastResult: R | undefined;
+  let lastState: T | undefined;
+  let isFirstRun = true;
 
   return (state: T): R => {
-    if (state !== lastState) {
+    if (isFirstRun || state !== lastState) {
       const newResult = selector(state);
-      if (!equalityFn(lastResult, newResult)) {
+      if (isFirstRun || !equalityFn(lastResult!, newResult)) {
         lastResult = newResult;
       }
       lastState = state;
+      isFirstRun = false;
     }
-    return lastResult;
+    return lastResult!;
   };
 }
 
@@ -94,14 +106,14 @@ export function useDebouncedValue<T>(value: T, delay: number): T {
 }
 
 // Throttled callback hook
-export function useThrottledCallback<T extends (...args: any[]) => any>(
+export function useThrottledCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T {
   const lastRun = useRef(Date.now());
 
   return useCallback(
-    ((...args: any[]) => {
+    ((...args: unknown[]) => {
       if (Date.now() - lastRun.current >= delay) {
         callback(...args);
         lastRun.current = Date.now();
@@ -131,7 +143,9 @@ export function useMemoizedComputation<T, R>(
     // Manage cache size
     if (cache.current.size >= cacheSize) {
       const firstKey = cache.current.keys().next().value;
-      cache.current.delete(firstKey);
+      if (firstKey !== undefined) {
+        cache.current.delete(firstKey);
+      }
     }
 
     cache.current.set(key, result);
