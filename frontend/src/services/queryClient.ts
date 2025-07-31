@@ -1,5 +1,5 @@
-import { QueryClient, DefaultOptions } from '@tanstack/react-query';
-import { ApiError } from '../types';
+import { QueryClient, type DefaultOptions } from '@tanstack/react-query';
+import type { ApiError } from '../types';
 
 // Default query options
 const defaultQueryOptions: DefaultOptions = {
@@ -134,7 +134,11 @@ export const createOptimisticUpdate = <T>(
       // Return a context object with the snapshotted value
       return { previousData };
     },
-    onError: (error: unknown, variables: unknown, context: any) => {
+    onError: (
+      error: unknown,
+      variables: unknown,
+      context?: { previousData: T }
+    ) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousData) {
         queryClient.setQueryData<T>(queryKey, context.previousData);

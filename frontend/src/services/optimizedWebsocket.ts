@@ -7,7 +7,6 @@ import {
   ThrottledEventEmitter,
   MessageQueue,
   ConnectionManager,
-  useOptimizedWebSocketHandler,
 } from '../utils/websocketOptimization';
 
 // Event types for type safety
@@ -39,8 +38,8 @@ export interface OptimizedWebSocketEvents {
 
 // Optimized event bus with batching and throttling
 export class OptimizedEventBus {
-  private listeners: Map<string, Function[]> = new Map();
-  private messageBatchers: Map<string, MessageBatcher<any>> = new Map();
+  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
+  private messageBatchers: Map<string, MessageBatcher<unknown>> = new Map();
   private throttledEmitter: ThrottledEventEmitter = new ThrottledEventEmitter();
 
   subscribe<K extends keyof OptimizedWebSocketEvents>(
@@ -72,12 +71,12 @@ export class OptimizedEventBus {
     if (batched) {
       if (!this.messageBatchers.has(event)) {
         const batcher = new MessageBatcher(
-          (messages: any[]) => {
+          (messages: readonly unknown[]) => {
             const listeners = this.listeners.get(event) || [];
             listeners.forEach(listener => {
               if (listener === callback) {
                 // Call with batched messages
-                (callback as any)(messages);
+                (callback as (msgs: readonly unknown[]) => void)(messages);
               }
             });
           },
@@ -87,18 +86,24 @@ export class OptimizedEventBus {
         this.messageBatchers.set(event, batcher);
       }
 
-      actualCallback = ((message: any) => {
+      actualCallback = ((message: unknown) => {
         this.messageBatchers.get(event)?.add(message);
       }) as OptimizedWebSocketEvents[K];
     }
 
     // Set up throttling if requested
     if (throttled) {
-      this.throttledEmitter.on(event, actualCallback, throttleDelay);
+      this.throttledEmitter.on(
+        event,
+        actualCallback as (...args: unknown[]) => void,
+        throttleDelay
+      );
       actualCallback = (() => {}) as OptimizedWebSocketEvents[K]; // Placeholder
     }
 
-    this.listeners.get(event)!.push(actualCallback);
+    this.listeners
+      .get(event)!
+      .push(actualCallback as (...args: unknown[]) => void);
 
     // Return unsubscribe function
     return () => this.unsubscribe(event, callback);
@@ -374,7 +379,7 @@ export class OptimizedWebSocketService {
   }
 
   // Optimized message sending with queuing
-  private sendMessage(event: string, data: any): void {
+  private sendMessage(event: string, data: unknown): void {
     if (this.socket?.connected) {
       this.socket.emit(event, data);
     } else {
@@ -454,7 +459,7 @@ export class OptimizedWebSocketService {
         reject(new Error('Ping timeout'));
       }, 5000);
 
-      this.socket!.emit('ping', startTime, (response: number) => {
+      this.socket!.emit('ping', startTime, (_response: number) => {
         clearTimeout(timeout);
         const latency = Date.now() - startTime;
         resolve(latency);
@@ -500,9 +505,3 @@ export class OptimizedWebSocketService {
     };
   }
 }
-
-// Create singleton instance
-export const optimizedWebSocketService = new OptimizedWebSocketService();
-
-// Export default instance
-export default optimizedWebSocketService;

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventBus, WebSocketService } from './websocket';
 import { storage } from '../utils';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { STORAGE_KEYS } from '../constants';
 
 // Mock socket.io-client

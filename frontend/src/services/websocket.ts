@@ -32,17 +32,18 @@ export interface WebSocketEvents {
 
 // Event bus for managing WebSocket events across the application
 export class EventBus {
-  private listeners: Map<string, Function[]> = new Map();
+  private listeners: {
+    [K in keyof WebSocketEvents]?: ((...args: unknown[]) => void)[];
+  } = {};
 
   subscribe<K extends keyof WebSocketEvents>(
     event: K,
     callback: WebSocketEvents[K]
   ): () => void {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, []);
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
     }
-
-    this.listeners.get(event)!.push(callback);
+    this.listeners[event]!.push(callback as (...args: unknown[]) => void);
 
     // Return unsubscribe function
     return () => this.unsubscribe(event, callback);
@@ -52,9 +53,11 @@ export class EventBus {
     event: K,
     callback: WebSocketEvents[K]
   ): void {
-    const eventListeners = this.listeners.get(event);
+    const eventListeners = this.listeners[event];
     if (eventListeners) {
-      const index = eventListeners.indexOf(callback);
+      const index = eventListeners.indexOf(
+        callback as (...args: unknown[]) => void
+      );
       if (index > -1) {
         eventListeners.splice(index, 1);
       }
@@ -65,11 +68,14 @@ export class EventBus {
     event: K,
     ...args: Parameters<WebSocketEvents[K]>
   ): void {
-    const eventListeners = this.listeners.get(event);
+    const eventListeners = this.listeners[event];
     if (eventListeners) {
-      eventListeners.forEach(callback => {
+      eventListeners.forEach(listener => {
         try {
-          callback(...args);
+          // The listener is cast to the correct type before being called
+          (listener as (...args: Parameters<WebSocketEvents[K]>) => void)(
+            ...args
+          );
         } catch (error) {
           console.error(`Error in event listener for ${event}:`, error);
         }
@@ -78,11 +84,11 @@ export class EventBus {
   }
 
   clear(): void {
-    this.listeners.clear();
+    this.listeners = {};
   }
 
   getListenerCount(event: keyof WebSocketEvents): number {
-    return this.listeners.get(event)?.length || 0;
+    return this.listeners[event]?.length || 0;
   }
 }
 
@@ -336,7 +342,7 @@ export class WebSocketService {
         reject(new Error('Ping timeout'));
       }, 5000);
 
-      this.socket!.emit('ping', startTime, (response: number) => {
+      this.socket!.emit('ping', startTime, (_response: number) => {
         clearTimeout(timeout);
         const latency = Date.now() - startTime;
         resolve(latency);

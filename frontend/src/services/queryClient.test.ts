@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   queryClient,
@@ -59,6 +60,7 @@ describe('QueryClient Configuration', () => {
 
   describe('Error Handling', () => {
     it('should handle API errors correctly', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const apiError = {
         status: 404,
         message: 'Not found',

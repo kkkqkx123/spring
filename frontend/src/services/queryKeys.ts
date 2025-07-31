@@ -9,16 +9,19 @@ export const queryKeys = {
   // Employees
   employees: {
     all: ['employees'] as const,
-    list: (params: any) => ['employees', 'list', params] as const,
+    list: (params: Record<string, unknown>) =>
+      ['employees', 'list', params] as const,
     detail: (id: number) => ['employees', 'detail', id] as const,
-    search: (criteria: any) => ['employees', 'search', criteria] as const,
+    search: (criteria: Record<string, unknown>) =>
+      ['employees', 'search', criteria] as const,
   },
 
   // Departments
   departments: {
     all: ['departments'] as const,
     tree: ['departments', 'tree'] as const,
-    list: (params: any) => ['departments', 'list', params] as const,
+    list: (params: Record<string, unknown>) =>
+      ['departments', 'list', params] as const,
     detail: (id: number) => ['departments', 'detail', id] as const,
   },
 
@@ -33,14 +36,14 @@ export const queryKeys = {
   // Chat
   chat: {
     conversations: ['chat', 'conversations'] as const,
-    conversation: (userId: number, params?: any) =>
+    conversation: (userId: number, params?: Record<string, unknown>) =>
       params
         ? (['chat', 'conversation', userId, params] as const)
         : (['chat', 'conversation', userId] as const),
-    messages: (userId: number, params: any) =>
+    messages: (userId: number, params: Record<string, unknown>) =>
       ['chat', 'messages', userId, params] as const,
     unreadCount: ['chat', 'unreadCount'] as const,
-    search: (query: string, params: any) =>
+    search: (query: string, params: Record<string, unknown>) =>
       ['chat', 'search', query, params] as const,
     onlineUsers: ['chat', 'onlineUsers'] as const,
   },
@@ -49,7 +52,8 @@ export const queryKeys = {
   email: {
     templates: ['email', 'templates'] as const,
     template: (id: number) => ['email', 'template', id] as const,
-    history: (params: any) => ['email', 'history', params] as const,
+    history: (params: Record<string, unknown>) =>
+      ['email', 'history', params] as const,
     recipients: ['email', 'recipients'] as const,
     departmentRecipients: (departmentId: number) =>
       ['email', 'recipients', 'department', departmentId] as const,
@@ -60,7 +64,8 @@ export const queryKeys = {
 
   // Notifications
   notifications: {
-    list: (params: any) => ['notifications', 'list', params] as const,
+    list: (params: Record<string, unknown>) =>
+      ['notifications', 'list', params] as const,
     unreadCount: ['notifications', 'unreadCount'] as const,
   },
 
