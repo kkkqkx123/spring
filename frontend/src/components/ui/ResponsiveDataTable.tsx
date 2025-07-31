@@ -26,7 +26,7 @@ import {
   IconSortDescending,
   IconDots,
   IconList,
-  IconGrid3X3,
+  IconGrid3x3,
 } from '@tabler/icons-react';
 import { useMediaQuery } from '@mantine/hooks';
 import { DataTableProps, DataTableColumn } from '../../types';
@@ -294,7 +294,7 @@ export function ResponsiveDataTable<T extends Record<string, any>>({
                   onClick={() => setViewMode('cards')}
                   size="lg"
                 >
-                  <IconGrid3X3 size={16} />
+                  <IconGrid3x3 size={16} />
                 </ActionIcon>
               </Group>
             )}

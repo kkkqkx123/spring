@@ -25,7 +25,7 @@ import { UserRoleAssignment } from '../components/UserRoleAssignment';
 import { RoleForm } from '../components/RoleForm';
 import {
   useRoles,
-  usePermissions,
+  useAllPermissions,
   useCreateRole,
 } from '../hooks/usePermissions';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
@@ -51,7 +51,7 @@ const PermissionsPage: React.FC = () => {
     data: permissions,
     isLoading: permissionsLoading,
     error: permissionsError,
-  } = usePermissions();
+  } = useAllPermissions();
 
   const createRole = useCreateRole();
 

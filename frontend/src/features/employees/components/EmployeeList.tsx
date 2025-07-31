@@ -21,7 +21,7 @@ import {
   IconUpload,
   IconTrash,
   IconList,
-  IconGrid3X3,
+  IconGrid3x3,
   IconDots,
   IconAlertCircle,
 } from '@tabler/icons-react';
@@ -334,7 +334,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
             onChange={value => setViewMode(value as ViewMode)}
             data={[
               { label: <IconList size={16} />, value: 'table' },
-              { label: <IconGrid3X3 size={16} />, value: 'grid' },
+              { label: <IconGrid3x3 size={16} />, value: 'grid' },
             ]}
             size="sm"
           />

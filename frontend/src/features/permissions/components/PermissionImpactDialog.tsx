@@ -185,30 +185,4 @@ export const PermissionImpactDialog: React.FC<PermissionImpactDialogProps> = ({
   );
 };
 
-export default PermissionImpactDialog;          color="orange"
-            onClick={onConfirm}
-            loading={loading}
-            disabled={isAnalyzing || !impactData}
-          >
-            Confirm Changes
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
-  );
-};
-
-export default PermissionImpactDialog;          color="orange"
-            onClick={onConfirm}
-            loading={loading}
-            disabled={isAnalyzing || !impactData}
-          >
-            Confirm Changes
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
-  );
-};
-
 export default PermissionImpactDialog;

@@ -1,4 +1,4 @@
-import { api } from '../../../services/api';
+import { apiClient } from '../../../services/api';
 import type {
   ChatMessage,
   Conversation,
@@ -11,7 +11,7 @@ export interface ChatMessageRequest {
   content: string;
 }
 
-export interface ChatMessageResponse extends ChatMessage {}
+export interface ChatMessageResponse extends ChatMessage { }
 
 export interface ConversationSearchParams {
   query?: string;
@@ -20,8 +20,7 @@ export interface ConversationSearchParams {
 export class ChatApi {
   // Send a new message
   async sendMessage(request: ChatMessageRequest): Promise<ChatMessageResponse> {
-    const response = await api.post('/chat/send', request);
-    return response.data;
+    return await apiClient.post('/chat/send', request);
   }
 
   // Get conversation with a specific user
@@ -29,28 +28,24 @@ export class ChatApi {
     userId: number,
     pageable: Pageable
   ): Promise<PaginatedResponse<ChatMessageResponse>> {
-    const response = await api.get(`/chat/conversation/${userId}`, {
+    return await apiClient.get(`/chat/conversation/${userId}`, {
       params: pageable,
     });
-    return response.data;
   }
 
   // Get list of recent conversations
   async getRecentConversations(): Promise<Conversation[]> {
-    const response = await api.get('/chat/conversations');
-    return response.data;
+    return await apiClient.get('/chat/conversations');
   }
 
   // Mark conversation as read
   async markConversationAsRead(userId: number): Promise<number> {
-    const response = await api.put(`/chat/conversation/${userId}/read`);
-    return response.data;
+    return await apiClient.put(`/chat/conversation/${userId}/read`);
   }
 
   // Get unread message count
   async getUnreadCount(): Promise<number> {
-    const response = await api.get('/chat/unread/count');
-    return response.data;
+    return await apiClient.get('/chat/unread/count');
   }
 
   // Search messages across conversations
@@ -58,16 +53,14 @@ export class ChatApi {
     query: string,
     pageable: Pageable
   ): Promise<PaginatedResponse<ChatMessageResponse>> {
-    const response = await api.get('/chat/search', {
+    return await apiClient.get('/chat/search', {
       params: { query, ...pageable },
     });
-    return response.data;
   }
 
   // Get online users
   async getOnlineUsers(): Promise<number[]> {
-    const response = await api.get('/chat/online-users');
-    return response.data;
+    return await apiClient.get('/chat/online-users');
   }
 }
 

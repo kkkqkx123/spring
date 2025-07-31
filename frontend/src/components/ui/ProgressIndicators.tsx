@@ -16,8 +16,8 @@ import {
   IconCheck,
   IconX,
   IconClock,
-  IconPause,
-  IconPlay,
+  IconPlayerPause,
+  IconPlayerPlay,
   IconRefresh,
 } from '@tabler/icons-react';
 
@@ -333,7 +333,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
             {status === 'running' && onPause && (
               <Tooltip label="Pause">
                 <ActionIcon variant="subtle" onClick={onPause}>
-                  <IconPause size={16} />
+                  <IconPlayerPause size={16} />
                 </ActionIcon>
               </Tooltip>
             )}
@@ -341,7 +341,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
             {status === 'paused' && onResume && (
               <Tooltip label="Resume">
                 <ActionIcon variant="subtle" onClick={onResume}>
-                  <IconPlay size={16} />
+                  <IconPlayerPlay size={16} />
                 </ActionIcon>
               </Tooltip>
             )}

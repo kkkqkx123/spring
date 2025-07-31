@@ -26,8 +26,6 @@ import { NotificationList } from '../components/NotificationList';
 import { NotificationSettings } from '../components/NotificationSettings';
 import {
   useNotifications,
-  useMarkAllAsRead,
-  useClearAllNotifications,
 } from '../hooks/useNotifications';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';

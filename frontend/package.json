@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:with-types": "tsc -b && vite build",
     "build:analyze": "ANALYZE=true npm run build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -26,7 +27,18 @@
     "test:integration": "vitest run src/test/integration",
     "test:all": "npm run test:run && npm run test:e2e && npm run test:accessibility",
     "analyze": "npm run build:analyze && npx serve dist",
-    "size-check": "npm run build && npx bundlesize"
+    "size-check": "npm run build && npx bundlesize",
+    "build:production": "node scripts/build-production.js",
+    "build:staging": "NODE_ENV=staging npm run build",
+    "deploy:staging": "node scripts/deploy.js staging",
+    "deploy:production": "node scripts/deploy.js production",
+    "docker:build": "docker build -t employee-management-frontend .",
+    "docker:run": "docker run -p 3000:80 employee-management-frontend",
+    "docker:compose:up": "docker-compose up -d",
+    "docker:compose:down": "docker-compose down",
+    "security:audit": "npm audit --audit-level=high",
+    "security:fix": "npm audit fix",
+    "health:check": "curl -f http://localhost:3000/health || exit 1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.0",

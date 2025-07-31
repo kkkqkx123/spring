@@ -1,10 +1,14 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  loadEnv(mode, process.cwd(), '')
+  
+  return {
   plugins: [
     react(),
     // Bundle analyzer plugin (only in analyze mode)
@@ -43,11 +47,27 @@ export default defineConfig({
     },
   },
   build: {
-    // Enable source maps for better debugging
-    sourcemap: true,
+    // Enable source maps for better debugging (disable in production for security)
+    sourcemap: mode === 'development',
     
     // Optimize chunk size
     chunkSizeWarningLimit: 1000,
+    
+    // Production optimizations
+    ...(mode === 'production' && {
+      minify: 'esbuild',
+      target: 'es2020',
+      cssMinify: true,
+      reportCompressedSize: false, // Disable for faster builds
+      
+      // Tree shaking optimizations
+      rollupOptions: {
+        treeshake: {
+          preset: 'recommended',
+          moduleSideEffects: false,
+        },
+      },
+    }),
     
     rollupOptions: {
       output: {
@@ -116,9 +136,6 @@ export default defineConfig({
       },
     },
     
-    // Minification options
-    minify: 'esbuild',
-    target: 'es2020',
   },
   
   // Performance optimizations
@@ -138,4 +155,17 @@ export default defineConfig({
       'socket.io-client',
     ],
   },
-})
+  
+  // Define global constants
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __PROD__: mode === 'production',
+  },
+  
+  // Preview server configuration (for production preview)
+  preview: {
+    port: 4173,
+    host: true,
+  },
+}})
