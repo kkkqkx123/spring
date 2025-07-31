@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Stack,
@@ -15,6 +14,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconAlertCircle, IconCheck } from '@tabler/icons-react';
 import { DepartmentTree, DepartmentForm } from '../components/index';
+import { DepartmentDetail } from '../components/DepartmentDetail';
 import { useDepartments } from '../hooks/useDepartments';
 import {
   useCreateDepartment,
@@ -26,7 +26,6 @@ import { useAuth } from '../../../hooks/useAuth';
 import type { Department } from '../../../types';
 
 const DepartmentsPage: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [selectedDepartment, setSelectedDepartment] =
@@ -34,6 +33,7 @@ const DepartmentsPage: React.FC = () => {
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(
     null
   );
+  const [creatingParentId, setCreatingParentId] = useState<number | null>(null);
   const [
     createModalOpened,
     { open: openCreateModal, close: closeCreateModal },
@@ -46,7 +46,7 @@ const DepartmentsPage: React.FC = () => {
   ] = useDisclosure(false);
 
   // Queries and mutations
-  const { data: departments, isLoading, error, refetch } = useDepartments();
+  const { isLoading, error, refetch } = useDepartments();
 
   const createDepartment = useCreateDepartment();
   const updateDepartment = useUpdateDepartment();
@@ -66,9 +66,17 @@ const DepartmentsPage: React.FC = () => {
     setSelectedDepartment(department);
   };
 
+  const handleOpenCreateModal = (parentId: number | null = null) => {
+    setCreatingParentId(parentId);
+    openCreateModal();
+  };
+
   const handleCreateDepartment = async (data: any) => {
     try {
-      await createDepartment.mutateAsync(data);
+      const departmentData = creatingParentId
+        ? { ...data, parentId: creatingParentId }
+        : data;
+      await createDepartment.mutateAsync(departmentData);
       notifications.show({
         title: 'Success',
         message: 'Department created successfully',
@@ -76,6 +84,7 @@ const DepartmentsPage: React.FC = () => {
         icon: <IconCheck size={16} />,
       });
       closeCreateModal();
+      setCreatingParentId(null);
       refetch();
     } catch {
       notifications.show({
@@ -183,7 +192,7 @@ const DepartmentsPage: React.FC = () => {
           {canCreate && (
             <Button
               leftSection={<IconPlus size={16} />}
-              onClick={openCreateModal}
+              onClick={() => handleOpenCreateModal()}
             >
               Add Department
             </Button>
@@ -192,105 +201,56 @@ const DepartmentsPage: React.FC = () => {
 
         {/* Department Tree */}
         <Grid>
-          <Grid.Col span={{ base: 12, md: 8 }}>
+          <Grid.Col span={{ base: 12, md: selectedDepartment ? 8 : 12 }}>
             <Card padding="lg" radius="md" withBorder>
               <Text fw={600} size="lg" mb="md">
                 Department Hierarchy
               </Text>
               <DepartmentTree
                 selectedDepartmentId={selectedDepartment?.id}
+                onSelectDepartment={handleDepartmentSelect}
+                onCreateDepartment={
+                  canCreate ? handleOpenCreateModal : undefined
+                }
                 onEditDepartment={canEdit ? handleEditDepartment : undefined}
               />
             </Card>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            {selectedDepartment ? (
-              <Card padding="lg" radius="md" withBorder>
-                <Text fw={600} size="lg" mb="md">
-                  Department Details
-                </Text>
-                <Stack gap="sm">
-                  <div>
-                    <Text size="sm" fw={500} c="dimmed">
-                      Name
-                    </Text>
-                    <Text>{selectedDepartment.name}</Text>
-                  </div>
-                  {selectedDepartment.description && (
-                    <div>
-                      <Text size="sm" fw={500} c="dimmed">
-                        Description
-                      </Text>
-                      <Text>{selectedDepartment.description}</Text>
-                    </div>
-                  )}
-                  <div>
-                    <Text size="sm" fw={500} c="dimmed">
-                      Employee Count
-                    </Text>
-                    <Text>{selectedDepartment.employeeCount || 0}</Text>
-                  </div>
-                  <div>
-                    <Text size="sm" fw={500} c="dimmed">
-                      Created
-                    </Text>
-                    <Text>
-                      {selectedDepartment.createdAt
-                        ? new Date(
-                            selectedDepartment.createdAt
-                          ).toLocaleDateString()
-                        : 'Unknown'}
-                    </Text>
-                  </div>
-                </Stack>
-
-                {(canEdit || canDelete) && (
-                  <Group gap="sm" mt="lg">
-                    {canEdit && (
-                      <Button
-                        variant="light"
-                        onClick={() => handleEditDepartment(selectedDepartment)}
-                      >
-                        Edit
-                      </Button>
-                    )}
-                    {canDelete && (
-                      <Button
-                        variant="light"
-                        color="red"
-                        onClick={() =>
-                          handleDeleteDepartment(selectedDepartment)
-                        }
-                      >
-                        Delete
-                      </Button>
-                    )}
-                  </Group>
-                )}
-              </Card>
-            ) : (
-              <Card padding="lg" radius="md" withBorder>
-                <Text c="dimmed" ta="center">
-                  Select a department to view details
-                </Text>
-              </Card>
-            )}
-          </Grid.Col>
+          {selectedDepartment && (
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <DepartmentDetail
+                department={selectedDepartment}
+                onEdit={handleEditDepartment}
+                onDelete={handleDeleteDepartment}
+                onClose={() => setSelectedDepartment(null)}
+                onCreateChild={handleOpenCreateModal}
+                canEdit={canEdit}
+                canDelete={canDelete}
+              />
+            </Grid.Col>
+          )}
         </Grid>
 
         {/* Create Department Modal */}
         <Modal
           opened={createModalOpened}
-          onClose={closeCreateModal}
+          onClose={() => {
+            closeCreateModal();
+            setCreatingParentId(null);
+          }}
           title="Create New Department"
           size="md"
         >
           <DepartmentForm
-            onSuccess={() => {
-              handleCreateDepartment({});
+            parentId={creatingParentId ?? undefined}
+            onSuccess={handleCreateDepartment}
+            onCancel={() => {
+              closeCreateModal();
+              setCreatingParentId(null);
             }}
-            onCancel={closeCreateModal}
+            isLoading={createDepartment.isPending}
+            error={createDepartment.error}
           />
         </Modal>
 
@@ -307,13 +267,13 @@ const DepartmentsPage: React.FC = () => {
           {editingDepartment && (
             <DepartmentForm
               department={editingDepartment}
-              onSuccess={() => {
-                handleUpdateDepartment({});
-              }}
+              onSuccess={handleUpdateDepartment}
               onCancel={() => {
                 closeEditModal();
                 setEditingDepartment(null);
               }}
+              isLoading={updateDepartment.isPending}
+              error={updateDepartment.error}
             />
           )}
         </Modal>

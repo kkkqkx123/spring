@@ -13,10 +13,6 @@ import {
 import { IconBuilding, IconAlertCircle } from '@tabler/icons-react';
 import { z } from 'zod';
 import { DepartmentSelect } from './DepartmentSelect';
-import {
-  useCreateDepartment,
-  useUpdateDepartment,
-} from '../hooks/useDepartmentTree';
 import type { Department } from '../../../types';
 
 // Helper to extract error message
@@ -45,8 +41,10 @@ type DepartmentFormData = z.infer<typeof departmentSchema>;
 interface DepartmentFormProps {
   department?: Department;
   parentId?: number;
-  onSuccess?: () => void;
+  onSuccess?: (data: any) => void;
   onCancel?: () => void;
+  isLoading?: boolean;
+  error?: any;
 }
 
 export const DepartmentForm: React.FC<DepartmentFormProps> = ({
@@ -54,10 +52,10 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
   parentId,
   onSuccess,
   onCancel,
+  isLoading,
+  error,
 }) => {
   const isEditing = !!department;
-  const createDepartment = useCreateDepartment();
-  const updateDepartment = useUpdateDepartment();
 
   const form = useForm<DepartmentFormData>({
     validate: zodResolver(departmentSchema),
@@ -68,33 +66,16 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
     },
   });
 
-  const handleSubmit = async (values: DepartmentFormData) => {
-    try {
-      const departmentData = {
-        name: values.name,
-        description: values.description || undefined,
-        parentId: values.parentId ? parseInt(values.parentId) : undefined,
-      };
-
-      if (isEditing) {
-        await updateDepartment.mutateAsync({
-          id: department.id,
-          ...departmentData,
-        });
-      } else {
-        await createDepartment.mutateAsync(departmentData);
-      }
-
-      onSuccess?.();
-    } catch (error) {
-      // Error handling is done in the hooks
-      console.error('Form submission error:', error);
-    }
+  const handleSubmit = (values: DepartmentFormData) => {
+    const departmentData = {
+      name: values.name,
+      description: values.description || undefined,
+      parentId: values.parentId ? parseInt(values.parentId) : undefined,
+    };
+    onSuccess?.(departmentData);
   };
 
-  const isLoading = createDepartment.isPending || updateDepartment.isPending;
-  const mutationError = createDepartment.error || updateDepartment.error;
-  const errorMessage = getErrorMessage(mutationError);
+  const errorMessage = getErrorMessage(error);
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)} noValidate>

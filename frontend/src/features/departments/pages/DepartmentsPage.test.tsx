@@ -21,7 +21,6 @@ vi.mock('../hooks/useDepartmentTree', () => ({
   useDeleteDepartment: vi.fn(),
 }));
 
-// Mock the components
 vi.mock('../components/DepartmentTree', () => ({
   DepartmentTree: ({
     onSelectDepartment,
@@ -39,22 +38,6 @@ vi.mock('../components/DepartmentTree', () => ({
       <button onClick={() => onEditDepartment({ id: 1, name: 'Engineering' })}>
         Edit Engineering
       </button>
-    </div>
-  ),
-}));
-
-vi.mock('../components/DepartmentDetail', () => ({
-  DepartmentDetail: ({
-    departmentId,
-    onCreateChild,
-    onDelete,
-    onClose,
-  }: any) => (
-    <div data-testid="department-detail">
-      <span>Department ID: {departmentId}</span>
-      <button onClick={() => onCreateChild()}>Add Child</button>
-      <button onClick={() => onDelete()}>Delete</button>
-      <button onClick={() => onClose()}>Close</button>
     </div>
   ),
 }));
@@ -158,7 +141,7 @@ describe('DepartmentsPage', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('department-detail')).toBeInTheDocument();
-      expect(screen.getByText('Department ID: 1')).toBeInTheDocument();
+      expect(screen.getByText('Engineering')).toBeInTheDocument();
     });
   });
 
@@ -283,29 +266,21 @@ describe('DepartmentsPage', () => {
     });
 
     // Delete the department
-    const deleteButton = screen.getByText('Delete');
+    const deleteButton = screen.getByRole('button', { name: 'Delete' });
     fireEvent.click(deleteButton);
 
+    // Confirm deletion in modal
+    await waitFor(async () => {
+      const confirmButton = await screen.findByRole('button', {
+        name: /delete department/i,
+      });
+      fireEvent.click(confirmButton);
+    });
+
     await waitFor(() => {
+      expect(mockDeleteDepartment).toHaveBeenCalledWith(1);
       expect(screen.queryByTestId('department-detail')).not.toBeInTheDocument();
     });
-  });
-
-  it('refreshes data when refresh button is clicked', () => {
-    // Mock window.location.reload
-    const mockReload = vi.fn();
-    Object.defineProperty(window, 'location', {
-      value: { reload: mockReload },
-      writable: true,
-    });
-
-    render(<DepartmentsPage />, { wrapper: createWrapper() });
-
-    // Find and click refresh button (it's an ActionIcon with tooltip)
-    const refreshButton = screen.getByLabelText('Refresh');
-    fireEvent.click(refreshButton);
-
-    expect(mockReload).toHaveBeenCalled();
   });
 
   it('adjusts grid layout based on selection', async () => {
