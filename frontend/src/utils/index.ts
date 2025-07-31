@@ -117,24 +117,7 @@ export const fileUtils = {
 };
 
 // Validation utilities
-export const validation = {
-  isEmail: (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  },
-
-  isPhone: (phone: string): boolean => {
-    const phoneRegex = /^\+?[\d\s\-()]+$/;
-    return phoneRegex.test(phone);
-  },
-
-  isStrongPassword: (password: string): boolean => {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    const strongPasswordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
-    return strongPasswordRegex.test(password);
-  },
-};
+export * from './validation';
 
 // Array utilities
 export const arrayUtils = {

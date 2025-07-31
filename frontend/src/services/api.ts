@@ -304,3 +304,6 @@ class ApiClient {
 // Create and export a singleton instance
 export const apiClient = new ApiClient();
 export default apiClient;
+
+// Export the class for type usage
+export { ApiClient };

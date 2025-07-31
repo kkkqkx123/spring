@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import {
@@ -179,12 +181,8 @@ describe('useLoadingState', () => {
 
     expect(result.current.isLoading).toBe(false);
 
-    // Catch the rejection to prevent unhandled promise rejection
-    try {
-      await promise;
-    } catch (error) {
-      // Expected to be aborted
-    }
+    // We expect the promise to be rejected, and this handles the rejection gracefully.
+    await expect(promise!).rejects.toThrow('Aborted');
   });
 });
 

@@ -1,9 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { AuthService } from './auth';
 import { apiClient } from './api';
-import { webSocketService } from './websocket';
 import { storage } from '../utils';
-import { STORAGE_KEYS } from '../constants';
 
 // Mock dependencies
 vi.mock('./api');

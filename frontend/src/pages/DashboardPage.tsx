@@ -93,10 +93,6 @@ const DashboardPage: React.FC = () => {
     ['ADMIN', 'HR_MANAGER'].includes(role.name)
   );
 
-  const canViewPermissions = user?.roles.some(role =>
-    ['ADMIN'].includes(role.name)
-  );
-
   return (
     <Container size="xl" py="xl">
       <Stack gap="xl">

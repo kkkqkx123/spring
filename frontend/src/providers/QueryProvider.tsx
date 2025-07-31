@@ -12,13 +12,7 @@ export const QueryProvider: React.FC<QueryProviderProps> = ({ children }) => {
     <QueryClientProvider client={queryClient}>
       {children}
       {/* Show React Query DevTools in development */}
-      {import.meta.env.DEV && (
-        <ReactQueryDevtools
-          initialIsOpen={false}
-          position="bottom-right"
-          buttonPosition="bottom-right"
-        />
-      )}
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 };

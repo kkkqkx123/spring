@@ -35,6 +35,10 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
+  bio?: string;
+  profilePicture?: string;
+  department?: Department;
   roles: Role[];
   enabled: boolean;
   createdAt: string;
@@ -48,6 +52,12 @@ export interface Role {
 }
 
 export interface Permission {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface Resource {
   id: number;
   name: string;
   description?: string;
@@ -100,11 +110,28 @@ export interface Department {
   createdAt: string;
 }
 
+export interface DepartmentDto {
+  id: number;
+  name: string;
+  description?: string;
+  parentId?: number;
+  parentName?: string;
+  children?: DepartmentDto[];
+}
+
 export interface Position {
   id: number;
   title: string;
   description?: string;
   departmentId: number;
+}
+
+export interface PositionDto {
+  id: number;
+  title: string;
+  description?: string;
+  departmentId: number;
+  departmentName?: string;
 }
 
 export type EmployeeStatus = 'ACTIVE' | 'INACTIVE' | 'TERMINATED';
@@ -131,6 +158,22 @@ export interface ChatMessage {
   recipientName: string;
   createdAt: string;
   read: boolean;
+}
+
+export interface ChatMessageRequest {
+  recipientId: number;
+  content: string;
+}
+
+export interface ChatMessageResponse {
+  id: number;
+  content: string;
+  senderId: number;
+  senderName: string;
+  recipientId: number;
+  recipientName: string;
+  createdAt: string;
+  isRead: boolean;
 }
 
 export interface Conversation {

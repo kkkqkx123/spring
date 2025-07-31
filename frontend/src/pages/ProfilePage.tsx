@@ -15,7 +15,6 @@ import {
   Switch,
   Select,
   Textarea,
-  ActionIcon,
   FileInput,
   Alert,
 } from '@mantine/core';
@@ -111,7 +110,7 @@ const ProfilePage: React.FC = () => {
     },
   });
 
-  const handleProfileSubmit = (values: ProfileFormData) => {
+  const handleProfileSubmit = (_values: ProfileFormData) => {
     // Simulate API call
     setTimeout(() => {
       notifications.show({
@@ -124,7 +123,7 @@ const ProfilePage: React.FC = () => {
     }, 1000);
   };
 
-  const handleSecuritySubmit = (values: SecurityFormData) => {
+  const handleSecuritySubmit = (_values: SecurityFormData) => {
     // Simulate API call
     setTimeout(() => {
       notifications.show({
@@ -138,7 +137,7 @@ const ProfilePage: React.FC = () => {
     }, 1000);
   };
 
-  const handlePreferencesSubmit = (values: PreferencesData) => {
+  const handlePreferencesSubmit = (_values: PreferencesData) => {
     // Simulate API call
     setTimeout(() => {
       notifications.show({

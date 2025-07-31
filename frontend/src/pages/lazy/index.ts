@@ -1,16 +1,14 @@
-import {
-  lazyImport,
-  lazyWithRetry,
-  preloadComponent,
-} from '../../utils/lazyImport';
+import { lazyWithRetry, preloadComponent } from '../../utils/lazyImport';
 
 // Lazy load feature pages with retry functionality
 export const DashboardPage = lazyWithRetry(() => import('../DashboardPage'));
 export const EmployeesPage = lazyWithRetry(
   () => import('../../features/employees/pages/EmployeesPage')
 );
-export const EmployeePage = lazyWithRetry(
-  () => import('../../features/employees/pages/EmployeePage')
+export const EmployeePage = lazyWithRetry(() =>
+  import('../../features/employees/pages/EmployeePage').then(module => ({
+    default: module.EmployeePage,
+  }))
 );
 export const DepartmentsPage = lazyWithRetry(
   () => import('../../features/departments/pages/DepartmentsPage')

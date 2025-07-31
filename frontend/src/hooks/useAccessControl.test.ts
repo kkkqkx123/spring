@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {

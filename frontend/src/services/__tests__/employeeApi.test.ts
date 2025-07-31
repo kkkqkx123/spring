@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 import { employeeApi } from '../employeeApi';
 import { apiClient } from '../api';
 
@@ -12,7 +12,7 @@ vi.mock('../api', () => ({
   },
 }));
 
-const mockApiClient = apiClient as any;
+const mockApiClient = apiClient as Mocked<typeof apiClient>;
 
 describe('employeeApi', () => {
   beforeEach(() => {
@@ -70,6 +70,16 @@ describe('employeeApi', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         employeeNumber: 'EMP001',
+        department: {
+          id: 1,
+          name: 'Engineering',
+          description: 'Engineering department',
+          employeeCount: 1,
+          createdAt: new Date().toISOString(),
+        },
+        position: { id: 1, title: 'Software Engineer', departmentId: 1 },
+        hireDate: new Date().toISOString(),
+        status: 'ACTIVE' as const,
       };
       const createdEmployee = { id: 1, ...newEmployee };
 
@@ -91,7 +101,7 @@ describe('employeeApi', () => {
       };
 
       mockApiClient.post.mockRejectedValue(new Error('Validation error'));
-
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(employeeApi.create(invalidEmployee as any)).rejects.toThrow(
         'Validation error'
       );
@@ -105,6 +115,17 @@ describe('employeeApi', () => {
         firstName: 'John',
         lastName: 'Doe Updated',
         email: 'john.updated@example.com',
+        employeeNumber: 'EMP001',
+        department: {
+          id: 1,
+          name: 'Engineering',
+          description: 'Engineering department',
+          employeeCount: 1,
+          createdAt: new Date().toISOString(),
+        },
+        position: { id: 1, title: 'Software Engineer', departmentId: 1 },
+        hireDate: new Date().toISOString(),
+        status: 'ACTIVE' as const,
       };
 
       mockApiClient.put.mockResolvedValue(updatedEmployee);
@@ -318,6 +339,7 @@ describe('employeeApi', () => {
 
       mockApiClient.post.mockRejectedValue(validationError);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(employeeApi.create({} as any)).rejects.toEqual(
         validationError
       );

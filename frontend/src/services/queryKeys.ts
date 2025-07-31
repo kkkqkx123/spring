@@ -24,7 +24,8 @@ export const queryKeys = {
     list: (params: Record<string, unknown>) =>
       ['departments', 'list', params] as const,
     detail: (id: number) => ['departments', 'detail', id] as const,
-    children: (parentId: number) => ['departments', 'children', parentId] as const,
+    children: (parentId: number) =>
+      ['departments', 'children', parentId] as const,
     byName: (name: string) => ['departments', 'byName', name] as const,
   },
 
@@ -34,7 +35,8 @@ export const queryKeys = {
     byDepartment: (departmentId: number) =>
       ['positions', 'department', departmentId] as const,
     detail: (id: number) => ['positions', 'detail', id] as const,
-    search: (searchTerm?: string) => ['positions', 'search', searchTerm] as const,
+    search: (searchTerm?: string) =>
+      ['positions', 'search', searchTerm] as const,
     hasEmployees: (id: number) => ['positions', 'hasEmployees', id] as const,
   },
 
@@ -52,14 +54,17 @@ export const queryKeys = {
     search: (query: string, params: Record<string, unknown>) =>
       ['chat', 'search', query, params] as const,
     recent: (limit: number) => ['chat', 'recent', limit] as const,
-    dateRange: (startDate: string, endDate: string, params: Record<string, unknown>) =>
-      ['chat', 'dateRange', startDate, endDate, params] as const,
+    dateRange: (
+      startDate: string,
+      endDate: string,
+      params: Record<string, unknown>
+    ) => ['chat', 'dateRange', startDate, endDate, params] as const,
   },
 
   // Email
   email: {
     templates: ['email', 'templates'] as const,
-    preview: (templateName: string, variables: Record<string, any>) =>
+    preview: (templateName: string, variables: Record<string, unknown>) =>
       ['email', 'preview', templateName, variables] as const,
   },
 
@@ -89,12 +94,17 @@ export const queryKeys = {
     list: (params: Record<string, unknown>) =>
       ['payroll', 'list', params] as const,
     detail: (id: number) => ['payroll', 'detail', id] as const,
-    search: (criteria: Record<string, unknown>, params: Record<string, unknown>) =>
-      ['payroll', 'search', criteria, params] as const,
+    search: (
+      criteria: Record<string, unknown>,
+      params: Record<string, unknown>
+    ) => ['payroll', 'search', criteria, params] as const,
     byEmployee: (employeeId: number, params: Record<string, unknown>) =>
       ['payroll', 'employee', employeeId, params] as const,
-    byPayPeriod: (year: number, month: number, params: Record<string, unknown>) =>
-      ['payroll', 'payPeriod', year, month, params] as const,
+    byPayPeriod: (
+      year: number,
+      month: number,
+      params: Record<string, unknown>
+    ) => ['payroll', 'payPeriod', year, month, params] as const,
     byDepartment: (departmentId: number, params: Record<string, unknown>) =>
       ['payroll', 'department', departmentId, params] as const,
     statsByDepartment: (year: number, month: number) =>
@@ -103,7 +113,10 @@ export const queryKeys = {
       ['payroll', 'stats', 'status', year, month] as const,
     totalAmount: (year: number, month: number) =>
       ['payroll', 'total', year, month] as const,
-    totalAmountByDepartment: (departmentId: number, year: number, month: number) =>
-      ['payroll', 'total', 'department', departmentId, year, month] as const,
+    totalAmountByDepartment: (
+      departmentId: number,
+      year: number,
+      month: number
+    ) => ['payroll', 'total', 'department', departmentId, year, month] as const,
   },
 } as const;
