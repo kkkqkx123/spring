@@ -10,6 +10,33 @@ interface PerformanceMetrics {
   timestamp: number;
 }
 
+// Custom interfaces for non-standard APIs
+interface PerformanceWithMemory extends Performance {
+  memory: {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection: {
+    effectiveType: string;
+    downlink: number;
+    rtt: number;
+    saveData: boolean;
+  };
+}
+
+interface LayoutShift extends PerformanceEntry {
+  value: number;
+  hadRecentInput: boolean;
+}
+
+interface PerformanceEventTiming extends PerformanceEntry {
+  processingStart: number;
+}
+
 // Performance observer for Core Web Vitals
 class PerformanceMonitor {
   private metrics: PerformanceMetrics[] = [];
@@ -25,14 +52,16 @@ class PerformanceMonitor {
       try {
         const lcpObserver = new PerformanceObserver(list => {
           const entries = list.getEntries();
-          const lastEntry = entries[entries.length - 1] as any;
+          const lastEntry = entries[entries.length - 1];
 
-          this.recordMetric({
-            name: 'LCP',
-            value: lastEntry.startTime,
-            rating: this.getLCPRating(lastEntry.startTime),
-            timestamp: Date.now(),
-          });
+          if (lastEntry) {
+            this.recordMetric({
+              name: 'LCP',
+              value: lastEntry.startTime,
+              rating: this.getLCPRating(lastEntry.startTime),
+              timestamp: Date.now(),
+            });
+          }
         });
 
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
@@ -44,8 +73,8 @@ class PerformanceMonitor {
       // First Input Delay (FID)
       try {
         const fidObserver = new PerformanceObserver(list => {
-          const entries = list.getEntries();
-          entries.forEach((entry: any) => {
+          const entries = list.getEntries() as PerformanceEventTiming[];
+          entries.forEach(entry => {
             this.recordMetric({
               name: 'FID',
               value: entry.processingStart - entry.startTime,
@@ -67,8 +96,8 @@ class PerformanceMonitor {
       try {
         let clsValue = 0;
         const clsObserver = new PerformanceObserver(list => {
-          const entries = list.getEntries();
-          entries.forEach((entry: any) => {
+          const entries = list.getEntries() as LayoutShift[];
+          entries.forEach(entry => {
             if (!entry.hadRecentInput) {
               clsValue += entry.value;
             }
@@ -188,7 +217,7 @@ export const logBundleInfo = () => {
 // Memory usage monitoring
 export const monitorMemoryUsage = () => {
   if ('memory' in performance) {
-    const memory = (performance as any).memory;
+    const memory = (performance as PerformanceWithMemory).memory;
 
     const memoryInfo = {
       usedJSHeapSize: Math.round(memory.usedJSHeapSize / 1048576), // MB
@@ -238,7 +267,7 @@ export const measureRenderTime = (componentName: string) => {
 // Network performance monitoring
 export const monitorNetworkPerformance = () => {
   if ('connection' in navigator) {
-    const connection = (navigator as any).connection;
+    const connection = (navigator as NavigatorWithConnection).connection;
 
     const networkInfo = {
       effectiveType: connection.effectiveType,

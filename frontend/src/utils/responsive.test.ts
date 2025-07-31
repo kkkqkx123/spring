@@ -20,15 +20,17 @@ const mockInnerWidth = (width: number) => {
 
 // Mock window.addEventListener and removeEventListener
 const mockEventListener = () => {
-  const listeners: { [key: string]: EventListener[] } = {};
+  const listeners: { [key: string]: EventListenerOrEventListenerObject[] } = {};
 
-  window.addEventListener = vi.fn((event: string, listener: EventListener) => {
-    if (!listeners[event]) listeners[event] = [];
-    listeners[event].push(listener);
-  });
+  window.addEventListener = vi.fn(
+    (event: string, listener: EventListenerOrEventListenerObject) => {
+      if (!listeners[event]) listeners[event] = [];
+      listeners[event].push(listener);
+    }
+  );
 
   window.removeEventListener = vi.fn(
-    (event: string, listener: EventListener) => {
+    (event: string, listener: EventListenerOrEventListenerObject) => {
       if (listeners[event]) {
         listeners[event] = listeners[event].filter(l => l !== listener);
       }
@@ -38,7 +40,11 @@ const mockEventListener = () => {
   return {
     trigger: (event: string) => {
       if (listeners[event]) {
-        listeners[event].forEach(listener => listener(new Event(event)));
+        listeners[event].forEach(listener => {
+          if (typeof listener === 'function') {
+            listener(new Event(event));
+          }
+        });
       }
     },
   };
@@ -47,45 +53,36 @@ const mockEventListener = () => {
 describe('Responsive Utilities', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockEventListener();
   });
 
   describe('useScreenSize', () => {
     it('should return xs for screen width < 576px', () => {
       mockInnerWidth(500);
-      mockEventListener();
-
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('xs');
     });
 
     it('should return sm for screen width 576-767px', () => {
       mockInnerWidth(700);
-      mockEventListener();
-
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('sm');
     });
 
     it('should return md for screen width 768-991px', () => {
       mockInnerWidth(900);
-      mockEventListener();
-
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('md');
     });
 
     it('should return lg for screen width 992-1199px', () => {
       mockInnerWidth(1100);
-      mockEventListener();
-
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('lg');
     });
 
     it('should return xl for screen width >= 1200px', () => {
       mockInnerWidth(1300);
-      mockEventListener();
-
       const { result } = renderHook(() => useScreenSize());
       expect(result.current).toBe('xl');
     });
@@ -109,24 +106,18 @@ describe('Responsive Utilities', () => {
   describe('useIsMobile', () => {
     it('should return true for xs screen size', () => {
       mockInnerWidth(500);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsMobile());
       expect(result.current).toBe(true);
     });
 
     it('should return true for sm screen size', () => {
       mockInnerWidth(700);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsMobile());
       expect(result.current).toBe(true);
     });
 
     it('should return false for md and larger screen sizes', () => {
       mockInnerWidth(900);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsMobile());
       expect(result.current).toBe(false);
     });
@@ -135,16 +126,12 @@ describe('Responsive Utilities', () => {
   describe('useIsTablet', () => {
     it('should return true for md screen size', () => {
       mockInnerWidth(900);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsTablet());
       expect(result.current).toBe(true);
     });
 
     it('should return false for non-md screen sizes', () => {
       mockInnerWidth(700);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsTablet());
       expect(result.current).toBe(false);
     });
@@ -153,24 +140,18 @@ describe('Responsive Utilities', () => {
   describe('useIsDesktop', () => {
     it('should return true for lg screen size', () => {
       mockInnerWidth(1100);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsDesktop());
       expect(result.current).toBe(true);
     });
 
     it('should return true for xl screen size', () => {
       mockInnerWidth(1300);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsDesktop());
       expect(result.current).toBe(true);
     });
 
     it('should return false for smaller screen sizes', () => {
       mockInnerWidth(900);
-      mockEventListener();
-
       const { result } = renderHook(() => useIsDesktop());
       expect(result.current).toBe(false);
     });
@@ -179,8 +160,6 @@ describe('Responsive Utilities', () => {
   describe('useResponsiveValue', () => {
     it('should return appropriate value for current screen size', () => {
       mockInnerWidth(900); // md
-      mockEventListener();
-
       const values = {
         xs: 'mobile',
         sm: 'mobile',
@@ -188,33 +167,26 @@ describe('Responsive Utilities', () => {
         lg: 'desktop',
         xl: 'desktop',
       };
-
       const { result } = renderHook(() => useResponsiveValue(values));
       expect(result.current).toBe('tablet');
     });
 
     it('should fallback to smaller breakpoint if current not defined', () => {
       mockInnerWidth(900); // md
-      mockEventListener();
-
       const values = {
         xs: 'mobile',
         lg: 'desktop',
       };
-
       const { result } = renderHook(() => useResponsiveValue(values));
       expect(result.current).toBe('mobile');
     });
 
     it('should return first available value if no match found', () => {
       mockInnerWidth(500); // xs
-      mockEventListener();
-
       const values = {
         lg: 'desktop',
         xl: 'large-desktop',
       };
-
       const { result } = renderHook(() => useResponsiveValue(values));
       expect(result.current).toBe('desktop');
     });
@@ -227,11 +199,11 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       const touchEnd = {
         changedTouches: [{ clientX: 105, clientY: 105 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);
@@ -250,11 +222,11 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       const touchEnd = {
         changedTouches: [{ clientX: 200, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);
@@ -273,11 +245,11 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 200, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       const touchEnd = {
         changedTouches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);
@@ -296,11 +268,11 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 100, clientY: 200 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       const touchEnd = {
         changedTouches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);
@@ -319,11 +291,11 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       const touchEnd = {
         changedTouches: [{ clientX: 100, clientY: 200 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);
@@ -342,7 +314,7 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);
@@ -358,7 +330,7 @@ describe('Responsive Utilities', () => {
 
       const touchStart = {
         touches: [{ clientX: 100, clientY: 100 }],
-      } as React.TouchEvent;
+      } as unknown as React.TouchEvent;
 
       act(() => {
         result.current.onTouchStart(touchStart);

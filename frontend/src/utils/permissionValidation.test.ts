@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore, type AuthStore } from '../stores/authStore';
 import {
   permissionValidator,
   validatePermission,
@@ -16,7 +16,29 @@ import type { User, Role, Permission } from '../types';
 // Mock the auth store
 vi.mock('../stores/authStore');
 
-const mockUseAuthStore = useAuthStore as any;
+const mockUseAuthStore = vi.mocked(useAuthStore);
+
+const createMockAuthState = (user: User | null): AuthStore => ({
+  user,
+  token: user ? 'mock-token' : null,
+  isAuthenticated: !!user,
+  isLoading: false,
+  setUser: vi.fn(),
+  setToken: vi.fn(),
+  login: vi.fn(),
+  logout: vi.fn(),
+  setLoading: vi.fn(),
+  hasPermission: vi.fn(permission =>
+    user
+      ? user.roles.some(role =>
+          role.permissions.some(p => p.name === permission)
+        )
+      : false
+  ),
+  hasRole: vi.fn(roleName =>
+    user ? user.roles.some(r => r.name === roleName) : false
+  ),
+});
 
 const mockPermissions: Permission[] = [
   { id: 1, name: 'EMPLOYEE_READ', description: 'Read employees' },
@@ -81,7 +103,9 @@ describe('PermissionValidator', () => {
 
   describe('validatePermission', () => {
     it('should return allowed=true when user has required permission', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validatePermission('EMPLOYEE_READ');
 
@@ -90,7 +114,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user lacks required permission', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       const result = permissionValidator.validatePermission('EMPLOYEE_DELETE');
 
@@ -103,7 +129,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=true for admin users in non-strict mode', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.admin)
+      );
 
       const result = permissionValidator.validatePermission(
         'NONEXISTENT_PERMISSION'
@@ -113,7 +141,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false for admin users in strict mode', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.admin)
+      );
 
       const result = permissionValidator.validatePermission(
         'NONEXISTENT_PERMISSION',
@@ -127,7 +157,7 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user is not authenticated', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: null }));
+      mockUseAuthStore.getState = vi.fn(() => createMockAuthState(null));
 
       const result = permissionValidator.validatePermission('EMPLOYEE_READ');
 
@@ -138,7 +168,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should throw error when throwOnFailure is true', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       expect(() => {
         permissionValidator.validatePermission('EMPLOYEE_DELETE', {
@@ -150,7 +182,9 @@ describe('PermissionValidator', () => {
 
   describe('validateAnyPermission', () => {
     it('should return allowed=true when user has any of the required permissions', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateAnyPermission([
         'EMPLOYEE_READ',
@@ -161,7 +195,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user has none of the required permissions', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       const result = permissionValidator.validateAnyPermission([
         'EMPLOYEE_CREATE',
@@ -179,7 +215,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=true for admin users in non-strict mode', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.admin)
+      );
 
       const result = permissionValidator.validateAnyPermission([
         'NONEXISTENT_PERMISSION',
@@ -189,7 +227,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should throw error when throwOnFailure is true', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       expect(() => {
         permissionValidator.validateAnyPermission(
@@ -204,7 +244,9 @@ describe('PermissionValidator', () => {
 
   describe('validateAllPermissions', () => {
     it('should return allowed=true when user has all required permissions', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateAllPermissions([
         'EMPLOYEE_READ',
@@ -215,7 +257,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user lacks some required permissions', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateAllPermissions([
         'EMPLOYEE_READ',
@@ -233,7 +277,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=true for admin users in non-strict mode', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.admin)
+      );
 
       const result = permissionValidator.validateAllPermissions([
         'NONEXISTENT_PERMISSION',
@@ -243,7 +289,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should throw error when throwOnFailure is true', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       expect(() => {
         permissionValidator.validateAllPermissions(
@@ -258,7 +306,9 @@ describe('PermissionValidator', () => {
 
   describe('validateCrudOperation', () => {
     it('should validate create operation correctly', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateCrudOperation(
         'employee',
@@ -269,7 +319,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should validate read operation correctly', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       const result = permissionValidator.validateCrudOperation(
         'employee',
@@ -280,7 +332,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should validate update operation correctly', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       const result = permissionValidator.validateCrudOperation(
         'employee',
@@ -294,7 +348,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should validate delete operation correctly', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateCrudOperation(
         'employee',
@@ -308,7 +364,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should handle different resource names', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.admin }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.admin)
+      );
 
       const result = permissionValidator.validateCrudOperation(
         'department',
@@ -321,7 +379,9 @@ describe('PermissionValidator', () => {
 
   describe('validateRole', () => {
     it('should return allowed=true when user has required role', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateRole('MANAGER');
 
@@ -329,7 +389,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user lacks required role', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       const result = permissionValidator.validateRole('ADMIN');
 
@@ -338,7 +400,7 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user is not authenticated', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: null }));
+      mockUseAuthStore.getState = vi.fn(() => createMockAuthState(null));
 
       const result = permissionValidator.validateRole('USER');
 
@@ -347,7 +409,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should throw error when throwOnFailure is true', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       expect(() => {
         permissionValidator.validateRole('ADMIN', { throwOnFailure: true });
@@ -357,7 +421,9 @@ describe('PermissionValidator', () => {
 
   describe('validateRoles', () => {
     it('should return allowed=true when user has any required role (requireAll=false)', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateRoles(
         ['ADMIN', 'MANAGER'],
@@ -368,7 +434,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user has none of the required roles (requireAll=false)', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       const result = permissionValidator.validateRoles(
         ['ADMIN', 'MANAGER'],
@@ -382,7 +450,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=false when user lacks some required roles (requireAll=true)', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateRoles(
         ['ADMIN', 'MANAGER'],
@@ -394,7 +464,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should return allowed=true when user has all required roles (requireAll=true)', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.manager)
+      );
 
       const result = permissionValidator.validateRoles(['MANAGER'], true);
 
@@ -402,7 +474,9 @@ describe('PermissionValidator', () => {
     });
 
     it('should throw error when throwOnFailure is true', () => {
-      mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.user }));
+      mockUseAuthStore.getState = vi.fn(() =>
+        createMockAuthState(mockUsers.user)
+      );
 
       expect(() => {
         permissionValidator.validateRoles(['ADMIN', 'MANAGER'], false, {
@@ -415,7 +489,9 @@ describe('PermissionValidator', () => {
 
 describe('convenience functions', () => {
   beforeEach(() => {
-    mockUseAuthStore.getState = vi.fn(() => ({ user: mockUsers.manager }));
+    mockUseAuthStore.getState = vi.fn(() =>
+      createMockAuthState(mockUsers.manager)
+    );
   });
 
   it('should export validatePermission function', () => {

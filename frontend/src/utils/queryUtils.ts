@@ -91,6 +91,14 @@ export const clearEntityCache = (entityType: keyof typeof queryKeys) => {
   });
 };
 
+interface OptimisticUpdateContext<T> {
+  previousDetailData: T | undefined;
+  previousListData: Array<{
+    queryKey: readonly unknown[];
+    data: PaginatedResponse<T>;
+  }>;
+}
+
 // Optimistic update helper for single item updates
 export const createOptimisticItemUpdate = <T extends { id: number }>(
   detailQueryKey: readonly unknown[],
@@ -105,7 +113,7 @@ export const createOptimisticItemUpdate = <T extends { id: number }>(
       const previousDetailData = queryClient.getQueryData<T>(detailQueryKey);
       const previousListData: Array<{
         queryKey: readonly unknown[];
-        data: any;
+        data: PaginatedResponse<T>;
       }> = [];
 
       // Update detail cache
@@ -136,14 +144,18 @@ export const createOptimisticItemUpdate = <T extends { id: number }>(
 
       return { previousDetailData, previousListData };
     },
-    onError: (error: unknown, variables: unknown, context: any) => {
+    onError: (
+      error: unknown,
+      variables: unknown,
+      context: OptimisticUpdateContext<T> | undefined
+    ) => {
       // Rollback optimistic updates
       if (context?.previousDetailData) {
         queryClient.setQueryData(detailQueryKey, context.previousDetailData);
       }
 
       if (context?.previousListData) {
-        context.previousListData.forEach(({ queryKey, data }: any) => {
+        context.previousListData.forEach(({ queryKey, data }) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
@@ -234,7 +246,7 @@ export const batchInvalidate = (queryKeys: readonly unknown[][]) => {
 export const batchPrefetch = async (
   queries: Array<{
     queryKey: readonly unknown[];
-    queryFn: () => Promise<any>;
+    queryFn: () => Promise<unknown>;
     staleTime?: number;
   }>
 ) => {

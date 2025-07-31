@@ -46,6 +46,14 @@ export const PERFORMANCE_BUDGETS = {
   },
 };
 
+interface PerformanceWithMemory extends Performance {
+  memory: {
+    totalJSHeapSize: number;
+    usedJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
+}
+
 export class PerformanceTestRunner {
   private results: Map<string, number[]> = new Map();
 
@@ -93,7 +101,7 @@ export class PerformanceTestRunner {
 
   measureMemoryUsage(testName: string): number {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as PerformanceWithMemory).memory;
       const memoryUsage = memory.usedJSHeapSize / 1024 / 1024; // MB
 
       this.recordResult(`${testName}_memory`, memoryUsage);
@@ -167,10 +175,14 @@ export class PerformanceTestRunner {
 export const performanceTestRunner = new PerformanceTestRunner();
 
 // Utility functions for performance testing
-export function createLargeDataset(
-  size: number,
-  itemFactory?: (index: number) => any
-) {
+export function createLargeDataset<
+  T = {
+    id: number;
+    name: string;
+    value: number;
+    timestamp: number;
+  },
+>(size: number, itemFactory?: (index: number) => T): T[] {
   const defaultFactory = (index: number) => ({
     id: index + 1,
     name: `Item ${index + 1}`,
@@ -179,7 +191,7 @@ export function createLargeDataset(
   });
 
   return Array.from({ length: size }, (_, index) =>
-    itemFactory ? itemFactory(index) : defaultFactory(index)
+    itemFactory ? itemFactory(index) : (defaultFactory(index) as T)
   );
 }
 
@@ -224,7 +236,7 @@ export function detectLongTasks(): Promise<PerformanceEntry[]> {
           observer.disconnect();
           resolve(longTasks);
         }, 5000);
-      } catch (error) {
+      } catch {
         resolve([]);
       }
     } else {
@@ -233,13 +245,18 @@ export function detectLongTasks(): Promise<PerformanceEntry[]> {
   });
 }
 
+interface PerformanceResourceTimingWithRenderBlocking
+  extends PerformanceResourceTiming {
+  renderBlockingStatus: 'blocking' | 'non-blocking';
+}
+
 export function analyzeRenderBlocking(): {
-  blockingResources: PerformanceResourceTiming[];
+  blockingResources: PerformanceResourceTimingWithRenderBlocking[];
   totalBlockingTime: number;
 } {
   const resourceEntries = performance.getEntriesByType(
     'resource'
-  ) as PerformanceResourceTiming[];
+  ) as PerformanceResourceTimingWithRenderBlocking[];
 
   const blockingResources = resourceEntries.filter(entry => {
     // Consider CSS and synchronous JS as render-blocking
@@ -284,7 +301,7 @@ export function measureInteractionToNextPaint(): Promise<number> {
           observer.disconnect();
           resolve(0);
         }, 10000);
-      } catch (error) {
+      } catch {
         resolve(0);
       }
     } else {

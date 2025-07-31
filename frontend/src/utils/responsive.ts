@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+
 /**
  * Responsive utilities for consistent breakpoint handling
  */
@@ -189,5 +191,3 @@ export const useTouchGestures = (handlers: TouchGestureHandlers) => {
     onTouchMove: handleTouchMove,
   };
 };
-
-import { useState, useEffect, useRef } from 'react';

@@ -39,7 +39,7 @@ class MockWebSocket {
   }
 
   // Helper method to simulate receiving messages
-  simulateMessage(data: any) {
+  simulateMessage(data: unknown) {
     if (this.onmessage) {
       this.onmessage(
         new MessageEvent('message', { data: JSON.stringify(data) })
@@ -49,7 +49,8 @@ class MockWebSocket {
 }
 
 // Mock global WebSocket
-global.WebSocket = MockWebSocket as any;
+// @ts-expect-error: Mocking global WebSocket for testing
+global.WebSocket = MockWebSocket;
 
 describe('WebSocket Optimization Performance', () => {
   let manager: OptimizedWebSocketManager;
@@ -71,7 +72,8 @@ describe('WebSocket Optimization Performance', () => {
   describe('Message Batching Performance', () => {
     it('should batch multiple messages efficiently', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       const startTime = performance.now();
 
@@ -96,7 +98,8 @@ describe('WebSocket Optimization Performance', () => {
 
     it('should handle high-frequency messages without blocking', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       const renderTime = await measureRenderPerformance(async () => {
         // Simulate high-frequency updates (like typing indicators)
@@ -111,7 +114,8 @@ describe('WebSocket Optimization Performance', () => {
 
     it('should prioritize high-priority messages', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       // Send mixed priority messages
       manager.send('low-priority', { data: 'low' }, 'low');
@@ -132,7 +136,8 @@ describe('WebSocket Optimization Performance', () => {
   describe('Message Buffering Performance', () => {
     it('should buffer and batch similar message types', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       // Send multiple typing indicators
       for (let i = 0; i < 10; i++) {
@@ -156,7 +161,8 @@ describe('WebSocket Optimization Performance', () => {
 
     it('should flush buffers when they reach capacity', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       const messagesSent = [];
       const originalSend = mockWebSocket.send.bind(mockWebSocket);
@@ -187,7 +193,7 @@ describe('WebSocket Optimization Performance', () => {
 
       try {
         await failingManager.connect();
-      } catch (error) {
+      } catch {
         // Expected to fail
       }
 
@@ -202,7 +208,8 @@ describe('WebSocket Optimization Performance', () => {
 
     it('should reconnect efficiently after disconnection', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       // Simulate disconnection
       mockWebSocket.readyState = MockWebSocket.CLOSED;
@@ -293,7 +300,8 @@ describe('WebSocket Optimization Performance', () => {
   describe('Stress Testing', () => {
     it('should handle burst of messages without performance degradation', async () => {
       await manager.connect();
-      mockWebSocket = (manager as any).socket;
+      // @ts-expect-error: Accessing private property for test
+      mockWebSocket = manager.socket;
 
       const startTime = performance.now();
 

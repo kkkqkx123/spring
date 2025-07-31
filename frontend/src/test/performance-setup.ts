@@ -19,11 +19,16 @@ Object.defineProperty(window, 'performance', {
 });
 
 // Mock PerformanceObserver
-global.PerformanceObserver = vi.fn().mockImplementation(callback => ({
+const mockPerformanceObserver = vi.fn().mockImplementation(_callback => ({
   observe: vi.fn(),
   disconnect: vi.fn(),
   takeRecords: vi.fn(() => []),
 }));
+// Add the missing static property to the mock
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(mockPerformanceObserver as any).supportedEntryTypes = [];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+global.PerformanceObserver = mockPerformanceObserver as any;
 
 // Mock navigator.connection
 Object.defineProperty(navigator, 'connection', {
@@ -46,9 +51,17 @@ export const measureRenderPerformance = async (
   return endTime - startTime;
 };
 
+interface PerformanceWithMemory extends Performance {
+  memory: {
+    usedJSHeapSize: number;
+  };
+}
+
 export const measureMemoryUsage = (testFn: () => void) => {
-  const initialMemory = (performance as any).memory.usedJSHeapSize;
+  const initialMemory = (performance as PerformanceWithMemory).memory
+    .usedJSHeapSize;
   testFn();
-  const finalMemory = (performance as any).memory.usedJSHeapSize;
+  const finalMemory = (performance as PerformanceWithMemory).memory
+    .usedJSHeapSize;
   return finalMemory - initialMemory;
 };

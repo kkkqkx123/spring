@@ -20,7 +20,7 @@ interface AuthActions {
   hasRole: (role: string) => boolean;
 }
 
-type AuthStore = AuthState & AuthActions;
+export type AuthStore = AuthState & AuthActions;
 
 export const useAuthStore = create<AuthStore>()(
   persist(

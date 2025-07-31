@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
@@ -15,9 +16,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        {children}
-      </MantineProvider>
+      <MantineProvider>{children}</MantineProvider>
     </QueryClientProvider>
   );
 };
@@ -43,7 +42,7 @@ describe('Performance Tests', () => {
 
   it('renders large employee list within performance budget', async () => {
     const largeDataset = generateMockEmployees(1000);
-    
+
     // Mock API to return large dataset
     vi.mock('../../services/employeeApi', () => ({
       employeeApi: {
@@ -56,7 +55,7 @@ describe('Performance Tests', () => {
     }));
 
     const startTime = performance.now();
-    
+
     render(
       <TestWrapper>
         <EmployeeList />
@@ -77,7 +76,7 @@ describe('Performance Tests', () => {
 
   it('handles rapid state updates efficiently', async () => {
     const mockEmployees = generateMockEmployees(100);
-    
+
     vi.mock('../../services/employeeApi', () => ({
       employeeApi: {
         getAll: vi.fn().mockResolvedValue({
@@ -89,7 +88,7 @@ describe('Performance Tests', () => {
     }));
 
     const startTime = performance.now();
-    
+
     const { rerender } = render(
       <TestWrapper>
         <EmployeeList />
@@ -114,7 +113,7 @@ describe('Performance Tests', () => {
 
   it('memory usage stays within bounds during component lifecycle', async () => {
     const mockEmployees = generateMockEmployees(500);
-    
+
     vi.mock('../../services/employeeApi', () => ({
       employeeApi: {
         getAll: vi.fn().mockResolvedValue({
@@ -127,7 +126,7 @@ describe('Performance Tests', () => {
 
     // Measure initial memory (if available)
     const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
-    
+
     const { unmount } = render(
       <TestWrapper>
         <EmployeeList />
@@ -155,7 +154,7 @@ describe('Performance Tests', () => {
 
   it('virtual scrolling performs well with large datasets', async () => {
     const largeDataset = generateMockEmployees(10000);
-    
+
     vi.mock('../../services/employeeApi', () => ({
       employeeApi: {
         getAll: vi.fn().mockResolvedValue({
@@ -167,7 +166,7 @@ describe('Performance Tests', () => {
     }));
 
     const startTime = performance.now();
-    
+
     render(
       <TestWrapper>
         <EmployeeList />

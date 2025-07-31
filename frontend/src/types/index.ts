@@ -25,7 +25,7 @@ export interface ApiError {
   status: number;
   message: string;
   code?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 // User and Authentication types
@@ -225,7 +225,7 @@ export interface DataTableColumn<T> {
   key: keyof T;
   title: string;
   sortable?: boolean;
-  render?: (value: any, record: T) => React.ReactNode;
+  render?: (value: T[keyof T], record: T) => React.ReactNode;
 }
 
 export interface DataTableProps<T> {
