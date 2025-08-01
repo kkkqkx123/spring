@@ -1,9 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import { DataTable } from './DataTable';
-import { DataTableColumn } from '../../types';
+import type { DataTableColumn } from '../../types';
+import { vi } from 'vitest';
 
 // Test data
 interface TestData {
@@ -181,7 +182,7 @@ describe('DataTable', () => {
 
   it('handles non-sortable columns', async () => {
     const user = userEvent.setup();
-    const nonSortableColumns = [
+    const nonSortableColumns: DataTableColumn<TestData>[] = [
       { key: 'name', title: 'Name', sortable: false },
       { key: 'email', title: 'Email', sortable: true },
     ];

@@ -1,4 +1,4 @@
-import React, { Suspense, ComponentType } from 'react';
+import React, { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Center, Alert, Button, Stack } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';

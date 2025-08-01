@@ -123,7 +123,7 @@ export const FormErrorSummary: React.FC<FormErrorSummaryProps> = ({
                   {formatFieldName(fieldName)}:
                 </Text>
               )}
-              <Text size="sm">{error?.message}</Text>
+              <Text size="sm">{String(error?.message ?? '')}</Text>
             </Group>
           </List.Item>
         ))}
@@ -216,7 +216,6 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
     </Stack>
   );
 };
-
 /**
  * Utility function to format field names for display
  */
@@ -226,114 +225,4 @@ const formatFieldName = (fieldName: string): string => {
     .replace(/^./, str => str.toUpperCase())
     .replace(/_/g, ' ')
     .trim();
-};
-
-/**
- * Hook to validate password strength
- */
-export const usePasswordValidation = (password: string) => {
-  const rules = React.useMemo(
-    () => [
-      {
-        label: 'At least 8 characters long',
-        valid: password.length >= 8,
-      },
-      {
-        label: 'Contains uppercase letter',
-        valid: /[A-Z]/.test(password),
-      },
-      {
-        label: 'Contains lowercase letter',
-        valid: /[a-z]/.test(password),
-      },
-      {
-        label: 'Contains number',
-        valid: /\d/.test(password),
-      },
-      {
-        label: 'Contains special character',
-        valid: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      },
-    ],
-    [password]
-  );
-
-  const isValid = rules.every(rule => rule.valid);
-  const strength = rules.filter(rule => rule.valid).length;
-
-  return {
-    rules,
-    isValid,
-    strength,
-    strengthLabel: getPasswordStrengthLabel(strength),
-  };
-};
-
-const getPasswordStrengthLabel = (strength: number): string => {
-  switch (strength) {
-    case 0:
-    case 1:
-      return 'Very Weak';
-    case 2:
-      return 'Weak';
-    case 3:
-      return 'Fair';
-    case 4:
-      return 'Good';
-    case 5:
-      return 'Strong';
-    default:
-      return 'Unknown';
-  }
-};
-
-/**
- * Hook to handle form validation state
- */
-export const useFormValidation = () => {
-  const [touched, setTouched] = React.useState<Record<string, boolean>>({});
-  const [serverErrors, setServerErrors] = React.useState<
-    Record<string, string>
-  >({});
-
-  const markFieldTouched = (fieldName: string) => {
-    setTouched(prev => ({ ...prev, [fieldName]: true }));
-  };
-
-  const markAllFieldsTouched = (fieldNames: string[]) => {
-    const touchedFields = fieldNames.reduce(
-      (acc, name) => {
-        acc[name] = true;
-        return acc;
-      },
-      {} as Record<string, boolean>
-    );
-    setTouched(touchedFields);
-  };
-
-  const setServerError = (fieldName: string, error: string) => {
-    setServerErrors(prev => ({ ...prev, [fieldName]: error }));
-  };
-
-  const clearServerErrors = () => {
-    setServerErrors({});
-  };
-
-  const clearServerError = (fieldName: string) => {
-    setServerErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors[fieldName];
-      return newErrors;
-    });
-  };
-
-  return {
-    touched,
-    serverErrors,
-    markFieldTouched,
-    markAllFieldsTouched,
-    setServerError,
-    clearServerErrors,
-    clearServerError,
-  };
 };

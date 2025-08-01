@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Table,
   Checkbox,
@@ -20,19 +20,19 @@ import {
 } from '@tabler/icons-react';
 import type { DataTableProps } from '@/types';
 
-interface SortState {
-  key: string | null;
+interface SortState<T> {
+  key: keyof T | null;
   direction: 'asc' | 'desc' | null;
 }
 
-export function DataTable<T extends Record<string, any>>({
+export function DataTable<T extends object>({
   data,
   columns,
   loading = false,
   pagination,
   rowSelection,
 }: DataTableProps<T>) {
-  const [sortState, setSortState] = useState<SortState>({
+  const [sortState, setSortState] = useState<SortState<T>>({
     key: null,
     direction: null,
   });
@@ -44,8 +44,8 @@ export function DataTable<T extends Record<string, any>>({
     if (!searchTerm) return data;
 
     return data.filter(item =>
-      columns.some(column => {
-        const value = item[column.key];
+      columns.some(({ key }) => {
+        const value = item[key];
         return value
           ?.toString()
           .toLowerCase()
@@ -69,7 +69,7 @@ export function DataTable<T extends Record<string, any>>({
     });
   }, [filteredData, sortState]);
 
-  const handleSort = (columnKey: string) => {
+  const handleSort = (columnKey: keyof T) => {
     const column = columns.find(col => col.key === columnKey);
     if (!column?.sortable) return;
 
@@ -107,7 +107,7 @@ export function DataTable<T extends Record<string, any>>({
     rowSelection.onChange(newSelectedKeys, newSelectedRows);
   };
 
-  const getSortIcon = (columnKey: string) => {
+  const getSortIcon = (columnKey: keyof T) => {
     if (sortState.key !== columnKey) return null;
     return sortState.direction === 'asc' ? (
       <IconSortAscending size={14} />
@@ -192,16 +192,16 @@ export function DataTable<T extends Record<string, any>>({
                 )}
                 {columns.map(column => (
                   <Table.Th
-                    key={String(column.key)}
+                    key={column.key as React.Key}
                     style={{
                       cursor: column.sortable ? 'pointer' : 'default',
                       userSelect: 'none',
                     }}
-                    onClick={() => handleSort(String(column.key))}
+                    onClick={() => handleSort(column.key)}
                   >
                     <Group gap="xs" justify="space-between">
                       <Text fw={600}>{column.title}</Text>
-                      {column.sortable && getSortIcon(String(column.key))}
+                      {column.sortable && getSortIcon(column.key)}
                     </Group>
                   </Table.Th>
                 ))}
@@ -234,7 +234,7 @@ export function DataTable<T extends Record<string, any>>({
                       <Table.Td key={String(column.key)}>
                         {column.render
                           ? column.render(row[column.key], row)
-                          : row[column.key]?.toString() || '-'}
+                          : String(row[column.key] ?? '-')}
                       </Table.Td>
                     ))}
                   </Table.Tr>

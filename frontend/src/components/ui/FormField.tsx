@@ -3,6 +3,24 @@ import { Box, Text, Group, Tooltip } from '@mantine/core';
 import { IconInfoCircle, IconAsterisk } from '@tabler/icons-react';
 import type { FormFieldProps } from '@/types';
 
+// 定义通用表单组件的属性类型
+interface BaseFormComponentProps {
+  id?: string;
+  error?: boolean;
+  'aria-describedby'?: string;
+  'aria-required'?: boolean;
+  'aria-invalid'?: boolean;
+}
+
+// 定义支持 label 的表单组件属性类型
+interface LabeledFormComponentProps extends BaseFormComponentProps {
+  label?: string;
+}
+
+// 扩展 React.ReactElement 类型以支持我们的表单组件属性
+type FormReactElement = React.ReactElement<BaseFormComponentProps>;
+type LabeledFormReactElement = React.ReactElement<LabeledFormComponentProps>;
+
 export function FormField({
   label,
   error,
@@ -49,7 +67,7 @@ export function FormField({
 
       {/* Input Field */}
       <Box>
-        {React.cloneElement(children as React.ReactElement, {
+        {React.cloneElement(children as FormReactElement, {
           id: fieldId,
           error: !!error,
           'aria-describedby': error ? `${fieldId}-error` : undefined,
@@ -128,7 +146,7 @@ export function CheckboxFormField({
   const fieldId = React.useId();
   return (
     <Box {...props}>
-      {React.cloneElement(children as React.ReactElement, {
+      {React.cloneElement(children as LabeledFormReactElement, {
         label,
         error: !!error,
         'aria-required': required,
