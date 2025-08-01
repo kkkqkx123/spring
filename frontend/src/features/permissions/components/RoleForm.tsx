@@ -46,7 +46,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
           return 'Role name must be less than 50 characters';
         return null;
       },
-      description: (value: string | any[]) => {
+      description: (value: string) => {
         if (value && value.length > 255) {
           return 'Description must be less than 255 characters';
         }

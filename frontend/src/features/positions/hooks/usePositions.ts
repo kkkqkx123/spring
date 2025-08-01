@@ -1,21 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../../../services/queryKeys';
 import { apiClient } from '../../../services/api';
-import { Position } from '../../../types';
+import type { Position } from '../../../types';
 
 const positionApi = {
-  getPositions: async (): Promise<Position[]> => {
-    const response = await apiClient.get('/api/positions');
-    return response.data;
+  getPositions: (): Promise<Position[]> => {
+    return apiClient.get<Position[]>('/api/positions');
   },
 
-  getPositionsByDepartment: async (
-    departmentId: number
-  ): Promise<Position[]> => {
-    const response = await apiClient.get(
+  getPositionsByDepartment: (departmentId: number): Promise<Position[]> => {
+    return apiClient.get<Position[]>(
       `/api/positions/department/${departmentId}`
     );
-    return response.data;
   },
 };
 

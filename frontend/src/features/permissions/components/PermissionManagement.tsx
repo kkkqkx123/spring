@@ -5,7 +5,6 @@ import {
   Tabs,
   Stack,
   Group,
-  Button,
   Card,
   Text,
   Badge,
@@ -33,11 +32,8 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [selectedRoleId, setSelectedRoleId] = useState<number | undefined>();
 
-  const { data: roles = [], isLoading: rolesLoading } = useAllRoles();
-  const { data: permissions = [], isLoading: permissionsLoading } =
-    useAllPermissions();
-
-  const isLoading = rolesLoading || permissionsLoading;
+  const { data: roles = [] } = useAllRoles();
+  const { data: permissions = [] } = useAllPermissions();
 
   return (
     <Container size="xl" py="md">

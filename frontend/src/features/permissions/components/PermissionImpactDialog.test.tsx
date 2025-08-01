@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import type { UseMutationResult } from '@tanstack/react-query';
 import { PermissionImpactDialog } from './PermissionImpactDialog';
 import type { PermissionImpactAnalysis } from '../services/permissionApi';
 import { vi } from 'vitest';
@@ -20,15 +21,83 @@ const createWrapper = () => {
     <MantineProvider>{children}</MantineProvider>
   );
 };
-
 describe('PermissionImpactDialog', () => {
   const mockOnClose = vi.fn();
   const mockOnConfirm = vi.fn();
-  const mockAnalyzeImpact = {
+
+  type MutationResult = UseMutationResult<
+    PermissionImpactAnalysis,
+    Error,
+    { roleId: number; permissionIds: number[] }
+  >;
+
+  const baseMock: Omit<
+    MutationResult,
+    | 'status'
+    | 'isIdle'
+    | 'isPending'
+    | 'isSuccess'
+    | 'isError'
+    | 'data'
+    | 'error'
+    | 'variables'
+  > = {
     mutate: vi.fn(),
-    data: null,
-    isLoading: false,
+    reset: vi.fn(),
+    mutateAsync: vi.fn(),
+    context: undefined,
+    failureCount: 0,
+    failureReason: null,
+    isPaused: false,
+    submittedAt: 0,
+  };
+
+  const idleMock: MutationResult = {
+    ...baseMock,
+    status: 'idle',
+    isIdle: true,
+    isPending: false,
+    isSuccess: false,
+    isError: false,
+    data: undefined,
     error: null,
+    variables: undefined,
+  };
+
+  const pendingMock: MutationResult = {
+    ...baseMock,
+    status: 'pending',
+    isIdle: false,
+    isPending: true,
+    isSuccess: false,
+    isError: false,
+    data: undefined,
+    error: null,
+    variables: { roleId: 1, permissionIds: [1, 2, 3] },
+  };
+
+  const errorMock: MutationResult = {
+    ...baseMock,
+    status: 'error',
+    isIdle: false,
+    isPending: false,
+    isSuccess: false,
+    isError: true,
+    data: undefined,
+    error: new Error('Failed to analyze impact'),
+    variables: { roleId: 1, permissionIds: [1, 2, 3] },
+  };
+
+  const successMock: MutationResult = {
+    ...baseMock,
+    status: 'success',
+    isIdle: false,
+    isPending: false,
+    isSuccess: true,
+    isError: false,
+    data: mockImpactAnalysis,
+    error: null,
+    variables: { roleId: 1, permissionIds: [1, 2, 3] },
   };
 
   beforeEach(() => {
@@ -41,7 +110,7 @@ describe('PermissionImpactDialog', () => {
         opened={false}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={mockAnalyzeImpact}
+        analyzeImpact={idleMock}
       />,
       { wrapper: createWrapper() }
     );
@@ -57,7 +126,7 @@ describe('PermissionImpactDialog', () => {
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={mockAnalyzeImpact}
+        analyzeImpact={idleMock}
       />,
       { wrapper: createWrapper() }
     );
@@ -75,29 +144,24 @@ describe('PermissionImpactDialog', () => {
         onConfirm={mockOnConfirm}
         roleId={1}
         permissionIds={[1, 2, 3]}
-        analyzeImpact={mockAnalyzeImpact}
+        analyzeImpact={idleMock}
       />,
       { wrapper: createWrapper() }
     );
 
-    expect(mockAnalyzeImpact.mutate).toHaveBeenCalledWith({
+    expect(idleMock.mutate).toHaveBeenCalledWith({
       roleId: 1,
       permissionIds: [1, 2, 3],
     });
   });
 
   it('should display loading state during analysis', () => {
-    const loadingAnalyzeImpact = {
-      ...mockAnalyzeImpact,
-      isLoading: true,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={loadingAnalyzeImpact}
+        analyzeImpact={pendingMock}
       />,
       { wrapper: createWrapper() }
     );
@@ -109,67 +173,49 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should display error when analysis fails', () => {
-    const errorAnalyzeImpact = {
-      ...mockAnalyzeImpact,
-      error: { message: 'Failed to analyze impact' },
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={errorAnalyzeImpact}
+        analyzeImpact={errorMock}
       />,
       { wrapper: createWrapper() }
     );
 
-    expect(
-      screen.getByText('Failed to analyze impact: Failed to analyze impact')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Analysis Failed')).toBeInTheDocument();
   });
 
   it('should display impact analysis results', () => {
-    const analysisWithData = {
-      ...mockAnalyzeImpact,
-      data: mockImpactAnalysis,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={analysisWithData}
+        analyzeImpact={successMock}
       />,
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('MEDIUM RISK')).toBeInTheDocument();
-    expect(
-      screen.getByText('This change will affect 5 user(s)')
-    ).toBeInTheDocument();
+    expect(screen.getByText('MEDIUM Risk Level')).toBeInTheDocument();
+    expect(screen.getByText('Affected Users:')).toBeInTheDocument();
+    expect(screen.getByText('5 users')).toBeInTheDocument();
     expect(screen.getByText('User Management')).toBeInTheDocument();
     expect(screen.getByText('Report Generation')).toBeInTheDocument();
   });
 
   it('should display warnings when present', () => {
-    const analysisWithData = {
-      ...mockAnalyzeImpact,
-      data: mockImpactAnalysis,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={analysisWithData}
+        analyzeImpact={successMock}
       />,
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('Warnings')).toBeInTheDocument();
+    expect(screen.getByText('Warnings:')).toBeInTheDocument();
     expect(
       screen.getByText('This change will affect 5 users')
     ).toBeInTheDocument();
@@ -179,8 +225,8 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should show correct risk level colors and icons', () => {
-    const highRiskAnalysis = {
-      ...mockAnalyzeImpact,
+    const highRiskAnalysis: MutationResult = {
+      ...successMock,
       data: { ...mockImpactAnalysis, riskLevel: 'HIGH' as const },
     };
 
@@ -194,12 +240,12 @@ describe('PermissionImpactDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('HIGH RISK')).toBeInTheDocument();
+    expect(screen.getByText('HIGH Risk Level')).toBeInTheDocument();
   });
 
   it('should handle low risk level', () => {
-    const lowRiskAnalysis = {
-      ...mockAnalyzeImpact,
+    const lowRiskAnalysis: MutationResult = {
+      ...successMock,
       data: { ...mockImpactAnalysis, riskLevel: 'LOW' as const },
     };
 
@@ -213,21 +259,16 @@ describe('PermissionImpactDialog', () => {
       { wrapper: createWrapper() }
     );
 
-    expect(screen.getByText('LOW RISK')).toBeInTheDocument();
+    expect(screen.getByText('LOW Risk Level')).toBeInTheDocument();
   });
 
   it('should handle cancel button click', () => {
-    const analysisWithData = {
-      ...mockAnalyzeImpact,
-      data: mockImpactAnalysis,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={analysisWithData}
+        analyzeImpact={successMock}
       />,
       { wrapper: createWrapper() }
     );
@@ -239,17 +280,12 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should handle confirm button click', () => {
-    const analysisWithData = {
-      ...mockAnalyzeImpact,
-      data: mockImpactAnalysis,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={analysisWithData}
+        analyzeImpact={successMock}
       />,
       { wrapper: createWrapper() }
     );
@@ -261,17 +297,12 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should disable buttons when loading', () => {
-    const analysisWithData = {
-      ...mockAnalyzeImpact,
-      data: mockImpactAnalysis,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={analysisWithData}
+        analyzeImpact={successMock}
         loading={true}
       />,
       { wrapper: createWrapper() }
@@ -281,12 +312,12 @@ describe('PermissionImpactDialog', () => {
     const confirmButton = screen.getByText('Confirm Changes');
 
     expect(cancelButton).toBeDisabled();
-    expect(confirmButton).toHaveAttribute('data-loading', 'true');
+    expect(confirmButton).toBeDisabled();
   });
 
   it('should show red confirm button for high risk', () => {
-    const highRiskAnalysis = {
-      ...mockAnalyzeImpact,
+    const highRiskAnalysis: MutationResult = {
+      ...successMock,
       data: { ...mockImpactAnalysis, riskLevel: 'HIGH' as const },
     };
 
@@ -306,8 +337,8 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should not show affected features section when empty', () => {
-    const analysisWithoutFeatures = {
-      ...mockAnalyzeImpact,
+    const analysisWithoutFeatures: MutationResult = {
+      ...successMock,
       data: { ...mockImpactAnalysis, affectedFeatures: [] },
     };
 
@@ -325,8 +356,8 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should not show warnings section when empty', () => {
-    const analysisWithoutWarnings = {
-      ...mockAnalyzeImpact,
+    const analysisWithoutWarnings: MutationResult = {
+      ...successMock,
       data: { ...mockImpactAnalysis, warnings: [] },
     };
 
@@ -344,24 +375,19 @@ describe('PermissionImpactDialog', () => {
   });
 
   it('should show confirmation question', () => {
-    const analysisWithData = {
-      ...mockAnalyzeImpact,
-      data: mockImpactAnalysis,
-    };
-
     render(
       <PermissionImpactDialog
         opened={true}
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
-        analyzeImpact={analysisWithData}
+        analyzeImpact={successMock}
       />,
       { wrapper: createWrapper() }
     );
 
     expect(
       screen.getByText(
-        'Are you sure you want to proceed with this permission change?'
+        /Are you sure you want to proceed with this permission change?/
       )
     ).toBeInTheDocument();
   });

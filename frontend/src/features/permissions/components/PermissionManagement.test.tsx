@@ -5,11 +5,13 @@ import { MantineProvider } from '@mantine/core';
 import { PermissionManagement } from './PermissionManagement';
 import * as permissionHooks from '../hooks/usePermissions';
 import type { Role, Permission } from '../../../types';
-import { vi } from 'vitest';
+import { type Mock, vi } from 'vitest';
 
 // Mock the hooks
 vi.mock('../hooks/usePermissions');
-const mockHooks = permissionHooks as any;
+const mockHooks = permissionHooks as unknown as {
+  [K in keyof typeof permissionHooks]: Mock;
+};
 
 const mockRoles: Role[] = [
   { id: 1, name: 'Admin', permissions: [] },

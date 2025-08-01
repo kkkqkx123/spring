@@ -6,7 +6,7 @@ import {
   type RoleUpdateRequest,
   type UserRoleAssignment as UserRoleAssignmentRequest,
 } from '../services/permissionApi';
-import type { Role, Permission, User, Pageable } from '../../../types';
+import type { Pageable } from '../../../types';
 import { notifications } from '@mantine/notifications';
 
 // Roles
@@ -47,7 +47,7 @@ export const useCreateRole = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to create role',
@@ -73,7 +73,7 @@ export const useUpdateRole = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to update role',
@@ -96,7 +96,7 @@ export const useDeleteRole = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to delete role',
@@ -140,7 +140,7 @@ export const useAssignUserRoles = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to update user roles',
@@ -166,7 +166,7 @@ export const useRemoveUserRole = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to remove role from user',
@@ -218,7 +218,7 @@ export const useUpdateRolePermissions = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to update role permissions',
@@ -257,7 +257,7 @@ export const useBulkAssignRoles = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to assign roles to users',
@@ -286,7 +286,7 @@ export const useBulkRemoveRoles = () => {
         color: 'green',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to remove roles from users',

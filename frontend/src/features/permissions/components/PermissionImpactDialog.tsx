@@ -188,7 +188,7 @@ export const PermissionImpactDialog: React.FC<PermissionImpactDialogProps> = ({
             color="orange"
             onClick={onConfirm}
             loading={loading}
-            disabled={isAnalyzing || !impactData}
+            disabled={loading || isAnalyzing || !impactData}
           >
             Confirm Changes
           </Button>

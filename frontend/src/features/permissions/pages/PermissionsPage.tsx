@@ -28,25 +28,23 @@ import {
   useAllPermissions,
   useCreateRole,
 } from '../hooks/usePermissions';
+import type { RoleCreateRequest } from '../services/permissionApi';
 import { LoadingSkeleton } from '../../../components/ui/LoadingSkeleton';
 import { useAuth } from '../../../hooks/useAuth';
 
 const PermissionsPage: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>('matrix');
+  const [activeTab, setActiveTab] = useState<string | null>('matrix');
   const [
     createRoleModalOpened,
     { open: openCreateRoleModal, close: closeCreateRoleModal },
   ] = useDisclosure(false);
-
   // Queries and mutations
   const {
-    data: roles,
     isLoading: rolesLoading,
     error: rolesError,
     refetch: refetchRoles,
   } = useRoles();
-
   const {
     data: permissions,
     isLoading: permissionsLoading,
@@ -62,7 +60,7 @@ const PermissionsPage: React.FC = () => {
   const isLoading = rolesLoading || permissionsLoading;
   const error = rolesError || permissionsError;
 
-  const handleCreateRole = async (data: any) => {
+  const handleCreateRole = async (data: RoleCreateRequest) => {
     try {
       await createRole.mutateAsync(data);
       notifications.show({
@@ -151,15 +149,11 @@ const PermissionsPage: React.FC = () => {
             </Tabs.List>
 
             <Tabs.Panel value="matrix" pt="lg">
-              <RolePermissionMatrix
-                roles={roles || []}
-                permissions={permissions || []}
-                onUpdate={refetchRoles}
-              />
+              <RolePermissionMatrix />
             </Tabs.Panel>
 
             <Tabs.Panel value="users" pt="lg">
-              <UserRoleAssignment roles={roles || []} onUpdate={refetchRoles} />
+              <UserRoleAssignment />
             </Tabs.Panel>
 
             <Tabs.Panel value="roles" pt="lg">
