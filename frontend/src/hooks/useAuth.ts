@@ -14,6 +14,33 @@ import {
 export const useAuth = () => {
   const { user, token, isAuthenticated, isLoading, hasPermission, hasRole } =
     useAuthStore();
+  const queryClient = useQueryClient();
+
+  const login = useCallback(
+    async (username: string, password: string) => {
+      const result = await authService.login({ username, password });
+      // Invalidate and refetch user data
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
+      queryClient.setQueryData(queryKeys.auth.user, result);
+      return result;
+    },
+    [queryClient]
+  );
+
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      // Clear all cached data
+      queryClient.clear();
+    }
+  }, [queryClient]);
+
+  const refreshToken = useCallback(async () => {
+    return await authService.refreshToken();
+  }, []);
 
   return {
     user,
@@ -22,6 +49,9 @@ export const useAuth = () => {
     isLoading,
     hasPermission,
     hasRole,
+    login,
+    logout,
+    refreshToken,
     // Additional helper methods
     getUserPermissions: useCallback(() => authService.getUserPermissions(), []),
     getUserRoles: useCallback(() => authService.getUserRoles(), []),

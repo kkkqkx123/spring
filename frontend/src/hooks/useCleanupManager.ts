@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import type { DependencyList } from 'react';
 
 /**
  * Cleanup management utilities for proper resource disposal
@@ -128,7 +129,7 @@ export class CleanupManager {
 
 // Hook for cleanup management
 export function useCleanupManager() {
-  const cleanupManagerRef = useRef<CleanupManager>();
+  const cleanupManagerRef = useRef<CleanupManager>(null);
 
   if (!cleanupManagerRef.current) {
     cleanupManagerRef.current = new CleanupManager();
@@ -337,7 +338,7 @@ export function useDOMEventListeners() {
 
 // Hook for async operation cleanup
 export function useAsyncCleanup() {
-  const { createAbortController, addCleanup } = useCleanupManager();
+  const { createAbortController } = useCleanupManager();
 
   const createCancellablePromise = useCallback(
     <T>(promiseFactory: (signal: AbortSignal) => Promise<T>): Promise<T> => {
@@ -370,7 +371,7 @@ export function useAsyncCleanup() {
 }
 
 // Hook for resource cleanup with dependencies
-export function useResourceCleanup(dependencies: any[] = []) {
+export function useResourceCleanup(dependencies: DependencyList = []) {
   const { addCleanup, cleanup } = useCleanupManager();
 
   // Cleanup when dependencies change
@@ -378,7 +379,7 @@ export function useResourceCleanup(dependencies: any[] = []) {
     return () => {
       cleanup();
     };
-  }, dependencies);
+  }, [cleanup, dependencies]);
 
   return { addCleanup, cleanup };
 }

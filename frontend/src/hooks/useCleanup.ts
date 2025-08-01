@@ -31,33 +31,36 @@ export function useCleanup() {
 /**
  * Hook for managing WebSocket subscriptions with automatic cleanup
  */
-export function useWebSocketSubscription(
-  websocket: any,
+
+// Define a WebSocket-like interface for better type safety
+interface WebSocketLike {
+  on: (event: string, handler: (data: unknown) => void) => void;
+  off: (event: string, handler: (data: unknown) => void) => void;
+}
+
+export function useWebSocketSubscription<T>(
+  websocket: WebSocketLike | null | undefined,
   eventType: string,
-  handler: (data: any) => void,
-  dependencies: React.DependencyList = []
+  handler: (data: T) => void
 ) {
   const { addCleanup } = useCleanup();
-  const handlerRef = useRef(handler);
-
-  // Update handler ref when dependencies change
-  useEffect(() => {
-    handlerRef.current = handler;
-  }, dependencies);
 
   useEffect(() => {
     if (!websocket) return;
 
-    const wrappedHandler = (data: any) => {
-      handlerRef.current(data);
+    const wrappedHandler = (data: T) => {
+      handler(data);
     };
 
-    websocket.on(eventType, wrappedHandler);
+    // Cast to a compatible type for the websocket library
+    const castedHandler = wrappedHandler as (data: unknown) => void;
+
+    websocket.on(eventType, castedHandler);
 
     addCleanup(() => {
-      websocket.off(eventType, wrappedHandler);
+      websocket.off(eventType, castedHandler);
     });
-  }, [websocket, eventType, addCleanup]);
+  }, [websocket, eventType, addCleanup, handler]);
 }
 
 /**

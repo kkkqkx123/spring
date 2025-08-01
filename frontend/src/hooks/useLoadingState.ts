@@ -1,18 +1,18 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useToast } from '../components/ui/ToastNotifications';
 
-interface LoadingState {
+interface LoadingState<T> {
   isLoading: boolean;
   error: Error | null;
-  data: any;
+  data: T | null;
 }
 
-interface LoadingOptions {
+interface LoadingOptions<T> {
   showSuccessToast?: boolean;
   showErrorToast?: boolean;
   successMessage?: string;
   errorMessage?: string;
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
   retries?: number;
   retryDelay?: number;
@@ -21,8 +21,8 @@ interface LoadingOptions {
 /**
  * Hook for managing loading states with automatic error handling and retries
  */
-export const useLoadingState = (options: LoadingOptions = {}) => {
-  const [state, setState] = useState<LoadingState>({
+export const useLoadingState = <T>(options: LoadingOptions<T> = {}) => {
+  const [state, setState] = useState<LoadingState<T>>({
     isLoading: false,
     error: null,
     data: null,
@@ -44,7 +44,7 @@ export const useLoadingState = (options: LoadingOptions = {}) => {
   } = options;
 
   const execute = useCallback(
-    async (asyncFunction: (signal?: AbortSignal) => Promise<any>) => {
+    async (asyncFunction: (signal?: AbortSignal) => Promise<T>) => {
       // Cancel any ongoing request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -176,8 +176,8 @@ export const useLoadingState = (options: LoadingOptions = {}) => {
 /**
  * Hook for managing multiple loading states
  */
-export const useMultipleLoadingStates = () => {
-  const [states, setStates] = useState<Record<string, LoadingState>>({});
+export const useMultipleLoadingStates = <T>() => {
+  const [states, setStates] = useState<Record<string, LoadingState<T>>>({});
 
   const setLoading = useCallback((key: string, loading: boolean) => {
     setStates(prev => ({
@@ -200,7 +200,7 @@ export const useMultipleLoadingStates = () => {
     }));
   }, []);
 
-  const setData = useCallback((key: string, data: any) => {
+  const setData = useCallback((key: string, data: T) => {
     setStates(prev => ({
       ...prev,
       [key]: {
@@ -213,7 +213,7 @@ export const useMultipleLoadingStates = () => {
   }, []);
 
   const getState = useCallback(
-    (key: string): LoadingState => {
+    (key: string): LoadingState<T> => {
       return states[key] || { isLoading: false, error: null, data: null };
     },
     [states]
@@ -254,8 +254,8 @@ export const useMultipleLoadingStates = () => {
 /**
  * Hook for managing form submission states
  */
-export const useFormSubmission = <T = any>(options: LoadingOptions = {}) => {
-  const loadingState = useLoadingState(options);
+export const useFormSubmission = <T>(options: LoadingOptions<T> = {}) => {
+  const loadingState = useLoadingState<T>(options);
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
@@ -282,7 +282,8 @@ export const useFormSubmission = <T = any>(options: LoadingOptions = {}) => {
       } catch (error) {
         // Handle validation errors from server
         if (error instanceof Error && 'details' in error) {
-          const details = (error as any).details;
+          const details = (error as { details: Record<string, string> })
+            .details;
           if (typeof details === 'object' && details !== null) {
             setValidationErrors(details);
           }
@@ -308,7 +309,7 @@ export const useFormSubmission = <T = any>(options: LoadingOptions = {}) => {
 /**
  * Hook for managing async operations with progress tracking
  */
-export const useAsyncOperation = () => {
+export const useAsyncOperation = <T>() => {
   const [operations, setOperations] = useState<
     Map<
       string,
@@ -318,7 +319,7 @@ export const useAsyncOperation = () => {
         progress: number;
         status: 'running' | 'completed' | 'error' | 'cancelled';
         error?: Error;
-        result?: any;
+        result?: T;
       }
     >
   >(new Map());
@@ -327,9 +328,7 @@ export const useAsyncOperation = () => {
     (
       id: string,
       title: string,
-      asyncFunction: (
-        updateProgress: (progress: number) => void
-      ) => Promise<any>
+      asyncFunction: (updateProgress: (progress: number) => void) => Promise<T>
     ) => {
       setOperations(prev =>
         new Map(prev).set(id, {

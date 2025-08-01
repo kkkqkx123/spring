@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
@@ -86,7 +85,7 @@ describe('Optimized State Hooks Performance', () => {
     it('should handle custom comparison functions', () => {
       let computations = 0;
 
-      const { result, rerender } = renderHook(
+      const { rerender } = renderHook(
         ({ obj }) => {
           return useOptimizedMemo(
             () => {
