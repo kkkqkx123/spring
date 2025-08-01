@@ -11,33 +11,33 @@ const sizeMap = {
 export function LoadingSpinner({
   size = 'md',
   overlay = false,
-  message,
+  text,
   color,
   ariaLabel,
   centered,
   ...props
-}: LoadingSpinnerProps & {
-  message?: string;
-  color?: string;
-  ariaLabel?: string;
-  centered?: boolean;
-  [key: string]: any;
-}) {
+}: LoadingSpinnerProps &
+  React.ComponentPropsWithoutRef<'div'> & {
+    text?: string;
+    color?: string;
+    ariaLabel?: string;
+    centered?: boolean;
+  }) {
   const loaderSize = sizeMap[size];
 
   const LoaderContent = (
-    <Stack 
-      align="center" 
-      gap="sm" 
-      role="status" 
+    <Stack
+      align="center"
+      gap="sm"
+      role="status"
       aria-label={ariaLabel || 'Loading'}
       data-size={size}
       data-color={color}
     >
       <Loader size={loaderSize} color={color} />
-      {message && (
+      {text && (
         <Text size="sm" c="dimmed" ta="center">
-          {message}
+          {text}
         </Text>
       )}
     </Stack>
@@ -52,27 +52,29 @@ export function LoadingSpinner({
         zIndex={1000}
         {...props}
       >
-        <Center h="100%" className="overlay">{LoaderContent}</Center>
+        <Center h="100%" className="overlay">
+          {LoaderContent}
+        </Center>
       </Overlay>
     );
   }
 
   if (centered) {
-    return <Center className="centered" {...props}>{LoaderContent}</Center>;
+    return (
+      <Center className="centered" {...props}>
+        {LoaderContent}
+      </Center>
+    );
   }
 
   return <Center {...props}>{LoaderContent}</Center>;
 }
 
 // Specialized loading spinner variants
-export function PageLoadingSpinner({
-  message = 'Loading...',
-}: {
-  message?: string;
-}) {
+export function PageLoadingSpinner({ text = 'Loading...' }: { text?: string }) {
   return (
     <Center h="50vh">
-      <LoadingSpinner size="lg" message={message} />
+      <LoadingSpinner size="lg" text={text} />
     </Center>
   );
 }
@@ -86,10 +88,10 @@ export function InlineLoadingSpinner({
 }
 
 export function OverlayLoadingSpinner({
-  message = 'Loading...',
+  text = 'Loading...',
   visible = true,
 }: {
-  message?: string;
+  text?: string;
   visible?: boolean;
 }) {
   if (!visible) return null;
@@ -97,7 +99,7 @@ export function OverlayLoadingSpinner({
   return (
     <LoadingSpinner
       overlay
-      message={message}
+      text={text}
       style={{ position: 'absolute', inset: 0 }}
     />
   );
@@ -105,9 +107,9 @@ export function OverlayLoadingSpinner({
 
 // Full page loading spinner for route transitions
 export function FullPageLoadingSpinner({
-  message = 'Loading application...',
+  text = 'Loading application...',
 }: {
-  message?: string;
+  text?: string;
 }) {
   return (
     <Box
@@ -122,7 +124,7 @@ export function FullPageLoadingSpinner({
       }}
     >
       <Center h="100vh">
-        <LoadingSpinner size="lg" message={message} />
+        <LoadingSpinner size="lg" text={text} />
       </Center>
     </Box>
   );

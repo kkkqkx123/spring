@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useAuth } from './useAuth';
-import type { User, Role, Permission } from '../types';
+import type { Role, Permission } from '../types';
 
 export interface AccessControlOptions {
   fallbackValue?: boolean;
@@ -159,7 +159,6 @@ export const useAccessControl = () => {
   // Get user's permissions for a specific resource
   const getResourcePermissions = useCallback(
     (resource: string) => {
-      const resourceUpper = resource.toUpperCase();
       return {
         create: canCreate(resource),
         read: canRead(resource),

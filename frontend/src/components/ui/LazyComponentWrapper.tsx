@@ -40,9 +40,9 @@ const DefaultErrorFallback: React.FC<{
   </Center>
 );
 
-const DefaultLoadingFallback: React.FC<{ skeletonVariant?: string }> = ({
-  skeletonVariant,
-}) => <LoadingSkeleton variant={skeletonVariant as any} />;
+const DefaultLoadingFallback: React.FC<{
+  skeletonVariant?: 'page' | 'list' | 'form' | 'card' | 'table';
+}> = ({ skeletonVariant }) => <LoadingSkeleton variant={skeletonVariant} />;
 
 export const LazyComponentWrapper: React.FC<LazyComponentWrapperProps> = ({
   children,

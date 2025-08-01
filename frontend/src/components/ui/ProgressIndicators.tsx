@@ -8,7 +8,6 @@ import {
   Center,
   Box,
   Card,
-  Button,
   ActionIcon,
   Tooltip,
 } from '@mantine/core';
@@ -139,7 +138,6 @@ interface StepProgressProps {
 export const StepProgress: React.FC<StepProgressProps> = ({
   steps,
   orientation = 'horizontal',
-  size = 'md',
 }) => {
   const getStepIcon = (status: StepProgressProps['steps'][0]['status']) => {
     switch (status) {
@@ -402,81 +400,5 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
   );
 };
 
-// Hook for managing operation progress
-export const useOperationProgress = () => {
-  const [operations, setOperations] = React.useState<
-    Map<string, OperationProgressProps>
-  >(new Map());
-
-  const startOperation = React.useCallback(
-    (
-      id: string,
-      operation: Omit<OperationProgressProps, 'progress' | 'status'>
-    ) => {
-      setOperations(prev =>
-        new Map(prev).set(id, {
-          ...operation,
-          progress: 0,
-          status: 'running',
-        })
-      );
-    },
-    []
-  );
-
-  const updateProgress = React.useCallback(
-    (
-      id: string,
-      progress: number,
-      updates?: Partial<OperationProgressProps>
-    ) => {
-      setOperations(prev => {
-        const newMap = new Map(prev);
-        const existing = newMap.get(id);
-        if (existing) {
-          newMap.set(id, {
-            ...existing,
-            progress,
-            ...updates,
-          });
-        }
-        return newMap;
-      });
-    },
-    []
-  );
-
-  const completeOperation = React.useCallback(
-    (id: string) => {
-      updateProgress(id, 100, { status: 'completed' });
-    },
-    [updateProgress]
-  );
-
-  const failOperation = React.useCallback(
-    (id: string, error?: string) => {
-      updateProgress(id, 0, {
-        status: 'error',
-        description: error,
-      });
-    },
-    [updateProgress]
-  );
-
-  const removeOperation = React.useCallback((id: string) => {
-    setOperations(prev => {
-      const newMap = new Map(prev);
-      newMap.delete(id);
-      return newMap;
-    });
-  }, []);
-
-  return {
-    operations: Array.from(operations.entries()),
-    startOperation,
-    updateProgress,
-    completeOperation,
-    failOperation,
-    removeOperation,
-  };
-};
+// Hook for managing operation progress has been moved to useOperationProgress.ts
+// to fix ESLint error: "Fast refresh only works when a file only exports components"

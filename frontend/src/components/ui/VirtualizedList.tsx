@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { Box, ScrollArea } from '@mantine/core';
 
 interface VirtualizedListProps<T> {
@@ -58,14 +52,6 @@ export function VirtualizedList<T>({
   }, [items, visibleRange, getItemKey]);
 
   // Handle scroll
-  const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      const newScrollTop = event.currentTarget.scrollTop;
-      setScrollTop(newScrollTop);
-      onScroll?.(newScrollTop);
-    },
-    [onScroll]
-  );
 
   // Scroll to index
   const scrollToIndex = useCallback(

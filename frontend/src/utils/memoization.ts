@@ -78,7 +78,11 @@ export function createMemoizedSelector<T, R>(
   return (state: T): R => {
     if (isFirstRun || state !== lastState) {
       const newResult = selector(state);
-      if (isFirstRun || !equalityFn(lastResult!, newResult)) {
+      if (
+        isFirstRun ||
+        lastResult === undefined ||
+        !equalityFn(lastResult, newResult)
+      ) {
         lastResult = newResult;
       }
       lastState = state;
@@ -106,14 +110,15 @@ export function useDebouncedValue<T>(value: T, delay: number): T {
 }
 
 // Throttled callback hook
-export function useThrottledCallback<T extends (...args: unknown[]) => unknown>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useThrottledCallback<T extends (...args: any[]) => any>(
   callback: T,
   delay: number
 ): T {
   const lastRun = useRef(Date.now());
 
   return useCallback(
-    ((...args: unknown[]) => {
+    ((...args: Parameters<T>) => {
       if (Date.now() - lastRun.current >= delay) {
         callback(...args);
         lastRun.current = Date.now();
@@ -132,7 +137,14 @@ export function useMemoizedComputation<T, R>(
   const cache = useRef<Map<string, R>>(new Map());
 
   return useMemo(() => {
-    const key = JSON.stringify(input);
+    const key =
+      typeof input === 'object' && input !== null
+        ? JSON.stringify(
+            Object.keys(input)
+              .sort()
+              .map(k => [k, (input as Record<string, unknown>)[k]])
+          )
+        : JSON.stringify(input);
 
     if (cache.current.has(key)) {
       return cache.current.get(key)!;
@@ -140,11 +152,11 @@ export function useMemoizedComputation<T, R>(
 
     const result = computation(input);
 
-    // Manage cache size
+    // Manage cache size - remove oldest entry
     if (cache.current.size >= cacheSize) {
-      const firstKey = cache.current.keys().next().value;
-      if (firstKey !== undefined) {
-        cache.current.delete(firstKey);
+      const oldestKey = cache.current.keys().next().value;
+      if (oldestKey !== undefined) {
+        cache.current.delete(oldestKey);
       }
     }
 

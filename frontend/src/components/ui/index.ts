@@ -28,8 +28,6 @@ export {
   FormErrorSummary,
   ValidationRulesDisplay,
   FormFieldWrapper,
-  usePasswordValidation,
-  useFormValidation,
 } from './FormValidation';
 export { RetryHandler, AutoRetryWrapper, useRetry } from './RetryHandler';
 export {
@@ -43,8 +41,8 @@ export {
   CircularProgress,
   StepProgress,
   OperationProgress,
-  useOperationProgress,
 } from './ProgressIndicators';
+export { useOperationProgress } from './useOperationProgress';
 export { DestructiveActionDialog, BulkActionDialog } from './ConfirmDialog';
 
 // Performance and Code Splitting Components

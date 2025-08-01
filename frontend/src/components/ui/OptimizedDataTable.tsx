@@ -3,7 +3,6 @@ import {
   Table,
   Checkbox,
   Text,
-  ActionIcon,
   Group,
   Pagination,
   TextInput,
@@ -19,7 +18,7 @@ import {
   IconSortAscending,
   IconSortDescending,
 } from '@tabler/icons-react';
-import { DataTableProps, DataTableColumn } from '../../types';
+import type { DataTableProps, DataTableColumn } from '../../types';
 import {
   useDeepMemo,
   useDebouncedValue,
@@ -32,81 +31,89 @@ interface SortState {
 }
 
 // Memoized table header component
-const TableHeader = memo<{
-  columns: DataTableColumn<any>[];
+function TableHeaderComponent<T extends Record<string, unknown>>({
+  columns,
+  sortState,
+  onSort,
+  hasRowSelection,
+  isAllSelected,
+  isIndeterminate,
+  onSelectAll,
+}: {
+  columns: DataTableColumn<T>[];
   sortState: SortState;
   onSort: (key: string) => void;
   hasRowSelection: boolean;
   isAllSelected: boolean;
   isIndeterminate: boolean;
   onSelectAll: (checked: boolean) => void;
-}>(
-  ({
-    columns,
-    sortState,
-    onSort,
-    hasRowSelection,
-    isAllSelected,
-    isIndeterminate,
-    onSelectAll,
-  }) => {
-    const getSortIcon = useCallback(
-      (columnKey: string) => {
-        if (sortState.key !== columnKey) return null;
-        return sortState.direction === 'asc' ? (
-          <IconSortAscending size={14} />
-        ) : (
-          <IconSortDescending size={14} />
-        );
-      },
-      [sortState]
-    );
+}) {
+  const getSortIcon = useCallback(
+    (columnKey: string) => {
+      if (sortState.key !== columnKey) return null;
+      return sortState.direction === 'asc' ? (
+        <IconSortAscending size={14} />
+      ) : (
+        <IconSortDescending size={14} />
+      );
+    },
+    [sortState]
+  );
 
-    return (
-      <Table.Thead>
-        <Table.Tr>
-          {hasRowSelection && (
-            <Table.Th w={40}>
-              <Checkbox
-                checked={isAllSelected}
-                indeterminate={isIndeterminate}
-                onChange={event => onSelectAll(event.currentTarget.checked)}
-                aria-label="Select all rows"
-              />
-            </Table.Th>
-          )}
-          {columns.map(column => (
-            <Table.Th
-              key={String(column.key)}
-              style={{
-                cursor: column.sortable ? 'pointer' : 'default',
-                userSelect: 'none',
-              }}
-              onClick={() => column.sortable && onSort(String(column.key))}
-            >
-              <Group gap="xs" justify="space-between">
-                <Text fw={600}>{column.title}</Text>
-                {column.sortable && getSortIcon(String(column.key))}
-              </Group>
-            </Table.Th>
-          ))}
-        </Table.Tr>
-      </Table.Thead>
-    );
-  }
-);
-
-TableHeader.displayName = 'TableHeader';
+  return (
+    <Table.Thead>
+      <Table.Tr>
+        {hasRowSelection && (
+          <Table.Th w={40}>
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={isIndeterminate}
+              onChange={event => onSelectAll(event.currentTarget.checked)}
+              aria-label="Select all rows"
+            />
+          </Table.Th>
+        )}
+        {columns.map(column => (
+          <Table.Th
+            key={String(column.key)}
+            style={{
+              cursor: column.sortable ? 'pointer' : 'default',
+              userSelect: 'none',
+            }}
+            onClick={() => column.sortable && onSort(String(column.key))}
+          >
+            <Group gap="xs" justify="space-between">
+              <Text fw={600}>{column.title}</Text>
+              {column.sortable && getSortIcon(String(column.key))}
+            </Group>
+          </Table.Th>
+        ))}
+      </Table.Tr>
+    </Table.Thead>
+  );
+}
+const TableHeader = memo(TableHeaderComponent) as <
+  T extends Record<string, unknown>,
+>(
+  props: React.ComponentProps<typeof TableHeaderComponent<T>>
+) => React.ReactElement;
 
 // Memoized table row component
-const TableRow = memo<{
-  row: any;
+function TableRowComponent<T extends Record<string, unknown>>({
+  row,
+  index,
+  columns,
+  hasRowSelection,
+  isSelected,
+  onSelectRow,
+}: {
+  row: T;
   index: number;
-  columns: DataTableColumn<any>[];
+  columns: DataTableColumn<T>[];
   hasRowSelection: boolean;
   isSelected: boolean;
   onSelectRow: (index: number, checked: boolean) => void;
-}>(({ row, index, columns, hasRowSelection, isSelected, onSelectRow }) => {
+}) {
   const handleSelectChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onSelectRow(index, event.currentTarget.checked);
@@ -134,10 +141,10 @@ const TableRow = memo<{
       ))}
     </Table.Tr>
   );
-});
-
-TableRow.displayName = 'TableRow';
-
+}
+const TableRow = memo(TableRowComponent) as <T extends Record<string, unknown>>(
+  props: React.ComponentProps<typeof TableRowComponent<T>>
+) => React.ReactElement;
 // Memoized search controls component
 const SearchControls = memo<{
   searchTerm: string;
@@ -198,7 +205,7 @@ const SearchControls = memo<{
 
 SearchControls.displayName = 'SearchControls';
 
-export function OptimizedDataTable<T extends Record<string, any>>({
+export function OptimizedDataTable<T extends Record<string, unknown>>({
   data,
   columns,
   loading = false,
@@ -235,28 +242,44 @@ export function OptimizedDataTable<T extends Record<string, any>>({
     if (!sortState.key || !sortState.direction) return filteredData;
 
     return [...filteredData].sort((a, b) => {
-      const aValue = a[sortState.key!];
-      const bValue = b[sortState.key!];
+      const aValue = a[sortState.key!] as unknown;
+      const bValue = b[sortState.key!] as unknown;
 
       if (aValue === bValue) return 0;
 
-      const comparison = aValue < bValue ? -1 : 1;
+      // Handle different types for comparison
+      const comparison = (() => {
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return aValue.localeCompare(bValue);
+        }
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return aValue - bValue;
+        }
+        // Fallback to string comparison
+        return String(aValue).localeCompare(String(bValue));
+      })();
+
       return sortState.direction === 'asc' ? comparison : -comparison;
     });
   }, [filteredData, sortState]);
 
   // Throttled sort handler to prevent excessive sorting
-  const handleSort = useThrottledCallback((columnKey: string) => {
-    const column = columns.find(col => col.key === columnKey);
+  const handleSort = useThrottledCallback((columnKey: string | number) => {
+    // Convert columnKey to string for consistent comparison
+    const columnKeyString = String(columnKey);
+    const column = columns.find(col => String(col.key) === columnKeyString);
     if (!column?.sortable) return;
 
     setSortState(prev => {
-      if (prev.key === columnKey) {
-        if (prev.direction === 'asc')
-          return { key: columnKey, direction: 'desc' };
-        if (prev.direction === 'desc') return { key: null, direction: null };
+      if (prev.key === columnKeyString) {
+        if (prev.direction === 'asc') {
+          return { key: columnKeyString, direction: 'desc' };
+        }
+        if (prev.direction === 'desc') {
+          return { key: null, direction: null };
+        }
       }
-      return { key: columnKey, direction: 'asc' };
+      return { key: columnKeyString, direction: 'asc' };
     });
   }, 100);
 
