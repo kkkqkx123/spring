@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,18 +8,18 @@ import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { BrowserRouter } from 'react-router-dom';
 import { LoginForm } from '../../features/auth/components/LoginForm';
-import { authApi } from '../../services/auth';
+import { authService } from '../../services/auth';
 
-// Mock the auth API
+// Mock the auth service
 vi.mock('../../services/auth', () => ({
-  authApi: {
+  authService: {
     login: vi.fn(),
     logout: vi.fn(),
     refreshToken: vi.fn(),
   },
 }));
 
-const mockAuthApi = authApi as any;
+const mockAuthService = authService as any;
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = new QueryClient({
@@ -53,16 +54,16 @@ describe('Authentication Integration Tests', () => {
       roles: ['USER'],
     };
 
-    mockAuthApi.login.mockResolvedValue({
+    mockAuthService.login.mockResolvedValue({
       token: 'test-token',
       user: mockUser,
     });
 
-    const mockOnSuccess = vi.fn();
+    const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -77,7 +78,7 @@ describe('Authentication Integration Tests', () => {
 
     // Verify API call
     await waitFor(() => {
-      expect(mockAuthApi.login).toHaveBeenCalledWith({
+      expect(mockAuthService.login).toHaveBeenCalledWith({
         username: 'testuser',
         password: 'password123',
       });
@@ -85,14 +86,14 @@ describe('Authentication Integration Tests', () => {
 
     // Verify success callback
     await waitFor(() => {
-      expect(mockOnSuccess).toHaveBeenCalled();
+      expect(mockOnSubmit).toHaveBeenCalled();
     });
   });
 
   it('handles login failure with proper error display', async () => {
     const user = userEvent.setup();
 
-    mockAuthApi.login.mockRejectedValue({
+    mockAuthService.login.mockRejectedValue({
       response: {
         status: 401,
         data: { message: 'Invalid credentials' },
@@ -101,7 +102,7 @@ describe('Authentication Integration Tests', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={vi.fn()} />
+        <LoginForm onSubmit={vi.fn()} />
       </TestWrapper>
     );
 
@@ -131,26 +132,25 @@ describe('Authentication Integration Tests', () => {
       },
     };
 
-    mockAuthApi.refreshToken.mockResolvedValue(mockRefreshResponse);
+    mockAuthService.refreshToken.mockResolvedValue(mockRefreshResponse);
 
     // Simulate token refresh
-    const result = await authApi.refreshToken();
+    const result = await authService.refreshToken();
 
     expect(result).toEqual(mockRefreshResponse);
-    expect(mockAuthApi.refreshToken).toHaveBeenCalled();
+    expect(mockAuthService.refreshToken).toHaveBeenCalled();
   });
 
   it('handles logout flow', async () => {
-    mockAuthApi.logout.mockResolvedValue({});
+    mockAuthService.logout.mockResolvedValue({});
 
     // Simulate logout
-    await authApi.logout();
+    await authService.logout();
 
-    expect(mockAuthApi.logout).toHaveBeenCalled();
+    expect(mockAuthService.logout).toHaveBeenCalled();
   });
 
   it('persists authentication state across page reloads', async () => {
-    const user = userEvent.setup();
     const mockUser = {
       id: 1,
       username: 'testuser',
@@ -162,14 +162,14 @@ describe('Authentication Integration Tests', () => {
     localStorage.setItem('auth_token', 'existing-token');
     localStorage.setItem('auth_user', JSON.stringify(mockUser));
 
-    mockAuthApi.login.mockResolvedValue({
+    mockAuthService.login.mockResolvedValue({
       token: 'existing-token',
       user: mockUser,
     });
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={vi.fn()} />
+        <LoginForm onSubmit={vi.fn()} />
       </TestWrapper>
     );
 
@@ -183,11 +183,11 @@ describe('Authentication Integration Tests', () => {
   it('handles network errors gracefully', async () => {
     const user = userEvent.setup();
 
-    mockAuthApi.login.mockRejectedValue(new Error('Network Error'));
+    mockAuthService.login.mockRejectedValue(new Error('Network Error'));
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={vi.fn()} />
+        <LoginForm onSubmit={vi.fn()} />
       </TestWrapper>
     );
 
