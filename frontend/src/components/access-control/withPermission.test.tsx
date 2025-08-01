@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import {
   withPermission,
   withAdminPermission,
@@ -13,13 +13,13 @@ import { useAccessControl } from '../../hooks/useAccessControl';
 // Mock the useAccessControl hook
 vi.mock('../../hooks/useAccessControl');
 
-const mockUseAccessControl = useAccessControl as any;
+const mockUseAccessControl = useAccessControl as Mock;
 
 const TestComponent: React.FC<{ message?: string }> = ({
   message = 'Test Content',
 }) => <div data-testid="test-component">{message}</div>;
 
-const CustomFallback: React.FC<any> = props => (
+const CustomFallback: React.FC<{ message?: string }> = props => (
   <div data-testid="custom-fallback">Custom Fallback: {props.message}</div>
 );
 
@@ -347,7 +347,9 @@ describe('withAdminPermission', () => {
       hasAllPermissions: vi.fn(() => false),
       hasRole: vi.fn(role => role === 'ADMIN'),
       hasAnyRole: vi.fn(roles => roles.includes('ADMIN')),
-      hasAllRoles: vi.fn(roles => roles.every(role => role === 'ADMIN')),
+      hasAllRoles: vi.fn(roles =>
+        roles.every((role: string) => role === 'ADMIN')
+      ),
     });
   });
 

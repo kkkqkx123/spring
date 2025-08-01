@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, List, ListProps } from '@mantine/core';
+import { Box, List } from '@mantine/core';
+import type { ListProps } from '@mantine/core';
 import {
   useKeyboardNavigation,
   useAriaSelected,
@@ -13,7 +14,7 @@ interface AccessibleListProps<T> extends Omit<ListProps, 'children'> {
     isSelected: boolean,
     isFocused: boolean
   ) => React.ReactNode;
-  onSelect?: (item: T, index: number) => void;
+  onItemSelect?: (item: T, index: number) => void;
   multiSelect?: boolean;
   orientation?: 'horizontal' | 'vertical' | 'grid';
   ariaLabel?: string;
@@ -23,24 +24,23 @@ interface AccessibleListProps<T> extends Omit<ListProps, 'children'> {
 export function AccessibleList<T>({
   items,
   renderItem,
-  onSelect,
+  onItemSelect,
   multiSelect = false,
   orientation = 'vertical',
   ariaLabel,
   ariaLabelledBy,
   ...listProps
 }: AccessibleListProps<T>) {
-  const { containerRef, focusedIndex } = useKeyboardNavigation(
-    items,
-    onSelect,
-    orientation
-  );
+  const { containerRef, focusedIndex } = useKeyboardNavigation<
+    T,
+    HTMLDivElement
+  >(items, onItemSelect, orientation);
 
   const { isSelected, select } = useAriaSelected(items, multiSelect);
 
   const handleItemClick = (item: T, index: number) => {
     select(index);
-    onSelect?.(item, index);
+    onItemSelect?.(item, index);
   };
 
   const handleItemKeyDown = (

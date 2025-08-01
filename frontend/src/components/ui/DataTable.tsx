@@ -3,7 +3,6 @@ import {
   Table,
   Checkbox,
   Text,
-  ActionIcon,
   Group,
   Pagination,
   TextInput,
@@ -19,7 +18,7 @@ import {
   IconSortAscending,
   IconSortDescending,
 } from '@tabler/icons-react';
-import { DataTableProps, DataTableColumn } from '../../types';
+import type { DataTableProps } from '@/types';
 
 interface SortState {
   key: string | null;

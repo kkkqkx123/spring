@@ -1,17 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import {
-  AppShell as MantineAppShell,
-  Burger,
-  Group,
-  Text,
-  UnstyledButton,
-  Overlay,
-  Box,
-} from '@mantine/core';
-import { useDisclosure, useMediaQuery, useViewportSize } from '@mantine/hooks';
+import React, { useEffect } from 'react';
+import { AppShell as MantineAppShell, Overlay, Box } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Navigation } from './Navigation';
 import { Header } from './Header';
-import { User } from '../../types';
+import type { User } from '../../types';
 import {
   useIsMobile,
   useIsTablet,
@@ -27,7 +19,6 @@ export function AppShell({ user, children }: AppShellProps) {
   const [opened, { toggle, close, open }] = useDisclosure();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
-  const { width } = useViewportSize();
 
   // Close navigation when screen size changes from mobile to desktop
   useEffect(() => {

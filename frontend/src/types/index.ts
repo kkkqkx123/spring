@@ -263,6 +263,9 @@ export interface FormFieldProps {
 export interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   overlay?: boolean;
+  className?: string;
+  fullScreen?: boolean;
+  text?: string;
 }
 
 export interface DataTableColumn<T> {

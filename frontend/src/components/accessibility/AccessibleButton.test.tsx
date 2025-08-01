@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { vi } from 'vitest';
 import { AccessibleButton } from './AccessibleButton';
+import * as accessibilityUtils from '../../utils/accessibility';
 
 // Mock the accessibility utilities
 vi.mock('../../utils/accessibility', () => ({
@@ -104,7 +105,6 @@ describe('AccessibleButton', () => {
     renderWithProvider(<AccessibleButton>Small</AccessibleButton>);
 
     const button = screen.getByRole('button');
-    const styles = window.getComputedStyle(button);
 
     // Note: In a real test environment, you'd check the computed styles
     // Here we're just ensuring the style prop is set correctly
@@ -124,8 +124,8 @@ describe('AccessibleButton', () => {
   });
 
   it('should respect reduced motion preference', () => {
-    const { useReducedMotion } = require('../../utils/accessibility');
-    useReducedMotion.mockReturnValue(true);
+    // Mock useReducedMotion to return true
+    vi.mocked(accessibilityUtils.useReducedMotion).mockReturnValue(true);
 
     renderWithProvider(
       <AccessibleButton style={{ transition: 'all 0.3s ease' }}>

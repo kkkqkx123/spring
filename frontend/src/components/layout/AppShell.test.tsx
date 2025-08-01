@@ -3,11 +3,17 @@ import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { BrowserRouter } from 'react-router-dom';
 import { AppShell } from './AppShell';
-import { User } from '../../types';
+import type { User } from '../../types';
+import { vi } from 'vitest';
 
 // Mock the child components
+type MockNavigationProps = {
+  user: User;
+  onNavigate?: () => void;
+};
+
 vi.mock('./Navigation', () => ({
-  Navigation: ({ user, onNavigate }: any) => (
+  Navigation: ({ user, onNavigate }: MockNavigationProps) => (
     <div data-testid="navigation">
       Navigation for {user.username}
       {onNavigate && <button onClick={onNavigate}>Navigate</button>}
@@ -15,8 +21,15 @@ vi.mock('./Navigation', () => ({
   ),
 }));
 
+type MockHeaderProps = {
+  user: User;
+  navbarOpened: boolean;
+  toggleNavbar: () => void;
+  isMobile: boolean;
+};
+
 vi.mock('./Header', () => ({
-  Header: ({ user, navbarOpened, toggleNavbar, isMobile }: any) => (
+  Header: ({ user, navbarOpened, toggleNavbar, isMobile }: MockHeaderProps) => (
     <div data-testid="header">
       Header for {user.username}
       <button onClick={toggleNavbar}>

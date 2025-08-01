@@ -15,8 +15,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { FormField } from '../../../components/ui';
-import type { LoginRequest } from '../../../types';
+import { FormField } from '@/components/ui';
+import type { LoginRequest } from '@/types';
 
 // Validation schema
 const loginSchema = z.object({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loader, Overlay, Center, Stack, Text, Box } from '@mantine/core';
-import { LoadingSpinnerProps } from '../../types';
+import type { LoadingSpinnerProps } from '../../types';
 
 const sizeMap = {
   sm: 'sm' as const,
@@ -12,16 +12,29 @@ export function LoadingSpinner({
   size = 'md',
   overlay = false,
   message,
+  color,
+  ariaLabel,
+  centered,
   ...props
 }: LoadingSpinnerProps & {
   message?: string;
+  color?: string;
+  ariaLabel?: string;
+  centered?: boolean;
   [key: string]: any;
 }) {
   const loaderSize = sizeMap[size];
 
   const LoaderContent = (
-    <Stack align="center" gap="sm" role="status" aria-label="Loading">
-      <Loader size={loaderSize} />
+    <Stack 
+      align="center" 
+      gap="sm" 
+      role="status" 
+      aria-label={ariaLabel || 'Loading'}
+      data-size={size}
+      data-color={color}
+    >
+      <Loader size={loaderSize} color={color} />
       {message && (
         <Text size="sm" c="dimmed" ta="center">
           {message}
@@ -39,9 +52,13 @@ export function LoadingSpinner({
         zIndex={1000}
         {...props}
       >
-        <Center h="100%">{LoaderContent}</Center>
+        <Center h="100%" className="overlay">{LoaderContent}</Center>
       </Overlay>
     );
+  }
+
+  if (centered) {
+    return <Center className="centered" {...props}>{LoaderContent}</Center>;
   }
 
   return <Center {...props}>{LoaderContent}</Center>;

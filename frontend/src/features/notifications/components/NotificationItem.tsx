@@ -13,7 +13,7 @@ import {
   IconAlertTriangle,
   IconX,
 } from '@tabler/icons-react';
-import type { Notification, NotificationType } from '../../../types';
+import type { Notification, NotificationType } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
 export interface NotificationItemProps {

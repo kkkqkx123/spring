@@ -10,7 +10,6 @@ import {
   Card,
   Pagination,
   Center,
-  Badge,
   ActionIcon,
   Menu,
 } from '@mantine/core';
@@ -21,9 +20,9 @@ import {
   IconCheck,
   IconDots,
 } from '@tabler/icons-react';
-import { Notification, NotificationType } from '../../../types';
+import type { Notification, NotificationType } from '@/types';
 import { NotificationItem } from './NotificationItem';
-import { useNotificationStore } from '../../../stores/notificationStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 export interface NotificationListProps {
   onNotificationClick?: (notification: Notification) => void;
@@ -43,7 +42,6 @@ export function NotificationList({
   const {
     notifications,
     unreadCount,
-    isLoading,
     markAsRead,
     markAllAsRead,
     removeNotification,

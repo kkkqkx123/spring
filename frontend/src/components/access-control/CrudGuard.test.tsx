@@ -1,13 +1,12 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { CrudGuard } from './CrudGuard';
 import { useAccessControl } from '../../hooks/useAccessControl';
 
 // Mock the useAccessControl hook
 vi.mock('../../hooks/useAccessControl');
 
-const mockUseAccessControl = useAccessControl as any;
+const mockUseAccessControl = useAccessControl as Mock;
 
 const TestComponent = () => (
   <div data-testid="protected-content">Protected Content</div>

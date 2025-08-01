@@ -32,7 +32,7 @@ describe('LoadingSpinner', () => {
   it('renders with custom text', () => {
     render(
       <TestWrapper>
-        <LoadingSpinner text="Loading data..." />
+        <LoadingSpinner message="Loading data..." />
       </TestWrapper>
     );
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text, Group, Tooltip } from '@mantine/core';
 import { IconInfoCircle, IconAsterisk } from '@tabler/icons-react';
-import { FormFieldProps } from '../../types';
+import type { FormFieldProps } from '@/types';
 
 export function FormField({
   label,
@@ -122,10 +122,10 @@ export function CheckboxFormField({
   label,
   error,
   required,
-  helpText,
   children,
   ...props
 }: FormFieldProps & { helpText?: string }) {
+  const fieldId = React.useId();
   return (
     <Box {...props}>
       {React.cloneElement(children as React.ReactElement, {
@@ -133,11 +133,18 @@ export function CheckboxFormField({
         error: !!error,
         'aria-required': required,
         'aria-invalid': !!error,
-        'aria-describedby': error ? `${React.useId()}-error` : undefined,
+        'aria-describedby': error ? `${fieldId}-error` : undefined,
       })}
 
       {error && (
-        <Text size="sm" c="red" mt="xs" role="alert" aria-live="polite">
+        <Text
+          id={`${fieldId}-error`}
+          size="sm"
+          c="red"
+          mt="xs"
+          role="alert"
+          aria-live="polite"
+        >
           {error}
         </Text>
       )}

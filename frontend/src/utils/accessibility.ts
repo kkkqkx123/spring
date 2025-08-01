@@ -9,8 +9,8 @@ import { useEffect, useRef, useState } from 'react';
  */
 
 // Focus trap for modals and dialogs
-export const useFocusTrap = (isActive: boolean) => {
-  const containerRef = useRef<HTMLElement>(null);
+export const useFocusTrap = <T extends HTMLElement>(isActive: boolean) => {
+  const containerRef = useRef<T>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -76,13 +76,13 @@ export const useFocusTrap = (isActive: boolean) => {
 };
 
 // Keyboard navigation for lists and grids
-export const useKeyboardNavigation = <T>(
+export const useKeyboardNavigation = <T, E extends HTMLElement = HTMLElement>(
   items: T[],
   onSelect?: (item: T, index: number) => void,
   orientation: 'horizontal' | 'vertical' | 'grid' = 'vertical'
 ) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<E>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -357,13 +357,35 @@ export const useAriaSelected = <T>(items: T[], multiSelect = false) => {
  */
 
 // Enhanced form field with accessibility features
+interface UseAccessibleFormFieldReturn {
+  fieldProps: {
+    id: string;
+    'aria-labelledby': string;
+    'aria-describedby': string | undefined;
+    'aria-required': boolean;
+    'aria-invalid': boolean;
+  };
+  labelProps: {
+    id: string;
+    htmlFor: string;
+  };
+  errorProps: {
+    id: string;
+    role: 'alert';
+    'aria-live': 'polite' | 'assertive' | 'off';
+  };
+  descriptionProps: {
+    id: string;
+  };
+}
+
 export const useAccessibleFormField = (
   fieldId: string,
-  label: string,
+  _label: string,
   required = false,
   error?: string,
   description?: string
-) => {
+): UseAccessibleFormFieldReturn => {
   const labelId = `${fieldId}-label`;
   const errorId = `${fieldId}-error`;
   const descriptionId = `${fieldId}-description`;

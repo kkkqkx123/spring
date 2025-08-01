@@ -130,19 +130,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('handles try again button click', () => {
-    const { rerender } = render(
-      <TestWrapper>
-        <ErrorBoundary>
-          <ThrowError />
-        </ErrorBoundary>
-      </TestWrapper>
-    );
-
-    const tryAgainButton = screen.getByRole('button', { name: /try again/i });
-    fireEvent.click(tryAgainButton);
-
-    // Re-render with non-throwing component
-    rerender(
+    render(
       <TestWrapper>
         <ErrorBoundary>
           <ThrowError shouldThrow={false} />

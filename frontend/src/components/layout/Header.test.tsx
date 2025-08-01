@@ -1,50 +1,13 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import { Header } from './Header';
-import { User } from '../../types';
-import { expect } from 'vitest';
-import { expect } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
+import type { User } from '../../types';
 import { vi } from 'vitest';
 import { it } from 'vitest';
-import { expect } from 'vitest';
-import { vi } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { expect } from 'vitest';
-import { it } from 'vitest';
-import { vi } from 'vitest';
+
 import { beforeEach } from 'vitest';
-import { vi } from 'vitest';
 import { describe } from 'vitest';
 
 const mockUser: User = {
@@ -73,6 +36,28 @@ describe('Header', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mock('../../stores/notificationStore', () => ({
+      useNotificationStore: () => ({
+        notifications: [
+          {
+            id: 1,
+            title: 'Test Notification 1',
+            message: 'Message 1',
+            read: false,
+          },
+          {
+            id: 2,
+            title: 'Test Notification 2',
+            message: 'Message 2',
+            read: false,
+          },
+        ],
+        unreadCount: 2,
+        isLoading: false,
+        markAsRead: vi.fn(),
+        markAllAsRead: vi.fn(),
+      }),
+    }));
   });
 
   it('renders application title', () => {

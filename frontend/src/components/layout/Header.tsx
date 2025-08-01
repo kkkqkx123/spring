@@ -15,7 +15,7 @@ import {
   IconLogout,
   IconChevronDown,
 } from '@tabler/icons-react';
-import { User } from '../../types';
+import type { User } from '../../types';
 import { NotificationDropdown } from '../../features/notifications';
 
 export interface HeaderProps {

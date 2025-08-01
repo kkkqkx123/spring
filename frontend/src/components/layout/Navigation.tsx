@@ -10,9 +10,10 @@ import {
   IconSettings,
   IconShield,
   IconLogout,
+  type IconProps,
 } from '@tabler/icons-react';
 import { Link, useLocation } from 'react-router-dom';
-import { User } from '../../types';
+import type { User } from '../../types';
 
 export interface NavigationProps {
   user: User;
@@ -23,7 +24,7 @@ export interface NavigationProps {
 
 interface NavigationItem {
   label: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<IconProps>;
   href: string;
   requiredRoles?: string[];
   children?: NavigationItem[];

@@ -14,9 +14,6 @@ import {
   Paper,
   ScrollArea,
   Card,
-  Badge,
-  Button,
-  Menu,
   Divider,
   Box,
 } from '@mantine/core';
@@ -24,13 +21,12 @@ import {
   IconSearch,
   IconSortAscending,
   IconSortDescending,
-  IconDots,
   IconList,
   IconGrid3x3,
 } from '@tabler/icons-react';
 import { useMediaQuery } from '@mantine/hooks';
-import { DataTableProps, DataTableColumn } from '../../types';
-import { useResponsiveValue, useTouchGestures } from '../../utils/responsive';
+import type { DataTableProps } from '@/types';
+import { useResponsiveValue, useTouchGestures } from '@/utils/responsive';
 
 interface SortState {
   key: string | null;

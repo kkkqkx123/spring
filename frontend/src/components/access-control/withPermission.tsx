@@ -6,13 +6,14 @@ import {
 import { Alert, Text } from '@mantine/core';
 import { IconLock } from '@tabler/icons-react';
 
-export interface WithPermissionOptions extends AccessControlOptions {
+export interface WithPermissionOptions<P extends object>
+  extends AccessControlOptions {
   permission?: string;
   permissions?: string[];
   role?: string;
   roles?: string[];
   requireAll?: boolean;
-  fallback?: React.ComponentType<any>;
+  fallback?: React.ComponentType<P>;
   showFallback?: boolean;
 }
 
@@ -21,7 +22,7 @@ export interface WithPermissionOptions extends AccessControlOptions {
  */
 export function withPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  options: WithPermissionOptions = {}
+  options: WithPermissionOptions<P> = {}
 ) {
   const {
     permission,
@@ -125,7 +126,7 @@ export function withPermission<P extends object>(
  */
 export function withAdminPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  options: Omit<WithPermissionOptions, 'role'> = {}
+  options: Omit<WithPermissionOptions<P>, 'role'> = {}
 ) {
   return withPermission(WrappedComponent, {
     ...options,
@@ -138,7 +139,7 @@ export function withAdminPermission<P extends object>(
  */
 export function withManagerPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  options: Omit<WithPermissionOptions, 'roles'> = {}
+  options: Omit<WithPermissionOptions<P>, 'roles'> = {}
 ) {
   return withPermission(WrappedComponent, {
     ...options,
@@ -154,7 +155,7 @@ export function withCrudPermission<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   resource: string,
   action: 'create' | 'read' | 'update' | 'delete',
-  options: Omit<WithPermissionOptions, 'permission'> = {}
+  options: Omit<WithPermissionOptions<P>, 'permission'> = {}
 ) {
   const permission = `${resource.toUpperCase()}_${action.toUpperCase()}`;
 

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Modal, ModalProps, Box } from '@mantine/core';
+import { Modal, Box } from '@mantine/core';
+import type { ModalProps } from '@mantine/core';
 import { useFocusTrap, useScreenReader } from '../../utils/accessibility';
 
 interface AccessibleModalProps extends Omit<ModalProps, 'opened' | 'onClose'> {
@@ -22,7 +23,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
   announceOnClose = true,
   ...modalProps
 }) => {
-  const focusTrapRef = useFocusTrap(opened);
+  const focusTrapRef = useFocusTrap<HTMLDivElement>(opened);
   const { announce } = useScreenReader();
 
   useEffect(() => {

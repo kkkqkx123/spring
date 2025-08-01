@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PermissionGuard } from './PermissionGuard';
@@ -7,7 +6,7 @@ import { useAccessControl } from '../../hooks/useAccessControl';
 // Mock the useAccessControl hook
 vi.mock('../../hooks/useAccessControl');
 
-const mockUseAccessControl = useAccessControl as any;
+const mockUseAccessControl = vi.mocked(useAccessControl);
 
 const TestComponent = () => (
   <div data-testid="protected-content">Protected Content</div>
@@ -16,20 +15,41 @@ const FallbackComponent = () => (
   <div data-testid="fallback-content">Access Denied</div>
 );
 
+const mockAccessControlDefaults: ReturnType<typeof useAccessControl> = {
+  hasPermission: vi.fn(),
+  hasRole: vi.fn(),
+  hasAnyPermission: vi.fn(),
+  hasAllPermissions: vi.fn(),
+  hasAnyRole: vi.fn(),
+  hasAllRoles: vi.fn(),
+  canCreate: vi.fn(),
+  canRead: vi.fn(),
+  canUpdate: vi.fn(),
+  canDelete: vi.fn(),
+  canAccessResource: vi.fn(),
+  getResourcePermissions: vi.fn(),
+  isAdmin: false,
+  isManager: false,
+  userPermissions: [],
+  userRoles: [],
+  isAuthenticated: true,
+  user: null,
+};
+
 describe('PermissionGuard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset mocks to default values before each test
+    mockUseAccessControl.mockReturnValue(mockAccessControlDefaults);
   });
 
   describe('permission-based rendering', () => {
     it('should render children when user has required permission', () => {
       mockUseAccessControl.mockReturnValue({
+        ...mockAccessControlDefaults,
         hasPermission: vi.fn(() => true),
         hasAnyPermission: vi.fn(() => true),
         hasAllPermissions: vi.fn(() => true),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -43,12 +63,10 @@ describe('PermissionGuard', () => {
 
     it('should not render children when user lacks required permission', () => {
       mockUseAccessControl.mockReturnValue({
+        ...mockAccessControlDefaults,
         hasPermission: vi.fn(() => false),
         hasAnyPermission: vi.fn(() => false),
         hasAllPermissions: vi.fn(() => false),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -62,12 +80,10 @@ describe('PermissionGuard', () => {
 
     it('should render fallback when user lacks permission and fallback is provided', () => {
       mockUseAccessControl.mockReturnValue({
+        ...mockAccessControlDefaults,
         hasPermission: vi.fn(() => false),
         hasAnyPermission: vi.fn(() => false),
         hasAllPermissions: vi.fn(() => false),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -87,12 +103,8 @@ describe('PermissionGuard', () => {
   describe('multiple permissions', () => {
     it('should render when user has any of the required permissions (requireAll=false)', () => {
       mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(),
+        ...mockAccessControlDefaults,
         hasAnyPermission: vi.fn(() => true),
-        hasAllPermissions: vi.fn(() => false),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -109,12 +121,8 @@ describe('PermissionGuard', () => {
 
     it('should not render when user has all required permissions but requireAll=true', () => {
       mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(),
-        hasAnyPermission: vi.fn(() => true),
+        ...mockAccessControlDefaults,
         hasAllPermissions: vi.fn(() => false),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -131,12 +139,8 @@ describe('PermissionGuard', () => {
 
     it('should render when user has all required permissions and requireAll=true', () => {
       mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(),
-        hasAnyPermission: vi.fn(() => true),
+        ...mockAccessControlDefaults,
         hasAllPermissions: vi.fn(() => true),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -155,12 +159,9 @@ describe('PermissionGuard', () => {
   describe('role-based rendering', () => {
     it('should render children when user has required role', () => {
       mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(() => false),
-        hasAnyPermission: vi.fn(() => false),
-        hasAllPermissions: vi.fn(() => false),
+        ...mockAccessControlDefaults,
         hasRole: vi.fn(() => true),
         hasAnyRole: vi.fn(() => true),
-        hasAllRoles: vi.fn(() => true),
       });
 
       render(
@@ -174,12 +175,9 @@ describe('PermissionGuard', () => {
 
     it('should not render children when user lacks required role', () => {
       mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(() => false),
-        hasAnyPermission: vi.fn(() => false),
-        hasAllPermissions: vi.fn(() => false),
+        ...mockAccessControlDefaults,
         hasRole: vi.fn(() => false),
         hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -195,12 +193,11 @@ describe('PermissionGuard', () => {
   describe('combined permission and role requirements', () => {
     it('should render when both permission and role requirements are met', () => {
       mockUseAccessControl.mockReturnValue({
+        ...mockAccessControlDefaults,
         hasPermission: vi.fn(() => true),
-        hasAnyPermission: vi.fn(() => true),
-        hasAllPermissions: vi.fn(() => true),
         hasRole: vi.fn(() => true),
+        hasAnyPermission: vi.fn(() => true),
         hasAnyRole: vi.fn(() => true),
-        hasAllRoles: vi.fn(() => true),
       });
 
       render(
@@ -214,12 +211,11 @@ describe('PermissionGuard', () => {
 
     it('should not render when permission requirement is met but role requirement is not', () => {
       mockUseAccessControl.mockReturnValue({
+        ...mockAccessControlDefaults,
         hasPermission: vi.fn(() => true),
         hasAnyPermission: vi.fn(() => true),
-        hasAllPermissions: vi.fn(() => true),
         hasRole: vi.fn(() => false),
         hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
       });
 
       render(
@@ -233,12 +229,11 @@ describe('PermissionGuard', () => {
 
     it('should not render when role requirement is met but permission requirement is not', () => {
       mockUseAccessControl.mockReturnValue({
+        ...mockAccessControlDefaults,
         hasPermission: vi.fn(() => false),
         hasAnyPermission: vi.fn(() => false),
-        hasAllPermissions: vi.fn(() => false),
         hasRole: vi.fn(() => true),
         hasAnyRole: vi.fn(() => true),
-        hasAllRoles: vi.fn(() => true),
       });
 
       render(
@@ -253,15 +248,7 @@ describe('PermissionGuard', () => {
 
   describe('no requirements', () => {
     it('should render children when no requirements are specified', () => {
-      mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(() => false),
-        hasAnyPermission: vi.fn(() => false),
-        hasAllPermissions: vi.fn(() => false),
-        hasRole: vi.fn(() => false),
-        hasAnyRole: vi.fn(() => false),
-        hasAllRoles: vi.fn(() => false),
-      });
-
+      // No specific mock setup needed, default should suffice
       render(
         <PermissionGuard>
           <TestComponent />
@@ -278,12 +265,9 @@ describe('PermissionGuard', () => {
       const mockHasAnyRole = vi.fn(() => true);
 
       mockUseAccessControl.mockReturnValue({
-        hasPermission: vi.fn(() => true),
+        ...mockAccessControlDefaults,
         hasAnyPermission: mockHasAnyPermission,
-        hasAllPermissions: vi.fn(() => true),
-        hasRole: vi.fn(() => true),
         hasAnyRole: mockHasAnyRole,
-        hasAllRoles: vi.fn(() => true),
       });
 
       const options = { strict: true, fallbackValue: false };
