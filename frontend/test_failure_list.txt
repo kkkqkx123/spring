@@ -7,27 +7,6 @@
     <testcase name="CustomRoleCreation > should open create role modal">
       <failure_reason>Unable to find a label with the text of: Role Name</failure_reason>
     </testcase>
-    <testcase name="CustomRoleCreation > should handle role creation">
-      <failure_reason>Unable to find a label with the text of: Role Name</failure_reason>
-    </testcase>
-    <testcase name="CustomRoleCreation > should handle role editing">
-      <failure_reason>Unable to find an element with the text: Edit Custom Role.</failure_reason>
-    </testcase>
-    <testcase name="CustomRoleCreation > should handle role cloning">
-      <failure_reason>Unable to find an element with the display value: Custom Admin (Copy).</failure_reason>
-    </testcase>
-    <testcase name="CustomRoleCreation > should group permissions by category">
-      <failure_reason>Unable to find an element with the text: user.</failure_reason>
-    </testcase>
-    <testcase name="CustomRoleCreation > should handle category selection">
-      <failure_reason>Unable to find an accessible element with the role "checkbox"</failure_reason>
-    </testcase>
-    <testcase name="CustomRoleCreation > should validate form inputs">
-      <failure_reason>Unable to find an element with the text: Create Role.</failure_reason>
-    </testcase>
-    <testcase name="CustomRoleCreation > should call onRoleCreated callback">
-      <failure_reason>Unable to find a label with the text of: Role Name</failure_reason>
-    </testcase>
   </testfile>
   <testfile path="src/components/ui/__tests__/DataTable.test.tsx">
     <testcase name="DataTable > renders table with data">

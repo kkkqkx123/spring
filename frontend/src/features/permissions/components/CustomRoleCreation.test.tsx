@@ -156,18 +156,12 @@ describe('CustomRoleCreation', () => {
     fireEvent.change(nameInput, { target: { value: 'Test Role' } });
 
     // Select some permissions
-    const userCategory = screen.getByText('user');
-    fireEvent.click(userCategory);
+    const userCategoryButton = screen.getByRole('button', { name: /user/i });
+    fireEvent.click(userCategoryButton);
 
     // Find and click a permission checkbox
-    const checkboxes = screen.getAllByRole('checkbox');
-    const permissionCheckbox = checkboxes.find(checkbox =>
-      checkbox.closest('div')?.textContent?.includes('read')
-    );
-
-    if (permissionCheckbox) {
-      fireEvent.click(permissionCheckbox);
-    }
+    const permissionCheckbox = await screen.findByLabelText('read');
+    fireEvent.click(permissionCheckbox);
 
     // Submit form
     const submitButton = screen.getByText('Create Role');
@@ -176,8 +170,8 @@ describe('CustomRoleCreation', () => {
     await waitFor(() => {
       expect(mockCreateRole).toHaveBeenCalledWith({
         name: 'Test Role',
-        description: undefined,
-        permissionIds: expect.any(Array),
+        description: '',
+        permissionIds: ['1'],
       });
     });
   });
