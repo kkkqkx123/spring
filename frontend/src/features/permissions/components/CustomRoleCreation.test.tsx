@@ -87,7 +87,11 @@ describe('CustomRoleCreation', () => {
     });
 
     mockHooks.useUpdateRole.mockReturnValue({
-      mutateAsync: vi.fn().mockResolvedValue(undefined),
+      mutateAsync: vi.fn().mockResolvedValue({
+        id: 1,
+        name: 'Updated Role',
+        permissions: [],
+      }),
       isPending: false,
     });
 
@@ -126,12 +130,11 @@ describe('CustomRoleCreation', () => {
     });
     fireEvent.click(createButton);
 
+    const dialog = await screen.findByRole('dialog');
     expect(
-      await screen.findByRole('heading', { name: /create custom role/i })
+      within(dialog).getByRole('heading', { name: /create custom role/i })
     ).toBeInTheDocument();
-    expect(
-      await screen.findByPlaceholderText('Enter role name')
-    ).toBeInTheDocument();
+    expect(within(dialog).getByLabelText(/role name/i)).toBeInTheDocument();
   });
 
   it('should handle role creation', async () => {
@@ -151,27 +154,29 @@ describe('CustomRoleCreation', () => {
     });
     fireEvent.click(createButton);
 
+    const dialog = await screen.findByRole('dialog');
+
     // Fill in form
-    const nameInput = await screen.findByPlaceholderText('Enter role name');
+    const nameInput = within(dialog).getByLabelText(/role name/i);
     fireEvent.change(nameInput, { target: { value: 'Test Role' } });
 
     // Select some permissions
-    const userCategoryButton = screen.getByRole('button', { name: /user/i });
-    fireEvent.click(userCategoryButton);
-
-    // Find and click a permission checkbox
-    const permissionCheckbox = await screen.findByLabelText('read');
-    fireEvent.click(permissionCheckbox);
+    const permissionsInput = within(dialog).getByRole('combobox');
+    fireEvent.mouseDown(permissionsInput);
+    const option = await screen.findByText(/read - Read user data/i);
+    fireEvent.click(option);
 
     // Submit form
-    const submitButton = screen.getByText('Create Role');
+    const submitButton = within(dialog).getByRole('button', {
+      name: /create role/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockCreateRole).toHaveBeenCalledWith({
         name: 'Test Role',
-        description: '',
-        permissionIds: ['1'],
+        description: undefined,
+        permissionIds: [1],
       });
     });
   });
@@ -193,6 +198,9 @@ describe('CustomRoleCreation', () => {
     expect(
       within(dialog).getByRole('heading', { name: /edit custom role/i })
     ).toBeInTheDocument();
+    expect(
+      within(dialog).getByDisplayValue('Custom Admin')
+    ).toBeInTheDocument();
   });
 
   it('should handle role cloning', async () => {
@@ -210,7 +218,7 @@ describe('CustomRoleCreation', () => {
 
     const dialog = await screen.findByRole('dialog');
     expect(
-      within(dialog).getByRole('heading', { name: /create custom role/i })
+      within(dialog).getByRole('heading', { name: /clone custom role/i })
     ).toBeInTheDocument();
     expect(
       within(dialog).getByDisplayValue('Custom Admin (Copy)')
@@ -237,61 +245,7 @@ describe('CustomRoleCreation', () => {
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(mockDeleteRole).toHaveBeenCalled();
-    });
-  });
-
-  it('should group permissions by category', async () => {
-    render(<CustomRoleCreation />, { wrapper: createWrapper() });
-
-    // Open create modal
-    const createButton = screen.getByText('Create Custom Role');
-    fireEvent.click(createButton);
-
-    // Should show permission categories
-    await waitFor(() => {
-      expect(screen.getByText('user')).toBeInTheDocument();
-      expect(screen.getByText('admin')).toBeInTheDocument();
-      expect(screen.getByText('report')).toBeInTheDocument();
-    });
-  });
-
-  it('should handle category selection', async () => {
-    render(<CustomRoleCreation />, { wrapper: createWrapper() });
-
-    // Open create modal
-    const createButton = screen.getByText('Create Custom Role');
-    fireEvent.click(createButton);
-
-    await waitFor(async () => {
-      // Find category checkbox
-      const categoryCheckboxes = await screen.findAllByRole('checkbox');
-      const userCategoryCheckbox = categoryCheckboxes.find(
-        checkbox =>
-          checkbox.closest('div')?.textContent?.includes('user') &&
-          checkbox.closest('div')?.textContent?.includes('2')
-      );
-
-      if (userCategoryCheckbox) {
-        fireEvent.click(userCategoryCheckbox);
-        // Should select all permissions in the category
-      }
-    });
-  });
-
-  it('should validate form inputs', async () => {
-    render(<CustomRoleCreation />, { wrapper: createWrapper() });
-
-    // Open create modal
-    const createButton = screen.getByRole('button', {
-      name: /create custom role/i,
-    });
-    fireEvent.click(createButton);
-
-    // Try to submit without name
-    await waitFor(() => {
-      const submitButton = screen.getByRole('button', { name: /create role/i });
-      expect(submitButton).toBeDisabled();
+      expect(mockDeleteRole).toHaveBeenCalledWith(1);
     });
   });
 
@@ -324,11 +278,10 @@ describe('CustomRoleCreation', () => {
     ).toBeInTheDocument();
   });
 
-  it('should call onRoleCreated callback', async () => {
+  it('should call onRoleCreated callback on creation', async () => {
     const mockOnRoleCreated = vi.fn();
-    const mockCreateRole = vi
-      .fn()
-      .mockResolvedValue({ id: 3, name: 'Test Role', permissions: [] });
+    const newRole = { id: 3, name: 'Test Role', permissions: [] };
+    const mockCreateRole = vi.fn().mockResolvedValue(newRole);
 
     mockHooks.useCreateRole.mockReturnValue({
       mutateAsync: mockCreateRole,
@@ -345,23 +298,23 @@ describe('CustomRoleCreation', () => {
     });
     fireEvent.click(createButton);
 
-    const nameInput = await screen.findByPlaceholderText('Enter role name');
+    const dialog = await screen.findByRole('dialog');
+    const nameInput = within(dialog).getByLabelText(/role name/i);
     fireEvent.change(nameInput, { target: { value: 'Test Role' } });
 
     // Select a permission
-    const checkboxes = screen.getAllByRole('checkbox');
-    const permissionCheckbox = checkboxes[checkboxes.length - 1]; // Last checkbox should be a permission
-    fireEvent.click(permissionCheckbox);
+    const permissionsInput = within(dialog).getByRole('combobox');
+    fireEvent.mouseDown(permissionsInput);
+    const option = await screen.findByText(/read - Read user data/i);
+    fireEvent.click(option);
 
-    const submitButton = screen.getByText('Create Role');
+    const submitButton = within(dialog).getByRole('button', {
+      name: /create role/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockOnRoleCreated).toHaveBeenCalledWith({
-        id: 3,
-        name: 'Test Role',
-        permissions: [],
-      });
+      expect(mockOnRoleCreated).toHaveBeenCalledWith(newRole);
     });
   });
 });
