@@ -1,0 +1,728 @@
+好的，这是对该测试日志的分析结果，以XML格式列出了所有失败的测试用例及其所在的测试文件和失败原因。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<test-failures>
+  <testfile path="src/features/permissions/components/CustomRoleCreation.test.tsx">
+    <testcase name="CustomRoleCreation > should open create role modal">
+      <failure_reason>Unable to find a label with the text of: Role Name</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should handle role creation">
+      <failure_reason>Unable to find a label with the text of: Role Name</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should handle role editing">
+      <failure_reason>Unable to find an element with the text: Edit Custom Role.</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should handle role cloning">
+      <failure_reason>Unable to find an element with the display value: Custom Admin (Copy).</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should group permissions by category">
+      <failure_reason>Unable to find an element with the text: user.</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should handle category selection">
+      <failure_reason>Unable to find an accessible element with the role "checkbox"</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should validate form inputs">
+      <failure_reason>Unable to find an element with the text: Create Role.</failure_reason>
+    </testcase>
+    <testcase name="CustomRoleCreation > should call onRoleCreated callback">
+      <failure_reason>Unable to find a label with the text of: Role Name</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/ui/__tests__/DataTable.test.tsx">
+    <testcase name="DataTable > renders table with data">
+      <failure_reason>Unable to find an element with the text: Name.</failure_reason>
+    </testcase>
+    <testcase name="DataTable > handles sorting when column header is clicked">
+      <failure_reason>Unable to find an element with the text: Name.</failure_reason>
+    </testcase>
+    <testcase name="DataTable > shows loading state">
+      <failure_reason>Unable to find an element with the text: Loading....</failure_reason>
+    </testcase>
+    <testcase name="DataTable > handles row selection">
+      <failure_reason>Unable to find an accessible element with the role "checkbox"</failure_reason>
+    </testcase>
+    <testcase name="DataTable > handles pagination">
+      <failure_reason>Unable to find a label with the text of: Next page</failure_reason>
+    </testcase>
+    <testcase name="DataTable > applies custom row className">
+      <failure_reason>expected "spy" to be called with arguments: [ 2 ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="DataTable > handles search functionality">
+      <failure_reason>expected "spy" to be called with arguments: [ 'John' ] but was called 0 times.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/permissions/components/PermissionManagement.test.tsx">
+    <testcase name="PermissionManagement > should render tabs for different management sections">
+      <failure_reason>Found multiple elements with the text: Role-Permission Matrix</failure_reason>
+    </testcase>
+    <testcase name="PermissionManagement > should switch between tabs">
+      <failure_reason>Found multiple elements with the text: User Role Assignment</failure_reason>
+    </testcase>
+    <testcase name="PermissionManagement > should display help section with guidance">
+      <failure_reason>Found multiple elements with the text: /Role-Permission Matrix/</failure_reason>
+    </testcase>
+    <testcase name="PermissionManagement > should accept defaultTab prop">
+      <failure_reason>Found multiple elements with the text: User Role Assignment</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/notifications/components/NotificationSettings.test.tsx">
+    <testcase name="NotificationSettings > updates quiet hours time settings">
+      <failure_reason>Found multiple elements with the text: 23:00</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/components/EmployeeSearch.test.tsx">
+    <testcase name="EmployeeSearch > shows advanced search when toggle is clicked">
+      <failure_reason>Unable to find role="combobox" and name `/department/i`</failure_reason>
+    </testcase>
+    <testcase name="EmployeeSearch > includes advanced criteria in search">
+      <failure_reason>Unable to find an accessible element with the role "combobox" and name `/department/i`</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/components/EmployeeImport.test.tsx">
+    <testcase name="EmployeeImport > displays validation errors">
+      <failure_reason>expect(received).toBeInTheDocument() - Received value must be an HTMLElement or an SVGElement. Received has type: Null</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/test/integration/employee.integration.test.tsx">
+    <testcase name="Employee Management Integration Tests > loads and displays employee list">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > handles employee search functionality">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > creates new employee successfully">
+      <failure_reason>Found a label with the text of: /employee number/i, however no form control was found associated to that label.</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > updates existing employee successfully">
+      <failure_reason>Unable to find an accessible element with the role "button" and name `/save/i`</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > deletes employee successfully">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > handles form validation errors">
+      <failure_reason>Unable to find an accessible element with the role "button" and name `/save/i`</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > handles API errors gracefully">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Employee Management Integration Tests > handles pagination correctly">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/utils/errorHandler.test.ts">
+    <testcase name="formatErrorForLogging > formats ApiError for logging">
+      <failure_reason>expected { ... } to deeply equal { timestamp: Any&lt;String&gt;, ... }</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/auth/integration/AuthFlow.test.tsx">
+    <testcase name="Authentication Flow Integration > Authenticated User Flow > allows access to protected routes with sufficient permissions">
+      <failure_reason>Found multiple elements with the text: /employees/i</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/ui/ResponsiveDataTable.test.tsx">
+    <testcase name="ResponsiveDataTable > should handle pagination">
+      <failure_reason>Unable to find an element with the text: Showing 1 to 3 of 100 entries.</failure_reason>
+    </testcase>
+    <testcase name="ResponsiveDataTable > should render custom mobile card renderer">
+      <failure_reason>useMediaQuery.mockReturnValue is not a function</failure_reason>
+    </testcase>
+    <testcase name="ResponsiveDataTable > should render default mobile cards when no custom renderer">
+      <failure_reason>useMediaQuery.mockReturnValue is not a function</failure_reason>
+    </testcase>
+    <testcase name="ResponsiveDataTable > should show view mode toggle on non-mobile">
+      <failure_reason>useMediaQuery.mockReturnValue is not a function</failure_reason>
+    </testcase>
+    <testcase name="ResponsiveDataTable > should render column content correctly">
+      <failure_reason>expect(element).toHaveStyle() failed: color: green vs rgb(0, 128, 0)</failure_reason>
+    </testcase>
+    <testcase name="ResponsiveDataTable > should handle responsive page size options">
+      <failure_reason>Cannot find module '../../utils/responsive'</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/permissions/components/RolePermissionMatrix.test.tsx">
+    <testcase name="RolePermissionMatrix > should handle role edit">
+      <failure_reason>Unable to find an element with the text: Edit Role.</failure_reason>
+    </testcase>
+    <testcase name="RolePermissionMatrix > should display loading state">
+      <failure_reason>Unable to find an element with the text: Role-Permission Matrix.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/components/EmployeeCard.test.tsx">
+    <testcase name="EmployeeCard > shows action menu with correct options">
+      <failure_reason>Unable to find an element with the text: View Details.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeCard > calls onView when View Details is clicked">
+      <failure_reason>Unable to find an element with the text: View Details.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeCard > calls onEdit when Edit is clicked">
+      <failure_reason>Unable to find an element with the text: Edit.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeCard > calls onDelete when Delete is clicked">
+      <failure_reason>Unable to find an element with the text: Delete.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/ui/ErrorBoundary.test.tsx">
+    <testcase name="ErrorBoundary > shows error details in development mode">
+      <failure_reason>Found multiple elements with the text: /Test error message/</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/layout/__tests__/AppShell.test.tsx">
+    <testcase name="AppShell > handles sidebar toggle">
+      <failure_reason>Unable to find an accessible element with the role "button" and name `/toggle navigation/i`</failure_reason>
+    </testcase>
+    <testcase name="AppShell > handles user logout">
+      <failure_reason>Unable to find an accessible element with the role "menuitem" and name `/logout/i`</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/permissions/components/PermissionImpactDialog.test.tsx">
+    <testcase name="PermissionImpactDialog > should disable buttons when loading">
+      <failure_reason>expect(element).toBeDisabled() - Received element is not disabled</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/test/accessibility/accessibility.test.tsx">
+    <testcase name="Accessibility Tests > LoginForm should not have accessibility violations">
+      <failure_reason>expectAssertion.call is not a function</failure_reason>
+    </testcase>
+    <testcase name="Accessibility Tests > EmployeeList should not have accessibility violations">
+      <failure_reason>expectAssertion.call is not a function</failure_reason>
+    </testcase>
+    <testcase name="Accessibility Tests > AppShell should not have accessibility violations">
+      <failure_reason>expectAssertion.call is not a function</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/permissions/components/RoleForm.test.tsx">
+    <testcase name="RoleForm > should render role form for creating new role">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should render role form for editing existing role">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should pre-populate form with existing role data">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should validate required fields">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should validate role name length">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should validate role name max length">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should validate description length">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should handle form submission with valid data">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should handle form submission without description">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should handle cancel button click">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should disable form when loading">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should group permissions by category">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should show permission count">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should handle permission selection">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="RoleForm > should trim whitespace from inputs">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/email/components/__tests__/EmailComposer.test.tsx">
+    <testcase name="EmailComposer > renders email composer form">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > loads and displays email templates">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > loads and displays recipients">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > updates form when template is selected">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > shows template variables when template is selected">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > validates required fields">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > sends email with valid data">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > validates template variables before sending">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > shows preview when preview button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > calls onCancel when cancel button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > shows loading state when sending email">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+    <testcase name="EmailComposer > initializes with provided initial data">
+      <failure_reason>Cannot read properties of undefined (reading 'map')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/accessibility/AccessibleButton.test.tsx">
+    <testcase name="AccessibleButton > should handle keyboard events">
+      <failure_reason>expected "spy" to be called 1 times, but got 0 times</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/notifications/components/NotificationItem.test.tsx">
+    <testcase name="NotificationItem > does not show unread indicator for read notifications">
+      <failure_reason>expect(element).toHaveStyle() failed: background-color: transparent vs rgba(0, 0, 0, 0)</failure_reason>
+    </testcase>
+    <testcase name="NotificationItem > applies correct font weight for read/unread notifications">
+      <failure_reason>@mantine/core: MantineProvider was not found in component tree</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/components/EmployeeList.test.tsx">
+    <testcase name="EmployeeList > renders employee list in table view by default">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > shows loading state when data is loading">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > shows Add Employee button when onCreateEmployee is provided">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > calls onCreateEmployee when Add Employee button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > switches between table and grid view">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > shows employee count">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > shows singular employee text for one employee">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > shows bulk actions when employees are selected">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > opens delete confirmation modal when delete button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > renders search component">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > shows More Actions menu">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="EmployeeList > calls onImportEmployees when Import Employees is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/routing/ProtectedRoute.test.tsx">
+    <testcase name="ProtectedRoute > shows access denied when user lacks required role">
+      <failure_reason>expected "spy" to be called with arguments: [ 'ADMIN' ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="ProtectedRoute > shows access denied when user lacks required permission">
+      <failure_reason>expected "spy" to be called with arguments: [ 'EMPLOYEE_READ' ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="ProtectedRoute > renders children when user has required role">
+      <failure_reason>Unable to find an element by: [data-testid="protected-content"]</failure_reason>
+    </testcase>
+    <testcase name="ProtectedRoute > renders children when user has required permission">
+      <failure_reason>Unable to find an element by: [data-testid="protected-content"]</failure_reason>
+    </testcase>
+    <testcase name="ProtectedRoute > handles multiple roles with requireAll=false (OR logic)">
+      <failure_reason>Unable to find an element by: [data-testid="protected-content"]</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/utils/__tests__/validation.test.ts">
+    <testcase name="validation utilities > validateEmail > rejects invalid email addresses">
+      <failure_reason>expected true to be false</failure_reason>
+    </testcase>
+    <testcase name="validation utilities > validatePassword > validates strong passwords">
+      <failure_reason>expected false to be true</failure_reason>
+    </testcase>
+    <testcase name="validation utilities > validatePhoneNumber > rejects invalid phone numbers">
+      <failure_reason>expected true to be false</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/ui/__tests__/LoadingSpinner.test.tsx">
+    <testcase name="LoadingSpinner > renders with custom text">
+      <failure_reason>Unable to find an element with the text: Loading data....</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/ui/LoadingSpinner.test.tsx">
+    <testcase name="LoadingSpinner > renders with custom message">
+      <failure_reason>Unable to find an element with the text: Loading data....</failure_reason>
+    </testcase>
+    <testcase name="LoadingSpinner > renders overlay with custom message">
+      <failure_reason>Unable to find an element with the text: Processing....</failure_reason>
+    </testcase>
+    <testcase name="PageLoadingSpinner > renders with custom message">
+      <failure_reason>Unable to find an element with the text: Loading page content....</failure_reason>
+    </testcase>
+    <testcase name="OverlayLoadingSpinner > renders with custom message">
+      <failure_reason>Unable to find an element with the text: Saving....</failure_reason>
+    </testcase>
+    <testcase name="FullPageLoadingSpinner > renders with custom message">
+      <failure_reason>Unable to find an element with the text: Initializing....</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/notifications/hooks/useRealTimeNotifications.test.ts">
+    <testcase name="useRealTimeNotifications > handles new notifications from WebSocket">
+      <failure_reason>expected "playNotificationSound" to be called with arguments: [ 'info' ] but was called 0 times.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/utils/accessibility.test.ts">
+    <testcase name="Accessibility Utilities > useFocusTrap > should set up focus trap when active">
+      <failure_reason>expected "spy" to be called with arguments: [ 'keydown', Any&lt;Function&gt; ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="Accessibility Utilities > useKeyboardNavigation > should call onSelect when Enter is pressed">
+      <failure_reason>expected "spy" to be called with arguments: [ 'keydown', Any&lt;Function&gt; ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="Accessibility Utilities > useAriaSelected > should handle multi-select">
+      <failure_reason>expected [ 2 ] to have a length of 2 but got 1</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/pages/EmployeesPage.test.tsx">
+    <testcase name="EmployeesPage > renders the employees page with title and employee list">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > navigates to create employee page when create is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > navigates to edit employee page when edit is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > navigates to view employee page when view is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > opens import modal when import is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > opens export modal when export is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > passes selected employees to export modal">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > closes import modal when close is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > closes export modal when close is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > handles import success and closes modal">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+    <testcase name="EmployeesPage > renders import and export modals initially closed">
+      <failure_reason>Cannot read properties of undefined (reading 'isPending')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/utils/index.test.ts">
+    <testcase name="Utility Functions > validation > should validate email correctly">
+      <failure_reason>Cannot read properties of undefined (reading 'isEmail')</failure_reason>
+    </testcase>
+    <testcase name="Utility Functions > validation > should validate phone correctly">
+      <failure_reason>Cannot read properties of undefined (reading 'isPhone')</failure_reason>
+    </testcase>
+    <testcase name="Utility Functions > validation > should validate strong password">
+      <failure_reason>Cannot read properties of undefined (reading 'isStrongPassword')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/departments/components/DepartmentDetail.test.tsx">
+    <testcase name="DepartmentDetail > renders department details correctly">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > shows loading state">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > shows error state">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > opens edit modal when edit button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > calls onEdit callback when provided">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > shows delete confirmation dialog">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > disables delete button for departments with employees">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > switches between tabs correctly">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > shows empty state for employees when none exist">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > calls onCreateChild when add subdepartment button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > calls onClose when close button is clicked">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+    <testcase name="DepartmentDetail > deletes department successfully">
+      <failure_reason>Cannot read properties of undefined (reading 'name')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/notifications/hooks/useBrowserNotifications.test.ts">
+    <testcase name="useBrowserNotifications > detects browser notification support">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > returns current permission status">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > requests permission successfully">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > handles permission request failure">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > shows browser notification when permission is granted">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > does not show notification when permission is denied">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > requires interaction for error notifications">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > auto-closes non-error notifications after 5 seconds">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > does not auto-close error notifications">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > handles notification click events">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+    <testcase name="useBrowserNotifications > returns denied permission when not supported">
+      <failure_reason>permission does not exist</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/components/ui/__tests__/FormField.test.tsx">
+    <testcase name="FormField > renders text input field">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > renders textarea field">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > renders select field">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > renders checkbox field">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > shows validation error">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > shows required indicator">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > shows help text">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > handles input change">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > handles checkbox change">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > handles select change">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > disables field when disabled prop is true">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > applies custom className">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+    <testcase name="FormField > renders with default value">
+      <failure_reason>The argument must be a React element, but you passed undefined.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/test/performance/performance.test.tsx">
+    <testcase name="Performance Tests > renders large employee list within performance budget">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Performance Tests > handles rapid state updates efficiently">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Performance Tests > memory usage stays within bounds during component lifecycle">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+    <testcase name="Performance Tests > virtual scrolling performs well with large datasets">
+      <failure_reason>Cannot read properties of undefined (reading 'length')</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/departments/components/DepartmentForm.test.tsx">
+    <testcase name="DepartmentForm > submits create form with valid data">
+      <failure_reason>expected "spy" to be called with arguments: [ { name: 'New Department', ... } ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="DepartmentForm > submits update form with valid data">
+      <failure_reason>expected "spy" to be called with arguments: [ { id: 1, ... } ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="DepartmentForm > shows loading state during submission">
+      <failure_reason>expect(element).toHaveAttribute("data-loading", "true") - Received: null</failure_reason>
+    </testcase>
+    <testcase name="DepartmentForm > shows error message on submission error">
+      <failure_reason>Unable to find an element with the text: /department name already exists/i.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/test/performance.test.tsx">
+    <testcase name="Performance Optimization Tests > Memoization Utilities > should throttle callback execution">
+      <failure_reason>expected "spy" to be called 1 times, but got 0 times</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Virtual Scrolling Performance > should render only visible items in virtual scroll list">
+      <failure_reason>expected "spy" to be called 18 times, but got 14 times</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Optimized Data Table Performance > should handle large datasets efficiently">
+      <failure_reason>expected 858.5773000000004 to be less than 100</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Store Selector Performance > should prevent unnecessary re-renders with optimized selectors">
+      <failure_reason>expected "spy" to be called 1 times, but got 2 times</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Performance Monitoring Integration > should track component render performance">
+      <failure_reason>expected "spy" to be called with arguments: [ 'TestComponent_render', Any&lt;Object&gt; ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Performance Monitoring Integration > should monitor bundle size and suggest optimizations">
+      <failure_reason>expected [] to include 'main.js exceeds size limit.'</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Performance Monitoring Integration > should detect memory leaks">
+      <failure_reason>expected null to be true</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Real-world Performance Scenarios > should optimize form validation performance">
+      <failure_reason>Unable to find an accessible element with the role "textbox" and name `/name/i`</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Advanced Performance Optimization > should optimize context updates with selective subscriptions">
+      <failure_reason>expected 2 to be 1</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Advanced Performance Optimization > should optimize list rendering with keys and stable references">
+      <failure_reason>Empty failure reason</failure_reason>
+    </testcase>
+    <testcase name="Performance Optimization Tests > Performance Regression Detection > should detect render performance regressions">
+      <failure_reason>actual value must be number or bigint, received "undefined"</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/email/components/__tests__/BulkEmailSender.test.tsx">
+    <testcase name="BulkEmailSender > validates template selection">
+      <failure_reason>Unable to find an element with the text: Template is required.</failure_reason>
+    </testcase>
+    <testcase name="BulkEmailSender > shows template variables when template is selected">
+      <failure_reason>Maximum update depth exceeded.</failure_reason>
+    </testcase>
+    <testcase name="BulkEmailSender > sends bulk email with valid data">
+      <failure_reason>Maximum update depth exceeded.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/components/EmployeeForm.test.tsx">
+    <testcase name="EmployeeForm > renders create form correctly">
+      <failure_reason>Unable to find an element with the text: Add New Employee.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeForm > renders edit form with employee data">
+      <failure_reason>Unable to find an element with the text: Edit Employee.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeForm > validates required fields">
+      <failure_reason>Unable to find an element with the text: /employee number is required/i.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeForm > validates email format">
+      <failure_reason>Found a label with the text of: /email/i, however no form control was found associated to that label.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeForm > submits form with valid data">
+      <failure_reason>Found a label with the text of: /employee number/i, however no form control was found associated to that label.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeForm > filters positions by selected department">
+      <failure_reason>Unable to find an accessible element with the role "combobox" and name `/department/i`</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/test/integration/auth.integration.test.tsx">
+    <testcase name="Authentication Integration Tests > completes full login flow successfully">
+      <failure_reason>expected "spy" to be called with arguments: [ { username: 'testuser', ... } ] but was called 0 times.</failure_reason>
+    </testcase>
+    <testcase name="Authentication Integration Tests > handles login failure with proper error display">
+      <failure_reason>Unable to find an element with the text: /invalid credentials/i.</failure_reason>
+    </testcase>
+    <testcase name="Authentication Integration Tests > handles network errors gracefully">
+      <failure_reason>Unable to find an element with the text: /network error/i.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/auth/components/__tests__/LoginForm.test.tsx">
+    <testcase name="LoginForm > submits form with valid data">
+      <failure_reason>expected "spy" to be called with arguments: [ { username: 'testuser', ... } ] but was called with different arguments.</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > shows loading state during submission">
+      <failure_reason>Unable to find an accessible element with the role "button" and name `/signing in/i`</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > shows error message on login failure">
+      <failure_reason>Unable to find an element with the text: Invalid credentials.</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > toggles password visibility">
+      <failure_reason>Unable to find a label with the text of: /toggle password visibility/i</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > shows forgot password link">
+      <failure_reason>Unable to find an element with the text: /forgot password/i.</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > handles form reset">
+      <failure_reason>Unable to find an accessible element with the role "form"</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > validates username format">
+      <failure_reason>Unable to find an element with the text: /username must be at least 3 characters/i.</failure_reason>
+    </testcase>
+    <testcase name="LoginForm > validates password format">
+      <failure_reason>Unable to find an element with the text: /password must be at least 6 characters/i.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/hooks/useLoadingState.test.ts">
+    <testcase name="useLoadingState > handles retries on failure">
+      <failure_reason>expected "spy" to be called 3 times, but got 1 times</failure_reason>
+    </testcase>
+    <testcase name="useAsyncOperation > starts and tracks async operation">
+      <failure_reason>Test timed out in 5000ms.</failure_reason>
+    </testcase>
+    <testcase name="useAsyncOperation > handles operation failure">
+      <failure_reason>Test timed out in 5000ms.</failure_reason>
+    </testcase>
+    <testcase name="useAsyncOperation > clears completed operations">
+      <failure_reason>Test timed out in 5000ms.</failure_reason>
+    </testcase>
+  </testfile>
+  <testfile path="src/features/employees/components/EmployeeExport.test.tsx">
+    <testcase name="EmployeeExport > prevents export when no fields are selected">
+      <failure_reason>Unable to find an element with the text: Deselect All.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > shows error notification when no fields are selected and export is attempted">
+      <failure_reason>Unable to find an element with the text: Deselect All.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > handles successful export">
+      <failure_reason>Test timed out in 5000ms.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > handles export failure">
+      <failure_reason>Test timed out in 5000ms.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > exports all employees when no selection is provided">
+      <failure_reason>Test timed out in 5000ms.</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > shows export progress during export">
+      <failure_reason>Unable to find an element with the text: Exporting employees....</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > disables buttons during export">
+      <failure_reason>expect(element).toBeDisabled() - Received element is not disabled</failure_reason>
+    </testcase>
+    <testcase name="EmployeeExport > displays correct field count">
+      <failure_reason>Unable to find an element with the text: 9 of 10 fields selected.</failure_reason>
+    </testcase>
+  </testfile>
+</test-failures>
+```

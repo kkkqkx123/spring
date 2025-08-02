@@ -12,16 +12,28 @@ interface VirtualizedListProps<T> {
   getItemKey?: (item: T, index: number) => string | number;
 }
 
-export function VirtualizedList<T>({
-  items,
-  itemHeight,
-  containerHeight,
-  renderItem,
-  overscan = 5,
-  className,
-  onScroll,
-  getItemKey = (_, index) => index,
-}: VirtualizedListProps<T>) {
+export interface VirtualizedListHandle {
+  scrollToIndex: (index: number) => void;
+  scrollToTop: () => void;
+  scrollToBottom: () => void;
+}
+
+export const VirtualizedList = React.forwardRef<
+  VirtualizedListHandle,
+  VirtualizedListProps<any>
+>(function VirtualizedList<T>(
+  {
+    items,
+    itemHeight,
+    containerHeight,
+    renderItem,
+    overscan = 5,
+    className,
+    onScroll,
+    getItemKey = (_, index) => index,
+  }: VirtualizedListProps<T>,
+  ref: React.ForwardedRef<VirtualizedListHandle>
+) {
   const [scrollTop, setScrollTop] = useState(0);
   const scrollElementRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +79,7 @@ export function VirtualizedList<T>({
 
   // Expose scroll methods
   React.useImperativeHandle(
-    React.forwardRef(() => null),
+    ref,
     () => ({
       scrollToIndex,
       scrollToTop: () => scrollToIndex(0),
@@ -104,35 +116,4 @@ export function VirtualizedList<T>({
       </Box>
     </ScrollArea>
   );
-}
-
-// Hook for virtualized list state management
-export function useVirtualizedList<T>(
-  items: T[],
-  itemHeight: number,
-  containerHeight: number
-) {
-  const [scrollTop, setScrollTop] = useState(0);
-
-  const visibleRange = useMemo(() => {
-    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight));
-    const endIndex = Math.min(
-      items.length - 1,
-      Math.ceil((scrollTop + containerHeight) / itemHeight)
-    );
-    return { startIndex, endIndex };
-  }, [scrollTop, itemHeight, containerHeight, items.length]);
-
-  const visibleItems = useMemo(() => {
-    const { startIndex, endIndex } = visibleRange;
-    return items.slice(startIndex, endIndex + 1);
-  }, [items, visibleRange]);
-
-  return {
-    visibleItems,
-    visibleRange,
-    totalHeight: items.length * itemHeight,
-    scrollTop,
-    setScrollTop,
-  };
-}
+});

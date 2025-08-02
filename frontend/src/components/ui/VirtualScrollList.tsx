@@ -23,11 +23,9 @@ export function VirtualScrollList<T>({
   containerHeight,
   renderItem,
   overscan = 5,
-  onScroll,
   className,
 }: VirtualScrollListProps<T>) {
   const [scrollTop, setScrollTop] = useState(0);
-  const scrollElementRef = useRef<HTMLDivElement>(null);
 
   // Calculate visible range
   const visibleRange = useMemo(() => {
@@ -49,14 +47,6 @@ export function VirtualScrollList<T>({
   }, [items, visibleRange]);
 
   // Handle scroll
-  const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      const newScrollTop = event.currentTarget.scrollTop;
-      setScrollTop(newScrollTop);
-      onScroll?.(newScrollTop);
-    },
-    [onScroll]
-  );
 
   // Total height of all items
   const totalHeight = items.length * itemHeight;
@@ -180,7 +170,6 @@ export function DynamicVirtualList<T>({
   containerHeight,
   renderItem,
   overscan = 5,
-  onScroll,
   className,
 }: {
   items: T[];
@@ -207,15 +196,6 @@ export function DynamicVirtualList<T>({
     containerHeight,
     overscan,
   });
-
-  const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      const newScrollTop = event.currentTarget.scrollTop;
-      setScrollTop(newScrollTop);
-      onScroll?.(newScrollTop);
-    },
-    [setScrollTop, onScroll]
-  );
 
   const visibleItems = useMemo(() => {
     return items.slice(visibleRange.startIndex, visibleRange.endIndex + 1);

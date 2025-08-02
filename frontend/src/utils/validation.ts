@@ -11,16 +11,14 @@ type SchemaDefinition = {
 };
 
 // Basic Validators
-export const validateEmail = (email: string | null | undefined): boolean => {
-  if (!email) return false;
+export const validateEmail = (email: unknown): boolean => {
+  if (typeof email !== 'string' || !email) return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
-export const validatePassword = (
-  password: string | null | undefined
-): boolean => {
-  if (!password) return false;
+export const validatePassword = (password: unknown): boolean => {
+  if (typeof password !== 'string' || !password) return false;
   // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
   const strongPasswordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -50,19 +48,15 @@ export const validateMaxLength = (
   return value.length <= maxLength;
 };
 
-export const validatePhoneNumber = (
-  phone: string | null | undefined
-): boolean => {
-  if (!phone) return false;
+export const validatePhoneNumber = (phone: unknown): boolean => {
+  if (typeof phone !== 'string' || !phone) return false;
   // This regex is simplified, consider a more robust one for production
   const phoneRegex = /^\+?[\d\s\-()]{10,}$/;
   return phoneRegex.test(phone);
 };
 
-export const validateEmployeeNumber = (
-  empNumber: string | null | undefined
-): boolean => {
-  if (!empNumber) return false;
+export const validateEmployeeNumber = (empNumber: unknown): boolean => {
+  if (typeof empNumber !== 'string' || !empNumber) return false;
   // Example: Must contain letters and numbers, and be at least 3 chars long
   const empNumberRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d-]{3,}$/;
   return empNumberRegex.test(empNumber);

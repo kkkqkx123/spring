@@ -32,7 +32,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 describe('LoginForm', () => {
-  const mockOnSuccess = vi.fn();
+  const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
   const mockMutateAsync = vi.fn();
 
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe('LoginForm', () => {
   it('renders login form', () => {
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -64,7 +64,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -86,7 +86,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -99,16 +99,15 @@ describe('LoginForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockMutateAsync).toHaveBeenCalledWith({
+      expect(mockOnSubmit).toHaveBeenCalledWith({
         username: 'testuser',
         password: 'password123',
+        rememberMe: false,
       });
-      expect(mockOnSuccess).toHaveBeenCalled();
     });
   });
 
   it('shows loading state during submission', async () => {
-    const user = userEvent.setup();
     mockUseLogin.mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: true,
@@ -118,7 +117,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -127,7 +126,6 @@ describe('LoginForm', () => {
   });
 
   it('shows error message on login failure', async () => {
-    const user = userEvent.setup();
     mockUseLogin.mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
@@ -137,7 +135,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -149,7 +147,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -168,7 +166,7 @@ describe('LoginForm', () => {
   it('shows remember me checkbox', () => {
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -178,7 +176,7 @@ describe('LoginForm', () => {
   it('shows forgot password link', () => {
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -190,7 +188,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -215,7 +213,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
@@ -235,7 +233,7 @@ describe('LoginForm', () => {
 
     render(
       <TestWrapper>
-        <LoginForm onSuccess={mockOnSuccess} />
+        <LoginForm onSubmit={mockOnSubmit} />
       </TestWrapper>
     );
 
