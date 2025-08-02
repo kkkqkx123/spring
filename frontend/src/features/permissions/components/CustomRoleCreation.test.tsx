@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { CustomRoleCreation } from './CustomRoleCreation';
@@ -112,14 +118,20 @@ describe('CustomRoleCreation', () => {
     expect(screen.getByText('1 permissions')).toBeInTheDocument();
   });
 
-  it('should open create role modal', () => {
+  it('should open create role modal', async () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
-    const createButton = screen.getByText('Create Custom Role');
+    const createButton = screen.getByRole('button', {
+      name: /create custom role/i,
+    });
     fireEvent.click(createButton);
 
-    expect(screen.getByText('Create Custom Role')).toBeInTheDocument();
-    expect(screen.getByLabelText('Role Name')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /create custom role/i })
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByPlaceholderText('Enter role name')
+    ).toBeInTheDocument();
   });
 
   it('should handle role creation', async () => {
@@ -134,11 +146,13 @@ describe('CustomRoleCreation', () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
     // Open create modal
-    const createButton = screen.getByText('Create Custom Role');
+    const createButton = screen.getByRole('button', {
+      name: /create custom role/i,
+    });
     fireEvent.click(createButton);
 
     // Fill in form
-    const nameInput = screen.getByLabelText('Role Name');
+    const nameInput = await screen.findByPlaceholderText('Enter role name');
     fireEvent.change(nameInput, { target: { value: 'Test Role' } });
 
     // Select some permissions
@@ -168,37 +182,45 @@ describe('CustomRoleCreation', () => {
     });
   });
 
-  it('should handle role editing', () => {
+  it('should handle role editing', async () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
-    // Find edit button
-    const editButtons = screen.getAllByRole('button');
-    const editButton = editButtons.find(button =>
-      button.querySelector('svg')?.classList.contains('tabler-icon-edit')
-    );
+    // Find edit button by its icon
+    const editButton = screen
+      .getAllByRole('button')
+      .find(button => button.querySelector('.tabler-icon-edit'));
 
-    if (editButton) {
-      fireEvent.click(editButton);
-      expect(screen.getByText('Edit Custom Role')).toBeInTheDocument();
+    if (!editButton) {
+      throw new Error('Edit button not found');
     }
+    fireEvent.click(editButton);
+
+    const dialog = await screen.findByRole('dialog');
+    expect(
+      within(dialog).getByRole('heading', { name: /edit custom role/i })
+    ).toBeInTheDocument();
   });
 
-  it('should handle role cloning', () => {
+  it('should handle role cloning', async () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
-    // Find clone button
-    const cloneButtons = screen.getAllByRole('button');
-    const cloneButton = cloneButtons.find(button =>
-      button.querySelector('svg')?.classList.contains('tabler-icon-copy')
-    );
+    // Find clone button by its icon
+    const cloneButton = screen
+      .getAllByRole('button')
+      .find(button => button.querySelector('.tabler-icon-copy'));
 
-    if (cloneButton) {
-      fireEvent.click(cloneButton);
-      expect(screen.getByText('Create Custom Role')).toBeInTheDocument();
-      expect(
-        screen.getByDisplayValue('Custom Admin (Copy)')
-      ).toBeInTheDocument();
+    if (!cloneButton) {
+      throw new Error('Clone button not found');
     }
+    fireEvent.click(cloneButton);
+
+    const dialog = await screen.findByRole('dialog');
+    expect(
+      within(dialog).getByRole('heading', { name: /create custom role/i })
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByDisplayValue('Custom Admin (Copy)')
+    ).toBeInTheDocument();
   });
 
   it('should handle role deletion', async () => {
@@ -210,22 +232,22 @@ describe('CustomRoleCreation', () => {
 
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
-    // Find delete button
-    const deleteButtons = screen.getAllByRole('button');
-    const deleteButton = deleteButtons.find(button =>
-      button.querySelector('svg')?.classList.contains('tabler-icon-trash')
-    );
+    // Find delete button by its icon
+    const deleteButton = screen
+      .getAllByRole('button')
+      .find(button => button.querySelector('.tabler-icon-trash'));
 
-    if (deleteButton) {
-      fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        expect(mockDeleteRole).toHaveBeenCalled();
-      });
+    if (!deleteButton) {
+      throw new Error('Delete button not found');
     }
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(mockDeleteRole).toHaveBeenCalled();
+    });
   });
 
-  it('should group permissions by category', () => {
+  it('should group permissions by category', async () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
     // Open create modal
@@ -233,42 +255,50 @@ describe('CustomRoleCreation', () => {
     fireEvent.click(createButton);
 
     // Should show permission categories
-    expect(screen.getByText('user')).toBeInTheDocument();
-    expect(screen.getByText('admin')).toBeInTheDocument();
-    expect(screen.getByText('report')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('user')).toBeInTheDocument();
+      expect(screen.getByText('admin')).toBeInTheDocument();
+      expect(screen.getByText('report')).toBeInTheDocument();
+    });
   });
 
-  it('should handle category selection', () => {
+  it('should handle category selection', async () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
     // Open create modal
     const createButton = screen.getByText('Create Custom Role');
     fireEvent.click(createButton);
 
-    // Find category checkbox
-    const categoryCheckboxes = screen.getAllByRole('checkbox');
-    const userCategoryCheckbox = categoryCheckboxes.find(
-      checkbox =>
-        checkbox.closest('div')?.textContent?.includes('user') &&
-        checkbox.closest('div')?.textContent?.includes('2')
-    );
+    await waitFor(async () => {
+      // Find category checkbox
+      const categoryCheckboxes = await screen.findAllByRole('checkbox');
+      const userCategoryCheckbox = categoryCheckboxes.find(
+        checkbox =>
+          checkbox.closest('div')?.textContent?.includes('user') &&
+          checkbox.closest('div')?.textContent?.includes('2')
+      );
 
-    if (userCategoryCheckbox) {
-      fireEvent.click(userCategoryCheckbox);
-      // Should select all permissions in the category
-    }
+      if (userCategoryCheckbox) {
+        fireEvent.click(userCategoryCheckbox);
+        // Should select all permissions in the category
+      }
+    });
   });
 
-  it('should validate form inputs', () => {
+  it('should validate form inputs', async () => {
     render(<CustomRoleCreation />, { wrapper: createWrapper() });
 
     // Open create modal
-    const createButton = screen.getByText('Create Custom Role');
+    const createButton = screen.getByRole('button', {
+      name: /create custom role/i,
+    });
     fireEvent.click(createButton);
 
     // Try to submit without name
-    const submitButton = screen.getByText('Create Role');
-    expect(submitButton).toBeDisabled();
+    await waitFor(() => {
+      const submitButton = screen.getByRole('button', { name: /create role/i });
+      expect(submitButton).toBeDisabled();
+    });
   });
 
   it('should display loading state', () => {
@@ -316,10 +346,12 @@ describe('CustomRoleCreation', () => {
     });
 
     // Open create modal and create a role
-    const createButton = screen.getByText('Create Custom Role');
+    const createButton = screen.getByRole('button', {
+      name: /create custom role/i,
+    });
     fireEvent.click(createButton);
 
-    const nameInput = screen.getByLabelText('Role Name');
+    const nameInput = await screen.findByPlaceholderText('Enter role name');
     fireEvent.change(nameInput, { target: { value: 'Test Role' } });
 
     // Select a permission
